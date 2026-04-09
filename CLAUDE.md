@@ -3,7 +3,7 @@ Personal finance app. Solo dev, Figma-first, TS-strict.
 Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 
 ## Workspace Layout & Boundaries
-- `apps/web`: Next.js 15+ App Router.
+- `apps/web`: Next.js 16 App Router.
 - `apps/mobile`: Expo Router.
 - `packages/db`: Drizzle only. Single source of truth. Integers for cents.
 - `packages/types`: Zod schemas + shared types. Zero runtime deps.
@@ -31,3 +31,4 @@ Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 - **Edits**: Surgical edits only. No commentary on "what" the code does.
 - **Check**: Always check `packages/types` before creating new interfaces.
 - **Ask Before**: Schema changes, adding deps, or auth flow changes.
+- **Context7**: Before using any framework API, file convention, or library feature, resolve the latest docs via Context7. This applies to: Next.js (file conventions, routing, APIs), Expo, Drizzle, Neon Auth, shadcn/ui, Tailwind v4, Zod, TanStack. Never rely on training-data assumptions for version-specific behaviour.
