@@ -208,7 +208,7 @@ pnpm --filter web add @neondatabase/auth-nextjs
 pnpm --filter mobile add @neondatabase/auth-expo
 ```
 
-Route protection is done via Next.js middleware (`apps/web/middleware.ts`) validating the Neon Auth JWT on every `/(dashboard)/*` route.
+Route protection is done via Next.js proxy (`apps/web/proxy.ts`) validating the Neon Auth JWT on every `/(dashboard)/*` route.
 
 ---
 

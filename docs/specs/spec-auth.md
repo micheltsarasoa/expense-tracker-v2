@@ -52,7 +52,7 @@ Session data is never stored in the DB — JWT only (HTTP-only cookie).
 
 ## Route Protection
 
-Middleware (`apps/web/middleware.ts`) runs on every request to `/(dashboard)/*`.  
+Proxy (`apps/web/proxy.ts`) runs on every request to `/(dashboard)/*`.  
 Redirects unauthenticated users to `/login`.  
 Public routes: `/login`, `/register`, `/api/auth/*`, `/api/v1/auth/register`.
 
@@ -102,6 +102,6 @@ Actions: Submit / link to Login
 - `users` table structure stays the same; password hashing delegated to Neon Auth
 
 **What stays the same:**
-- Route protection middleware (updated to validate Neon Auth tokens)
+- Route protection proxy (updated to validate Neon Auth tokens)
 - Same `/login` and `/register` UI pages
 - Same business rules (rate limiting, password strength)

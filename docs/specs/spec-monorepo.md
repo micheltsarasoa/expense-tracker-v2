@@ -42,7 +42,7 @@ expense-tracker/
 - Owns all `/api/v1/*` REST routes
 - Uses `@expense-tracker/db` directly for data access
 - Uses `@expense-tracker/types` for request/response typing
-- Auth: Neon Auth (server-side token validation in middleware)
+- Auth: Neon Auth (server-side token validation in proxy)
 
 ### `apps/mobile`
 - Expo SDK, Expo Router (file-based routing — mirrors web route structure where possible)
@@ -61,7 +61,7 @@ graph LR
   end
   subgraph apps/web
     API[Next.js API /api/v1]
-    MW[Auth Middleware]
+    MW[Auth Proxy]
   end
   subgraph packages/db
     DB[Drizzle + Neon]
