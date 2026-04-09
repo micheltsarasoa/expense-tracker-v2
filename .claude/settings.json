@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(pnpm *)",
+      "Bash(npx *)",
+      "Bash(tsx *)",
+      "Bash(drizzle-kit *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE '\"git commit'; then pnpm --prefix \"$(git rev-parse --show-toplevel)\" lint && pnpm --prefix \"$(git rev-parse --show-toplevel)\" typecheck; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
