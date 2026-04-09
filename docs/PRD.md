@@ -25,21 +25,31 @@ Individuals managing personal finances who want full control over their data wit
 - Mobile app
 - AI-powered features
 
-## Feature List
+## Feature List & Priority Matrix
 
-| Feature | Description |
-|---|---|
-| Auth | Email + password registration and login |
-| Transactions | CRUD for income / expense / transfer, with soft delete |
-| Accounts | Multiple payment methods with auto-tracked balances |
-| Categories | Hierarchical (parent → child), typed income/expense |
-| Labels | Free-form color-coded tags for transactions |
-| Budgets | Period-based budgets (one-time / weekly / monthly / yearly) |
-| Dashboard | Financial overview, recent transactions, budget status |
-| Reports | Spending charts by category and time |
-| Import | CSV / Excel bulk import with downloadable template |
-| Settings | Customizable number format, date format, currency symbol |
-| Dark mode | Light / dark theme toggle |
+| Priority | Feature | Description |
+|----------|---------|-------------|
+| P0 | Auth | Email + password registration and login (Neon Auth) |
+| P0 | Transactions | CRUD for income / expense / transfer, with soft delete |
+| P0 | Accounts | Multiple payment methods with auto-tracked balances |
+| P0 | Categories | Hierarchical (parent → child), typed income/expense |
+| P0 | Dashboard | Financial overview, recent transactions, budget status |
+| P0 | Settings | Customizable number format, date format, currency symbol |
+| P1 | Labels | Free-form tags for transactions (single label per transaction) |
+| P1 | Budgets | Period-based budgets with explicit start/end dates |
+| P1 | Reports | Spending charts by category and time |
+| P1 | Import | CSV / Excel bulk import with downloadable template |
+| P2 | Dark mode | Light / dark theme toggle |
+| P2 | Budget suggestions (rule-based) | Detect recurring patterns, propose budgets |
+| P2 | Forecast view | Monthly cash flow projection |
+| Scope 2 | Budget suggestions (AI) | LLM-powered pattern detection |
+| Scope 2 | Multi-label (M:N) | Many-to-many transaction ↔ label relationship |
+| Scope 2 | Mobile app | Expo + Expo Router (ships after web) |
+
+**P0** — Required at launch. Blocks all other features.
+**P1** — Ships in v2 but not blocking launch.
+**P2** — Ships in v2 if time permits; deferred otherwise.
+**Scope 2** — Explicitly out of v2 scope.
 
 ## Architecture (v1)
 
