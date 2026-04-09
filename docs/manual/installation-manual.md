@@ -80,7 +80,7 @@ mkdir -p apps packages
 cd apps
 npx create-next-app@latest web \
   --typescript --tailwind --eslint \
-  --app --src-dir --import-alias "@/*"
+  --app --import-alias "@/*"
 
 # Mobile app (Expo)
 npx create-expo-app@latest mobile --template blank-typescript
@@ -208,7 +208,7 @@ pnpm --filter web add @neondatabase/auth-nextjs
 pnpm --filter mobile add @neondatabase/auth-expo
 ```
 
-Route protection is done via Next.js middleware (`apps/web/src/middleware.ts`) validating the Neon Auth JWT on every `/(dashboard)/*` route.
+Route protection is done via Next.js middleware (`apps/web/middleware.ts`) validating the Neon Auth JWT on every `/(dashboard)/*` route.
 
 ---
 

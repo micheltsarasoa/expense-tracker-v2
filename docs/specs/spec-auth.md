@@ -52,7 +52,7 @@ Session data is never stored in the DB — JWT only (HTTP-only cookie).
 
 ## Route Protection
 
-Middleware runs on every request to `/(dashboard)/*`.  
+Middleware (`apps/web/middleware.ts`) runs on every request to `/(dashboard)/*`.  
 Redirects unauthenticated users to `/login`.  
 Public routes: `/login`, `/register`, `/api/auth/*`, `/api/v1/auth/register`.
 
