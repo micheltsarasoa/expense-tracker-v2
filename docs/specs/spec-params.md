@@ -76,7 +76,7 @@ labels
 ### Business Rules
 
 - Free-form tags, no hierarchy
-- One label per transaction (v1) — consider many-to-many in v2
+- One label per transaction in v2 — M:N relationship deferred to scope 2
 - No system defaults; fully user-created
 - Deleting a label does not delete linked transactions (labelId → null)
 
@@ -125,7 +125,7 @@ payment_methods
 
 ### Business Rules
 
-- `currentBalance` is maintained automatically via DB trigger on transaction insert / update / delete — do not set manually
+- `currentBalance` is maintained by `TransactionService` (DB transaction, no SQL trigger) — do not set manually
 - Deactivated accounts (`isActive = false`) are hidden from transaction forms but their history is preserved
 - Transfer transactions require two distinct active accounts
 
@@ -201,7 +201,7 @@ Error states:
 
 ## v2 Notes
 
-- **Labels → many-to-many**: a transaction should support multiple labels
-- **Categories**: consider allowing icon upload or emoji picker in Figma design
-- **Accounts**: add `currency` field per account for multi-currency (future scope)
-- **Settings**: add `language` / `locale` field to drive date/number formatting via `Intl`
+- **Labels → M:N**: deferred to scope 2. Single label per transaction at launch.
+- **Categories**: consider icon upload or emoji picker in Figma design
+- **Accounts**: `currency` field per account for multi-currency — future scope
+- **Settings**: moved to [spec-settings.md](spec-settings.md)

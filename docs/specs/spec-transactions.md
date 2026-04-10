@@ -30,7 +30,7 @@ transactions
 - `transfer` type: `toPaymentMethodId` required, must differ from `paymentMethodId`, no `categoryId`
 - `income` / `expense`: `categoryId` required, `toPaymentMethodId` null
 - Deleting a transaction is always soft (sets `isDeleted = true`)
-- Account balances are updated automatically via DB trigger on insert / update / delete
+- Account balances are updated by `TransactionService` inside a `db.transaction()` block — no SQL triggers
 
 ## Operations
 
@@ -47,10 +47,7 @@ transactions
 
 ## Import
 
-- Accepted formats: `.csv`, `.xlsx`, `.xls`
-- Downloadable template with required columns
-- Two-step: validate first (returns errors per row), then commit
-- Libraries: PapaParse (CSV), SheetJS (Excel)
+See [spec-import.md](spec-import.md) for the full import specification (template columns, validation rules, error handling, UI flow).
 
 ## UI Pages
 
@@ -76,7 +73,7 @@ Fields:
 Behavior:
 - Switching **Type** resets Category and clears / shows "To account"
 - Edit pre-fills all fields
-- Submitting triggers account balance recalculation (via DB trigger — no client action needed)
+- Submitting triggers account balance recalculation (handled server-side by TransactionService)
 
 Error states:
 - Validation errors (missing required field, amount ≤ 0, same from/to account) → inline, below the relevant field

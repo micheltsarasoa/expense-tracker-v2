@@ -141,10 +141,11 @@ As a user, I want the app to suggest budgets based on my recurring transaction p
 - Each suggestion shows estimated amount, suggested dates, and a confidence level
 - I can accept (creates the budget), edit the amount, or dismiss
 
-**US-BDG-07 — Budget suggestions — AI-powered (v2, scope 2)**
+**US-BDG-07 — Budget suggestions — AI-powered (scope 2 — deferred)**
 As a user, I want AI-powered budget suggestions that group my spending by intent so that I get smarter recommendations than simple pattern matching.
 - The app sends anonymized transaction history (no descriptions) to an LLM
 - Suggestions include reasoning and are validated against rule-based results
+- *Not in v2 scope. Deferred pending LLM provider selection.*
 
 **US-BDG-08 — Forecast view (v2)**
 As a user, I want to see a projected end-of-month balance so that I can make spending decisions with confidence.
@@ -177,6 +178,8 @@ As a user, I want to delete a category I no longer use so that my list stays tid
 ---
 
 ## Labels
+
+> Single label per transaction in v2. Many-to-many (M:N) is deferred to scope 2.
 
 **US-LBL-01 — Create a label**
 As a user, I want to create colored labels so that I can tag transactions with cross-cutting themes (e.g. "vacation", "reimbursable").
