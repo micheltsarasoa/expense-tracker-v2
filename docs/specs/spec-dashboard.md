@@ -52,7 +52,7 @@ All data is scoped to the authenticated user.
 
 - All widgets load in parallel (independent queries)
 - Date scope selector: current month (default), last 30 days, current year
-- Charts: Recharts (v1) — library choice open for v2
+- Charts: shadcn/ui Charts (built on Recharts, pre-themed with Tailwind v4 tokens)
 - Responsive grid layout: 2-col on desktop, 1-col on mobile
 
 ## v2 Notes

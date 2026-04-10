@@ -64,4 +64,4 @@ No modals — reports are read-only. Interactions are:
 - Add CSV export per view
 - Consider a **custom date range** calendar picker (v1 only has presets)
 - Balance history view is missing in v1 — worth adding in v2
-- Chart library choice is open for v2 (Recharts used in v1)
+- Chart library: shadcn/ui Charts (built on Recharts, pre-themed with Tailwind v4 tokens)

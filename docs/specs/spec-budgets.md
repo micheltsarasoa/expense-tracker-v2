@@ -85,25 +85,60 @@ Actions: Delete (destructive) / Cancel
 **Goal:** detect recurring transactions and propose a budget for them.
 
 **Detection algorithm:**
-1. For each `(categoryId, description_normalized)` group, count occurrences over the last 3–6 months
-2. If a group appears ≥ 2 times in ≥ 2 distinct months → mark as recurring
-3. Compute `avg_amount` and infer `periodType` from the gap between occurrences
-4. Surface as a suggestion: "You spend ~€X/month on [category]. Create a budget?"
+
+```
+Input:  transactions for the authenticated user, last 6 months
+Output: list of SuggestedBudget objects
+
+1. Normalize descriptions
+   - Lowercase, strip punctuation, collapse whitespace
+   - e.g. "NETFLIX.COM/123" → "netflix"
+
+2. Group transactions by (categoryId, normalizedDescription)
+
+3. For each group:
+   a. Collect the distinct calendar months that contain ≥ 1 transaction
+   b. If distinctMonths < 2 → skip (not enough history)
+   c. If totalOccurrences < 2 → skip
+   d. Compute avgAmount = mean of all amounts in the group (cents)
+   e. Ignore groups where avgAmount < 100 (< €1.00) — noise filter
+
+4. Compute confidence:
+   - distinctMonths ≥ 5 → high
+   - distinctMonths ≥ 3 → medium
+   - distinctMonths = 2 → low
+
+5. Infer suggested date range:
+   - suggestedStartDate = first day of next calendar month
+   - suggestedEndDate   = last day of next calendar month
+
+6. De-duplicate: if an active budget already covers the same (categoryId, next month)
+   → skip that group (don't suggest what already exists)
+
+7. Sort output: high confidence first, then by avgAmount DESC
+```
 
 **Suggested budget object:**
-```
+```ts
 {
-  name: string           // e.g. "Netflix"
-  suggestedAmount: number
-  suggestedStartDate: date   // e.g. first day of next month
-  suggestedEndDate: date     // e.g. last day of next month
-  categoryId: uuid
-  confidence: low|medium|high
-  basedOnMonths: number
+  id: string             // deterministic hash of (userId, categoryId, normalizedDescription)
+  name: string           // normalizedDescription, title-cased (e.g. "Netflix")
+  suggestedAmount: number        // avgAmount in cents
+  suggestedStartDate: string     // YYYY-MM-DD, first day of next month
+  suggestedEndDate: string       // YYYY-MM-DD, last day of next month
+  categoryId: string
+  categoryName: string
+  confidence: 'low' | 'medium' | 'high'
+  basedOnMonths: number          // distinctMonths count
+  basedOnTransactions: number    // totalOccurrences count
 }
 ```
 
-**User action:** accept (creates budget), edit amount, or dismiss.
+**Dismissal:** dismissed suggestions are stored (userId + suggestion id) and excluded from future runs.
+
+**Refresh:** suggestions are recomputed on demand (`GET /api/v1/budgets/suggestions`) — not cached long-term.
+
+**User actions per suggestion:** Accept (creates budget with suggested values, pre-filled in modal) · Edit amount (opens create modal pre-filled) · Dismiss (hides permanently).
 
 ## v2 — Budget Suggestions (scope 2: AI-powered)
 
