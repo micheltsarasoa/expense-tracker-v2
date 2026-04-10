@@ -15,13 +15,14 @@
 - [x] **Environment Mapping**: `.env.example` at root covers all required variables.
 
 ## 1.3 Schema Design (`packages/db/schema/`)
-- [ ] **ERD Draft**: Mermaid diagram of the 7-table schema.
-- [ ] **Type Safety**: Replace SQL `CHECK` constraints with Drizzle `pgEnum`.
-- [ ] **Budget Logic**: Resolve nullable `categoryId` / `labelId` on budgets table.
+- [x] **ERD Draft**: Mermaid diagram of the 7-table schema — in `docs/tech-spec.md`.
+- [ ] **Type Safety**: Replace SQL `CHECK` constraints with Drizzle `pgEnum` — deferred to Phase 4 (requires scaffolded packages).
+- [x] **Budget Logic**: `categoryId` / `labelId` nullable on budgets — resolved in `docs/tech-spec.md` and `spec-budgets.md`.
 
 ## 1.4 Workspace Setup
 - [x] **Project Context**: `CLAUDE.md` and `.claude/settings.json` initialized.
-- [x] **Slash Commands**: `/sync`, `/commit`, `/feature`, `/component`, `/migrate`, `/seed`.
+- [x] **Branching Strategy**: One branch per PR, `claude/<name>` off latest `main` — documented in `CLAUDE.md`.
+- [x] **Slash Commands**: `/sync`, `/commit`, `/feature`, `/component`, `/migrate`, `/seed`, `/pr`.
 - [ ] **Quality Gates**: ESLint / Prettier / Husky — deferred to Phase 3 (requires scaffolded apps).
 
 ---
