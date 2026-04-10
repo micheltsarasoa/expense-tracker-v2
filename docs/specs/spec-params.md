@@ -117,7 +117,7 @@ payment_methods
   name            text
   type            enum(checking, savings, credit_card, cash, investment, other)
   initialBalance  numeric
-  currentBalance  numeric   (auto-updated by DB trigger)
+  currentBalance  numeric   (maintained by TransactionService — never set manually)
   icon            text
   color           hex string
   isActive        boolean default true
@@ -162,40 +162,7 @@ Actions: Deactivate / Delete / Cancel
 
 ## 4. User Settings
 
-### Data Model
-
-```
-user_settings
-  id                uuid PK
-  userId            uuid FK → users (unique)
-  decimalSeparator  text  (e.g. "." or ",")
-  thousandSeparator text  (e.g. "," or "." or " ")
-  dateFormat        text  (e.g. "DD/MM/YYYY")
-  timeFormat        enum(12h, 24h)
-  currencySymbol    text  (e.g. "€", "$")
-  currencyPosition  enum(before, after)
-```
-
-### Business Rules
-
-- One row per user — created with defaults on registration
-- Settings applied globally to all number and date display across the app
-- Formatting is client-side only; raw values are always stored as numeric in the DB
-
-### Operations
-
-| Operation | Endpoint |
-|---|---|
-| Get | `GET /api/v1/settings` |
-| Update | `PUT /api/v1/settings` |
-
-### UI
-
-Settings is a **full page form** at `/settings` — not a modal. Fields are grouped into sections (Number format, Date format, Currency). Changes are saved on submit (single "Save" button), not auto-saved.
-
-Error states:
-- API failure on save → toast: "Failed to save settings. Please try again."
-- Success → toast: "Settings saved."
+Full spec lives in [spec-settings.md](spec-settings.md).
 
 ---
 
@@ -204,4 +171,3 @@ Error states:
 - **Labels → M:N**: deferred to scope 2. Single label per transaction at launch.
 - **Categories**: consider icon upload or emoji picker in Figma design
 - **Accounts**: `currency` field per account for multi-currency — future scope
-- **Settings**: moved to [spec-settings.md](spec-settings.md)
