@@ -25,6 +25,12 @@ Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 - **Forms**: Reuse Zod schemas from `packages/types` in both RHF and Server Actions.
 - **UI**: shadcn/ui + Tailwind v4 (@theme). Follow Figma exactly.
 
+## Branching Strategy
+- **One branch per PR.** Never reuse a branch after its PR is merged.
+- Branch naming: `claude/<short-kebab-description>` (e.g. `claude/auth-proxy`, `claude/db-schema`)
+- Always branch off the latest `main`: `git fetch origin main && git checkout -b claude/<name> origin/main`
+- Before starting any new batch of work, check current branch — if it was already merged, create a new one.
+
 ## Agent Instructions
 - **Context**: If session exceeds 20k tokens, suggest a `compact` or `clear`.
 - **Specs**: Read `docs/specs/` first. If missing, STOP and ask.

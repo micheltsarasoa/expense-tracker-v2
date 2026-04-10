@@ -1,21 +1,29 @@
 Create a conventional commit for the current changes and push.
 
-Steps:
-1. `git status` — see changed files
-2. `git diff` and `git diff --cached` — understand what changed
-3. Infer commit type: `feat` | `fix` | `docs` | `refactor` | `test` | `chore` | `style`
-4. Infer scope from the changed files:
+## Pre-flight — branch check
+1. `git branch --show-current` — check the current branch
+2. `git log --oneline origin/main..HEAD` — see if there are any unpushed commits
+   - If the branch has **no commits ahead of main** (was already merged), it is stale.
+     Create a new branch before committing:
+     `git fetch origin main && git checkout -b claude/<short-description> origin/main`
+   - If the branch already has unpushed commits, continue on it.
+
+## Commit
+3. `git status` — see changed files
+4. `git diff` and `git diff --cached` — understand what changed
+5. Infer commit type: `feat` | `fix` | `docs` | `refactor` | `test` | `chore` | `style`
+6. Infer scope from the changed files:
    - `packages/db` → `db`
    - `packages/types` → `types`
    - `apps/web/app/api` → `api`
    - `apps/web/app/(dashboard)/<feature>` → feature name
    - `docs/` → `docs`
    - `.claude/` → `dx`
-5. Write a subject line: max 72 chars, imperative mood, no period
-6. Stage specific files by name — never `git add .` unless every change belongs to this commit
-7. Run `pnpm lint && pnpm typecheck` before committing — fix any errors first
-8. Commit: `git commit -m "type(scope): subject"`
-9. Push: `git push -u origin <current-branch>`
+7. Write a subject line: max 72 chars, imperative mood, no period
+8. Stage specific files by name — never `git add .` unless every change belongs to this commit
+9. Run `pnpm lint && pnpm typecheck` before committing — fix any errors first
+10. Commit: `git commit -m "type(scope): subject"`
+11. Push: `git push -u origin <current-branch>`
 
 Conventional Commits format: `type(scope): subject`
 Examples:
