@@ -2,21 +2,21 @@
 
 ## Stack
 
-| Layer | Choice | Notes |
-|-------|--------|-------|
-| Web framework | Next.js 16 — App Router | React 19, no `src/` dir |
-| Mobile | Expo SDK + Expo Router | Ships after web (scope 2 for v2 launch) |
-| Database | Neon PostgreSQL (serverless) | Already provisioned |
-| ORM | Drizzle ORM | `packages/db` is the only DB entry point |
-| Auth | Neon Auth | Replaces NextAuth — handles password hashing, JWT |
-| UI | shadcn/ui + Tailwind v4 | `@theme` tokens, no inline styles |
-| Charts | shadcn/ui Charts (Recharts) | Pre-themed, zero extra config |
-| Forms | React Hook Form + Zod | Schemas from `packages/types` |
-| Tables | TanStack Table v5 | Server-side pagination/filtering |
-| State / fetching | TanStack Query v5 | Optimistic updates via `onMutate` |
-| Import | PapaParse (CSV) + SheetJS (Excel) | Client-side parsing |
-| Monorepo | Turborepo + pnpm workspaces | |
-| Hosting | Vercel (web) | Neon DB branching per PR |
+| Layer            | Choice                            | Notes                                             |
+| ---------------- | --------------------------------- | ------------------------------------------------- |
+| Web framework    | Next.js 16 — App Router           | React 19, no `src/` dir                           |
+| Mobile           | Expo SDK + Expo Router            | Ships after web (scope 2 for v2 launch)           |
+| Database         | Neon PostgreSQL (serverless)      | Already provisioned                               |
+| ORM              | Drizzle ORM                       | `packages/db` is the only DB entry point          |
+| Auth             | Neon Auth                         | Replaces NextAuth — handles password hashing, JWT |
+| UI               | shadcn/ui + Tailwind v4           | `@theme` tokens, no inline styles                 |
+| Charts           | shadcn/ui Charts (Recharts)       | Pre-themed, zero extra config                     |
+| Forms            | React Hook Form + Zod             | Schemas from `packages/types`                     |
+| Tables           | TanStack Table v5                 | Server-side pagination/filtering                  |
+| State / fetching | TanStack Query v5                 | Optimistic updates via `onMutate`                 |
+| Import           | PapaParse (CSV) + SheetJS (Excel) | Client-side parsing                               |
+| Monorepo         | Turborepo + pnpm workspaces       |                                                   |
+| Hosting          | Vercel (web)                      | Neon DB branching per PR                          |
 
 ---
 
@@ -51,10 +51,10 @@ Neon PostgreSQL
 
 **Provider**: Neon Auth
 
-| Client | Token storage | Header |
-|--------|--------------|--------|
-| Web browser | HTTP-only cookie | Cookie |
-| Mobile (Expo) | `SecureStore` | `Authorization: Bearer <token>` |
+| Client        | Token storage    | Header                          |
+| ------------- | ---------------- | ------------------------------- |
+| Web browser   | HTTP-only cookie | Cookie                          |
+| Mobile (Expo) | `SecureStore`    | `Authorization: Bearer <token>` |
 
 **Route protection**: `proxy.ts` at `apps/web/proxy.ts` — validates the Neon Auth JWT on every `/(dashboard)/*` request. Redirects unauthenticated users to `/login`.
 
@@ -76,26 +76,26 @@ export class AppError extends Error {
     public readonly message: string,
     public readonly status: number,
   ) {
-    super(message)
+    super(message);
   }
 }
 
 export type ErrorCode =
-  | 'VALIDATION_ERROR'      // 400 — Zod parse failure
-  | 'UNAUTHORIZED'          // 401 — missing or invalid token
-  | 'FORBIDDEN'             // 403 — valid token, wrong userId
-  | 'NOT_FOUND'             // 404 — resource does not exist
-  | 'CONFLICT'              // 409 — duplicate (e.g. email already exists)
-  | 'UNPROCESSABLE'         // 422 — business rule violation
-  | 'INTERNAL'              // 500 — unexpected server error
+  | 'VALIDATION_ERROR' // 400 — Zod parse failure
+  | 'UNAUTHORIZED' // 401 — missing or invalid token
+  | 'FORBIDDEN' // 403 — valid token, wrong userId
+  | 'NOT_FOUND' // 404 — resource does not exist
+  | 'CONFLICT' // 409 — duplicate (e.g. email already exists)
+  | 'UNPROCESSABLE' // 422 — business rule violation
+  | 'INTERNAL'; // 500 — unexpected server error
 ```
 
 **API response envelope** (`packages/types/src/api.ts`):
 
 ```ts
 export type ApiResponse<T> =
-  | { success: true;  data: T }
-  | { success: false; error: { code: ErrorCode; message: string } }
+  | { success: true; data: T }
+  | { success: false; error: { code: ErrorCode; message: string } };
 ```
 
 Route handlers catch `AppError` and map `error.status` to the HTTP status code. Unknown errors map to `INTERNAL` / 500.
@@ -108,54 +108,66 @@ Route handlers catch `AppError` and map `error.status` to the HTTP status code. 
 erDiagram
   users {
     uuid id PK
-    text email UK
-    text name
+    varchar email UK
+    varchar name
     timestamp createdAt
     timestamp updatedAt
   }
   user_settings {
     uuid id PK
     uuid userId FK
-    text currency
-    text currencyPosition
-    text decimalSeparator
-    text thousandSeparator
-    text dateFormat
-    text timeFormat
+    varchar currencySymbol
+    varchar currencyPosition
+    varchar decimalSeparator
+    varchar thousandSeparator
+    varchar dateFormat
+    varchar timeFormat
+    timestamp createdAt
+    timestamp updatedAt
   }
   payment_methods {
     uuid id PK
     uuid userId FK
-    text name
-    text type
-    int currentBalance
+    varchar name
+    enum type
+    numeric initialBalance
+    numeric currentBalance
+    varchar icon
+    varchar color
     bool isActive
     timestamp createdAt
+    timestamp updatedAt
   }
   categories {
     uuid id PK
     uuid userId FK
     uuid parentId FK
-    text name
-    text type
-    bool isSystem
+    varchar name
+    enum type
+    varchar icon
+    varchar color
+    bool isDefault
+    timestamp createdAt
+    timestamp updatedAt
   }
   labels {
     uuid id PK
     uuid userId FK
-    text name
-    text color
+    varchar name
+    varchar color
+    timestamp createdAt
+    timestamp updatedAt
   }
   transactions {
     uuid id PK
     uuid userId FK
-    text type
-    int amount
-    date date
+    enum type
+    numeric amount
+    date transactionDate
     uuid categoryId FK
     uuid labelId FK
-    uuid accountId FK
-    uuid toAccountId FK
+    uuid paymentMethodId FK
+    uuid toPaymentMethodId FK
     text description
     bool isValidated
     bool isDeleted
@@ -165,13 +177,15 @@ erDiagram
   budgets {
     uuid id PK
     uuid userId FK
-    text name
-    int amount
+    varchar name
+    numeric amount
     date startDate
     date endDate
     uuid categoryId FK
     uuid labelId FK
+    bool isActive
     timestamp createdAt
+    timestamp updatedAt
   }
 
   users ||--o{ user_settings : "has"
@@ -189,12 +203,14 @@ erDiagram
 ```
 
 **Key constraints:**
-- `amount` is always stored in cents (integer). Never floats.
-- `transactions.type = 'transfer'` → `toAccountId` required, `categoryId` null.
-- `transactions.type = 'income' | 'expense'` → `categoryId` required, `toAccountId` null.
+
+- All monetary amounts use `numeric(15,2)`. Never integers.
+- `transactions.type = 'transfer'` → `toPaymentMethodId` required, `categoryId` null.
+- `transactions.type = 'income' | 'expense'` → `categoryId` required, `toPaymentMethodId` null.
 - All deletes on `transactions` are soft (`isDeleted = true`).
 - `payment_methods.currentBalance` is updated programmatically by `TransactionService` inside a DB transaction — no SQL triggers.
 - `budgets.categoryId` and `budgets.labelId` are both nullable (budget can be unscoped).
+- Auth is fully delegated to Neon Auth — no `password_hash` in `users`.
 
 ---
 
@@ -206,7 +222,7 @@ Every query **must** be scoped by `userId`. Use the `withUserScope` Drizzle help
 // packages/db/src/lib/scope.ts
 export const withUserScope = (userId: string) => ({
   where: (table: { userId: Column }) => eq(table.userId, userId),
-})
+});
 ```
 
 A service that omits `userId` scoping is a security bug — treat it as P0.
@@ -215,14 +231,14 @@ A service that omits `userId` scoping is a security bug — treat it as P0.
 
 ## Key Technical Decisions
 
-| Decision | Choice | Reason |
-|----------|--------|--------|
-| Auth provider | Neon Auth | Cross-platform (web cookie + mobile Bearer) |
-| Password hashing | Neon Auth (delegated) | No manual bcrypt/argon2 |
-| Balance updates | `TransactionService` DB transaction | SQL triggers are hard to test and migrate |
-| Chart library | shadcn/ui Charts | Already themed with Tailwind tokens |
-| Multi-label | Single label per transaction (M:N deferred to scope 2) | Simpler schema for v2 launch |
-| Recurring budgets | Explicit `startDate`/`endDate` only | Intentional regression from v1 |
-| Route protection | `proxy.ts` (Next.js 16) | Renamed from `middleware.ts` in Next.js 16 |
-| Amounts | Integer cents | Eliminates floating-point errors |
-| Deletes | Soft delete only (`isDeleted`) | Preserves audit trail |
+| Decision          | Choice                                                 | Reason                                      |
+| ----------------- | ------------------------------------------------------ | ------------------------------------------- |
+| Auth provider     | Neon Auth                                              | Cross-platform (web cookie + mobile Bearer) |
+| Password hashing  | Neon Auth (delegated)                                  | No manual bcrypt/argon2                     |
+| Balance updates   | `TransactionService` DB transaction                    | SQL triggers are hard to test and migrate   |
+| Chart library     | shadcn/ui Charts                                       | Already themed with Tailwind tokens         |
+| Multi-label       | Single label per transaction (M:N deferred to scope 2) | Simpler schema for v2 launch                |
+| Recurring budgets | Explicit `startDate`/`endDate` only                    | Intentional regression from v1              |
+| Route protection  | `proxy.ts` (Next.js 16)                                | Renamed from `middleware.ts` in Next.js 16  |
+| Amounts           | Integer cents                                          | Eliminates floating-point errors            |
+| Deletes           | Soft delete only (`isDeleted`)                         | Preserves audit trail                       |
