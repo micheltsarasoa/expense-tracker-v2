@@ -29,6 +29,7 @@ Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 - **Exports**: Named exports only (except Next.js pages/Expo screens).
 - **Forms**: Reuse Zod schemas from `packages/types` in both RHF and Server Actions.
 - **UI**: shadcn/ui + Tailwind v4 (@theme). Follow Figma exactly.
+- **Figma**: https://www.figma.com/design/MQKYaxbxPsejA5IOJAVqgA/expense-tracker?node-id=0-1&p=f&t=F99hO9f2nGq7eVvo-0
 
 ## Branching Strategy
 
