@@ -67,6 +67,18 @@ Define these semantic tokens in the Tailwind v4 `@theme` block (exact hex values
 
 shadcn/ui's CSS variables (`--background`, `--foreground`, `--card`, `--border`, `--destructive`, etc.) remain as configured.
 
+### Dark mode
+
+The app supports **system-default** dark mode (CSS `prefers-color-scheme`) plus a manual **Light / Dark / System** toggle stored in user settings.
+
+Rules:
+
+- All semantic color tokens above must have dark-mode variants defined in the `@theme` block
+- Income (emerald), expense (rose), transfer (violet), and budget threshold colors must remain distinguishable in both modes — use lighter tints in dark mode (e.g. Emerald 400 instead of 600) so they don't burn against a dark background
+- Charts: axis lines, grid lines, and tooltip backgrounds must adapt to the active theme
+- Never use raw hex colors in components — always reference a semantic token so dark mode is automatic
+- The mode toggle (Light / Dark / System) lives in `/settings` under a new **Appearance** section and in the user dropdown menu in the sidebar for quick access
+
 ### Typography scale
 
 | Role                   | Tailwind classes                   | Size |
@@ -93,31 +105,31 @@ shadcn/ui's CSS variables (`--background`, `--foreground`, `--card`, `--border`,
 
 ### shadcn/ui components required
 
-| Component                                                       | Used on                                      |
-| --------------------------------------------------------------- | -------------------------------------------- |
-| `Button` — variants: default, outline, ghost, destructive, icon | Everywhere                                   |
-| `Input`                                                         | All forms                                    |
-| `Textarea`                                                      | Transaction description                      |
-| `Select`                                                        | Category, label, account dropdowns           |
-| `Combobox`                                                      | Same as Select, with search                  |
-| `Dialog`                                                        | Create / Edit / Delete / Duplicate modals    |
-| `Sheet`                                                         | Mobile drawer navigation                     |
-| `Table`                                                         | Transactions list, import preview            |
-| `Card`                                                          | Dashboard widgets, budgets, accounts         |
-| `Badge`                                                         | Transaction type, validated status, inactive |
-| `Progress`                                                      | Budget progress bars                         |
-| `Tabs`                                                          | Reports view switcher                        |
-| `Form` + `FormField`                                            | All forms                                    |
-| `Calendar` / `DatePicker`                                       | Date fields                                  |
-| `Avatar`                                                        | User menu                                    |
-| `DropdownMenu`                                                  | Row actions, user menu                       |
-| `Sonner` (Toast)                                                | Success / error feedback                     |
-| `Skeleton`                                                      | Loading states                               |
-| `Chart` — Bar, Line, Pie/Donut, Horizontal bar                  | Dashboard + Reports                          |
-| `Command`                                                       | Search and filter with keyboard navigation   |
-| `Pagination`                                                    | Transaction list                             |
-| `Separator`                                                     | Sidebar section dividers                     |
-| `Tooltip`                                                       | Icon-only buttons                            |
+| Component                                                       | Used on                                                                                                                               |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button` — variants: default, outline, ghost, destructive, icon | Everywhere                                                                                                                            |
+| `Input`                                                         | All forms                                                                                                                             |
+| `Textarea`                                                      | Transaction description                                                                                                               |
+| `Select`                                                        | Category, label, account dropdowns                                                                                                    |
+| `Combobox`                                                      | Same as Select, with search                                                                                                           |
+| `Dialog`                                                        | Create / Edit / Delete / Duplicate modals                                                                                             |
+| `Sheet`                                                         | Mobile drawer navigation + all create/edit/delete modals on mobile (< 768px) — slides up from bottom to avoid soft-keyboard conflicts |
+| `Table`                                                         | Transactions list, import preview                                                                                                     |
+| `Card`                                                          | Dashboard widgets, budgets, accounts                                                                                                  |
+| `Badge`                                                         | Transaction type, validated status, inactive                                                                                          |
+| `Progress`                                                      | Budget progress bars                                                                                                                  |
+| `Tabs`                                                          | Reports view switcher                                                                                                                 |
+| `Form` + `FormField`                                            | All forms                                                                                                                             |
+| `Calendar` / `DatePicker`                                       | Date fields                                                                                                                           |
+| `Avatar`                                                        | User menu                                                                                                                             |
+| `DropdownMenu`                                                  | Row actions, user menu                                                                                                                |
+| `Sonner` (Toast)                                                | Success / error feedback                                                                                                              |
+| `Skeleton`                                                      | Loading states                                                                                                                        |
+| `Chart` — Bar, Line, Pie/Donut, Horizontal bar                  | Dashboard + Reports                                                                                                                   |
+| `Command`                                                       | Global search palette (`⌘K` / `Ctrl+K`)                                                                                               |
+| `Pagination`                                                    | Transaction list                                                                                                                      |
+| `Separator`                                                     | Sidebar section dividers                                                                                                              |
+| `Tooltip`                                                       | Icon-only buttons                                                                                                                     |
 
 ### Custom components
 
@@ -131,6 +143,35 @@ shadcn/ui's CSS variables (`--background`, `--foreground`, `--card`, `--border`,
 | `TransactionRow`      | Table row: date + type badge + description + amount (colored) + account + category + label + validated icon + actions menu |
 | `EmptyState`          | Illustration + heading + body copy + optional CTA button                                                                   |
 | `StatCard`            | Single-metric card: label + value + optional trend arrow + percentage                                                      |
+
+### Global Search (`⌘K` / `Ctrl+K`)
+
+A `Command` palette overlay, triggered from anywhere in the app via keyboard shortcut or a search icon in the sidebar header.
+
+**Anatomy**:
+
+```
+┌─────────────────────────────────────────┐
+│ 🔍  Search transactions, accounts…      │
+├─────────────────────────────────────────┤
+│ Transactions                            │
+│   ↑ Coffee — Expense — €4.50 — 14 Apr  │
+│   ↑ Salary — Income — €3,200 — 1 Apr   │
+│ Accounts                                │
+│   💳 Visa Card — €450.00               │
+│ Navigate                                │
+│   Dashboard                             │
+│   Reports                               │
+└─────────────────────────────────────────┘
+```
+
+- Input is focused on open; `Esc` closes
+- Results grouped: **Transactions** (top 5 matches on description/amount/category) | **Accounts** | **Navigate** (all routes)
+- Selecting a transaction opens the Edit modal for that transaction
+- Selecting an account navigates to `/accounts`
+- Selecting a nav item navigates to that route
+- Empty query shows recent transactions + navigate links only
+- No results: "No results for '[query]'"
 
 ---
 
@@ -165,15 +206,15 @@ shadcn/ui's CSS variables (`--background`, `--foreground`, `--card`, `--border`,
 
 **Widget grid** — 2-column desktop, 1-column mobile:
 
-| Widget               | Grid span  | Component             | Content                                                         |
-| -------------------- | ---------- | --------------------- | --------------------------------------------------------------- |
-| Account Balances     | Full width | `BalanceCard` list    | All active accounts + grand total row                           |
-| Income this period   | Half       | `StatCard`            | Total income, emerald, trend vs previous period                 |
-| Expenses this period | Half       | `StatCard`            | Total expenses, rose, trend vs previous period                  |
-| Recent Transactions  | Full width | `TransactionRow` × 10 | Date + type + description + amount; "View all →" footer link    |
-| Budget Status        | Half       | Progress list         | Budget name + progress bar (colored) + % label                  |
-| Spending by Category | Half       | Donut chart           | Top 5 categories + "Other" slice; legend list below             |
-| Monthly Trend        | Full width | Grouped bar chart     | Last 6 months, income (emerald) + expense (rose) bars per month |
+| Widget               | Grid span  | Component             | Content                                                                                                                                                                       |
+| -------------------- | ---------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Account Balances     | Full width | `BalanceCard` list    | All active accounts + grand total row                                                                                                                                         |
+| Income this period   | Half       | `StatCard`            | Total income, emerald, trend vs previous period                                                                                                                               |
+| Expenses this period | Half       | `StatCard`            | Total expenses, rose, trend vs previous period                                                                                                                                |
+| Recent Transactions  | Full width | `TransactionRow` × 10 | Date + type + description + amount; "View all →" footer link                                                                                                                  |
+| Budget Status        | Half       | Progress list         | Budget name + progress bar (colored) + % label; over-limit budgets (≥ 100%) sorted first with a rose `AlertCircle` icon and "Over budget" label; amber warning icon at 75–99% |
+| Spending by Category | Half       | Donut chart           | Top 5 categories + "Other" slice; legend list below                                                                                                                           |
+| Monthly Trend        | Full width | Grouped bar chart     | Last 6 months, income (emerald) + expense (rose) bars per month                                                                                                               |
 
 **States**:
 
@@ -475,6 +516,8 @@ Color dot sized 12px, colored with the label's hex color
 
 **View tabs**: Spending by Category | Income vs Expenses | Balance History | Budget vs Actual
 
+**Export**: Each tab has an "Export CSV" button (outline, `Download` icon) top-right, inside the tab panel. Disabled when the tab is in empty state. Exports the underlying data for the active tab and active filters only.
+
 ---
 
 #### Tab 1 — Spending by Category
@@ -483,6 +526,7 @@ Color dot sized 12px, colored with the label's hex color
 - Right: Breakdown table — Category name | Amount | % of total
 - Colors: use category's stored hex color; auto-assign if null
 - Empty state: "No expense transactions in this period"
+- Export columns: Category, Amount, % of total
 
 #### Tab 2 — Income vs Expenses
 
@@ -490,6 +534,7 @@ Color dot sized 12px, colored with the label's hex color
 - Net line overlay on secondary Y-axis (violet) — `income − expense` per month
 - Summary row below chart: Total income | Total expenses | Net (colored by sign)
 - Empty state: "No transactions in this period"
+- Export columns: Month, Income, Expenses, Net
 
 #### Tab 3 — Balance History
 
@@ -498,6 +543,7 @@ Color dot sized 12px, colored with the label's hex color
 - Tooltip on hover: date + balance per account
 - Legend: account name + color swatch
 - Empty state: "No accounts or transactions found"
+- Export columns: Date, Account, Balance
 
 #### Tab 4 — Budget vs Actual
 
@@ -508,6 +554,7 @@ Color dot sized 12px, colored with the label's hex color
   ```
 - Bar color matches budget progress rules (emerald / amber / rose)
 - Empty state: "No budgets in this period"
+- Export columns: Budget name, Budgeted amount, Spent, Remaining, %
 
 ---
 
@@ -517,28 +564,41 @@ Color dot sized 12px, colored with the label's hex color
 
 **Sections** (separated by `Separator`):
 
-1. **Currency**
+1. **Profile**
+   - Display name: `Input`
+   - Email: `Input` (read-only if managed by auth provider; editable otherwise)
+   - Change password: "Change password" ghost button → opens a sub-form (Current password, New password, Confirm new password) inline or in a Dialog
+   - Save profile: primary button scoped to this section
+
+2. **Appearance**
+   - Theme: Toggle group — Light | Dark | System _(default)_
+   - Applies immediately without saving; persisted on "Save changes"
+
+3. **Currency**
    - Symbol: `Input` (max 3 chars), placeholder "€"
    - Position: Toggle group — Before | After
 
-2. **Number format**
+4. **Number format**
    - Decimal separator: `Input` (1 char), e.g. `.` or `,`
    - Thousand separator: `Input` (1 char), e.g. `,` or `.`
    - Inline error if both are equal: "Decimal and thousand separators must differ"
 
-3. **Date format**
+5. **Date format**
    - `Select`: DD/MM/YYYY | MM/DD/YYYY | YYYY-MM-DD
 
-4. **Time format**
+6. **Time format**
    - Toggle group: 12h | 24h
+
+7. **Danger zone** (rose-tinted section, bottom of page)
+   - "Delete my account" — destructive ghost button → confirmation Dialog: "This will permanently delete all your data. Type DELETE to confirm." — destructive CTA + Cancel
 
 **Live preview** (sticky panel below form, or aside on desktop):
 
 > Your amounts and dates will look like: **€1.234,56** on **14/04/2026 at 14:30**
 
-Updates live as the user changes settings.
+Updates live as the user changes currency/number/date/time settings.
 
-**CTA**: "Save changes" — full-width primary; shows spinner; success toast on save
+**CTA**: "Save changes" — full-width primary (excludes Profile section which has its own save); shows spinner; success toast on save
 
 ---
 
@@ -570,6 +630,18 @@ Updates live as the user changes settings.
 1. Budget card → Actions → "Duplicate"
 2. Dialog: enter new Start date + End date
 3. "Duplicate" → new card with same name/amount/filters but new dates
+
+### Find a transaction (global search)
+
+1. Press `⌘K` / `Ctrl+K` from any page — palette opens
+2. Type description, amount, or category name
+3. Select a result → Edit modal opens for that transaction
+
+### Export a report
+
+1. `/reports` → set date range + filters
+2. Select a tab (e.g. Income vs Expenses)
+3. Click "Export CSV" (top-right of tab panel) → file downloads immediately
 
 ---
 
@@ -641,3 +713,10 @@ All icons from **Lucide** (no additional icon library needed):
 | User menu         | `ChevronDown`       |
 | Collapse sidebar  | `PanelLeftClose`    |
 | Expand sidebar    | `PanelLeftOpen`     |
+| Search            | `Search`            |
+| Export / download | `Download`          |
+| Budget over-limit | `AlertCircle`       |
+| Budget warning    | `AlertTriangle`     |
+| Theme / dark mode | `Sun` / `Moon`      |
+| Danger zone       | `Trash2`            |
+| Password / lock   | `KeyRound`          |
