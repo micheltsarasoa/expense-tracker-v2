@@ -274,7 +274,22 @@ shadcn/ui's CSS variables (`--background`, `--foreground`, `--card`, `--border`,
 
 **Header**: "Budgets" + "Add budget" button
 
-**Content**: Card grid — 3 columns desktop, 2 tablet, 1 mobile
+**Filter bar** — horizontal, below header:
+
+| Filter     | Control                                                                               |
+| ---------- | ------------------------------------------------------------------------------------- |
+| Period     | Month picker (single month) or custom date range (from → to) — default: current month |
+| Type       | Segmented: All / Income / Expense                                                     |
+| Categories | Multi-select Combobox — color dot + name per option; default: All                     |
+| —          | "Reset filters" ghost button (shown only when filters are active)                     |
+
+**Content**: Budgets grouped by category, each group stacked vertically.
+
+Group header row: category color dot + category name + group aggregate (`€X spent of €Y budgeted`)
+
+Within each group: card grid — 3 columns desktop, 2 tablet, 1 mobile.
+
+Uncategorized budgets collected under a "No category" group at the bottom.
 
 **`BudgetCard` anatomy**:
 
@@ -294,7 +309,30 @@ Progress bar color: emerald < 75%, amber 75–99%, rose ≥ 100%
 
 Actions menu: Edit | Duplicate | Delete
 
-**Empty state**: "No budgets yet" + "Add budget" CTA
+**Empty state**: "No budgets yet" + "Add budget" CTA — full page, replaces groups and footer
+
+**No results for active filters**: "No budgets match your filters" + "Reset filters" link
+
+---
+
+**Fixed summary footer** — always visible at the bottom of the viewport, above the mobile tab bar:
+
+```
+┌─────────────────────────────────────────────────────┐
+│  Total income      Total expenses       Net          │
+│  +€3,200.00        -€2,150.00          +€1,050.00   │
+│  [period label: April 2026]                          │
+└─────────────────────────────────────────────────────┘
+```
+
+- Income: emerald, prefixed `+`
+- Expenses: rose, prefixed `-`
+- Net: emerald if positive, rose if negative, muted if zero; prefixed `+` or `-`
+- Period label reflects the active period filter (e.g. "April 2026", "1–15 Apr 2026")
+- Updates reactively when filters change
+- Desktop: full-width bar with top `shadow-md`; Mobile: sits above the bottom tab bar
+
+---
 
 #### Modal — Create / Edit Budget
 
