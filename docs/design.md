@@ -46,6 +46,25 @@ Protected (requires auth)
 | Tablet 768–1023px | Collapsible sidebar (icon-only or off-canvas)                       |
 | Mobile < 768px    | Bottom tab bar: Dashboard / Transactions / Budgets / Reports / More |
 
+**Mobile "More" tab contents** (Sheet drawer, slides up):
+
+- Accounts
+- Categories
+- Labels
+- Settings
+- Sign out
+
+### Sidebar user menu (desktop)
+
+Triggered by clicking Avatar + display name + `ChevronDown` at the bottom of the sidebar:
+
+| Item                 | Action                              |
+| -------------------- | ----------------------------------- |
+| Display name + email | Read-only header, no action         |
+| Theme                | Inline Light / Dark / System toggle |
+| Settings             | Navigate to `/settings`             |
+| Sign out             | Ends session, redirects to `/login` |
+
 ---
 
 ## 3. Design Tokens
@@ -133,16 +152,16 @@ Rules:
 
 ### Custom components
 
-| Component             | Description                                                                                                                |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `AmountInput`         | Numeric input, always positive; applies live currency formatting from user settings                                        |
-| `TransactionTypeTabs` | Icon + label three-way toggle: ↑ Income / ↓ Expense / ↔ Transfer                                                           |
-| `ColorPicker`         | Swatch grid (12–16 preset hex colors) for category and label color                                                         |
-| `BalanceCard`         | Account card: type icon + name + type label + balance (colored by sign) + inactive badge                                   |
-| `BudgetCard`          | Budget card: name + date range + category badge + amount + progress bar + spent/remaining                                  |
-| `TransactionRow`      | Table row: date + type badge + description + amount (colored) + account + category + label + validated icon + actions menu |
-| `EmptyState`          | Illustration + heading + body copy + optional CTA button                                                                   |
-| `StatCard`            | Single-metric card: label + value + optional trend arrow + percentage                                                      |
+| Component             | Description                                                                                                                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AmountInput`         | Numeric input, always positive; applies live currency formatting from user settings                                                                                                                       |
+| `TransactionTypeTabs` | Icon + label three-way toggle: ↑ Income / ↓ Expense / ↔ Transfer                                                                                                                                          |
+| `ColorPicker`         | Swatch grid (12–16 preset hex colors) for category and label color                                                                                                                                        |
+| `BalanceCard`         | Account card: type icon + name + type label + balance (colored by sign) + inactive badge                                                                                                                  |
+| `BudgetCard`          | Budget card: name + date range + category badge + amount + progress bar + spent/remaining                                                                                                                 |
+| `TransactionRow`      | Table row: date + type badge + description + amount (colored) + account + category + label + validated icon + actions menu                                                                                |
+| `EmptyState`          | Illustration + heading + body copy + optional CTA button. Illustration = inline SVG, one per semantic context: no-data (generic), no-results (filtered), no-budgets, no-accounts. Muted color, ~120×120px |
+| `StatCard`            | Single-metric card: label + value + optional trend arrow + percentage                                                                                                                                     |
 
 ### Global Search (`⌘K` / `Ctrl+K`)
 
@@ -253,6 +272,16 @@ A `Command` palette overlay, triggered from anywhere in the app via keyboard sho
 | Validated   | `CheckCircle` icon (emerald = validated, gray = not) |
 | Actions     | `DropdownMenu`: Edit \| Toggle validated \| Delete   |
 
+**Mobile table fallback** (< 768px): replace the 9-column table with a card list. Each card:
+
+```
+[Type badge]  Description (or "—")       Amount (colored)
+              Account · Category          Date
+                                         [Actions menu]
+```
+
+Label and Validated columns are hidden on mobile; accessible via the Edit modal.
+
 **Pagination**: 20 rows per page; prev / next arrows + "Page X of Y"
 
 **Empty states**:
@@ -294,6 +323,7 @@ A `Command` palette overlay, triggered from anywhere in the app via keyboard sho
 - Drag-and-drop zone: dashed border, upload icon, "Drop CSV or Excel file here" / "or click to browse"
 - Accepted formats: `.csv`, `.xlsx`
 - Download template link below zone: ↓ "Download import template"
+- **Mobile**: drag & drop is replaced by a single "Choose file" button (`<input type="file" accept=".csv,.xlsx">`); step indicator and preview table remain unchanged
 
 **Step 2 — Preview**
 
@@ -684,39 +714,104 @@ Consistent across every screen — no exceptions:
 
 All icons from **Lucide** (no additional icon library needed):
 
-| Concept           | Lucide icon         |
-| ----------------- | ------------------- |
-| Dashboard         | `LayoutDashboard`   |
-| Transactions      | `ArrowLeftRight`    |
-| Budgets           | `Target`            |
-| Accounts          | `Wallet`            |
-| Categories        | `Tag`               |
-| Labels            | `Tags`              |
-| Reports           | `BarChart3`         |
-| Settings          | `Settings`          |
-| Add / New         | `Plus`              |
-| Edit              | `Pencil`            |
-| Delete            | `Trash2`            |
-| Import            | `Upload`            |
-| Download template | `Download`          |
-| Validated         | `CheckCircle`       |
-| Not validated     | `Circle`            |
-| Income type       | `TrendingUp`        |
-| Expense type      | `TrendingDown`      |
-| Transfer type     | `ArrowLeftRight`    |
-| Duplicate         | `Copy`              |
-| System / locked   | `Lock`              |
-| Inactive          | `EyeOff`            |
-| Deactivate        | `PowerOff`          |
-| Filter            | `SlidersHorizontal` |
-| Reset             | `X`                 |
-| User menu         | `ChevronDown`       |
-| Collapse sidebar  | `PanelLeftClose`    |
-| Expand sidebar    | `PanelLeftOpen`     |
-| Search            | `Search`            |
-| Export / download | `Download`          |
-| Budget over-limit | `AlertCircle`       |
-| Budget warning    | `AlertTriangle`     |
-| Theme / dark mode | `Sun` / `Moon`      |
-| Danger zone       | `Trash2`            |
-| Password / lock   | `KeyRound`          |
+| Concept                    | Lucide icon         |
+| -------------------------- | ------------------- |
+| Dashboard                  | `LayoutDashboard`   |
+| Transactions               | `ArrowLeftRight`    |
+| Budgets                    | `Target`            |
+| Accounts                   | `Wallet`            |
+| Categories                 | `Tag`               |
+| Labels                     | `Tags`              |
+| Reports                    | `BarChart3`         |
+| Settings                   | `Settings`          |
+| Add / New                  | `Plus`              |
+| Edit                       | `Pencil`            |
+| Delete                     | `Trash2`            |
+| Import                     | `Upload`            |
+| Download template / Export | `Download`          |
+| Validated                  | `CheckCircle`       |
+| Not validated              | `Circle`            |
+| Income type                | `TrendingUp`        |
+| Expense type               | `TrendingDown`      |
+| Transfer type              | `ArrowLeftRight`    |
+| Duplicate                  | `Copy`              |
+| System / locked            | `Lock`              |
+| Inactive                   | `EyeOff`            |
+| Deactivate                 | `PowerOff`          |
+| Filter                     | `SlidersHorizontal` |
+| Reset                      | `X`                 |
+| User menu                  | `ChevronDown`       |
+| Collapse sidebar           | `PanelLeftClose`    |
+| Expand sidebar             | `PanelLeftOpen`     |
+| Search                     | `Search`            |
+| Budget over-limit          | `AlertCircle`       |
+| Budget warning             | `AlertTriangle`     |
+| Theme / dark mode          | `Sun` / `Moon`      |
+| Danger zone                | `Trash2`            |
+| Password / lock            | `KeyRound`          |
+
+---
+
+## 10. Implementation Conventions
+
+Decisions made once here apply to every page. Do not re-decide per feature.
+
+### Server vs Client Components
+
+| Pattern                                | Rule                                                                                                                  |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Pages that only display data           | Server Component by default — fetch in the component, no `"use client"`                                               |
+| Filter bars, forms, modals, charts     | `"use client"` — they require state or browser APIs                                                                   |
+| Dashboard widgets                      | Individual Server Components wrapped in `<Suspense>` — enables per-widget streaming; each widget fetches its own data |
+| Layout shell (sidebar, bottom tab bar) | Client Component — active route highlighting requires `usePathname()`                                                 |
+
+### URL State for Filters
+
+Pages with filters persist them in URL search params so links are shareable and the browser back button works:
+
+| Page            | Persisted params                                                                |
+| --------------- | ------------------------------------------------------------------------------- |
+| `/transactions` | `type`, `categoryId`, `labelId`, `accountId`, `from`, `to`, `validated`, `page` |
+| `/reports`      | `from`, `to`, `accountId`, `categoryId`, `tab`                                  |
+| `/budgets`      | `from`, `to`, `type`, `categoryId`                                              |
+
+Use `useSearchParams()` + `useRouter()` to read and update. Default values are applied when params are absent — never write defaults into the URL on first load.
+
+### Mutation Pattern
+
+All create / edit / delete / duplicate actions use **Next.js Server Actions** (not client-side fetch to API routes). Forms pass a `action={serverAction}` prop. The Server Action:
+
+1. Validates the body with the Zod schema from `@expense-tracker/types`
+2. Scopes the DB query by `userId` from the Neon Auth session
+3. Returns `{ success: true, data }` or `{ success: false, error: string }`
+
+The calling Client Component reads the return value and shows a `Sonner` toast accordingly.
+
+### Optimistic UI
+
+| Action              | Strategy                                                                  |
+| ------------------- | ------------------------------------------------------------------------- |
+| Toggle validated    | Optimistic — flip the icon immediately, rollback on error                 |
+| Inline label save   | Optimistic — show new value immediately                                   |
+| Delete (any entity) | **Not** optimistic — wait for server confirmation before removing from UI |
+| Create / Edit       | **Not** optimistic — wait for server response, then refresh               |
+
+### Global Search Behavior
+
+- Triggered by `⌘K` / `Ctrl+K` or clicking the `Search` icon in the sidebar
+- Debounce: **300ms** after last keystroke before firing the request
+- Minimum query length: **2 characters** (below that, show recent transactions + nav links only)
+- Results endpoint: `GET /api/v1/search?q=<query>` — returns `{ transactions[], accounts[] }`
+- Max results: 5 transactions, 3 accounts, all nav items
+
+### Currency Formatting Context
+
+User display settings (currency symbol, position, decimal/thousand separators, date format, time format) are loaded once at the layout level and provided via a React Context (`UserSettingsContext`). Every component that formats amounts or dates reads from this context — never fetches settings independently.
+
+### Icon Picker Scope
+
+The icon picker for categories and accounts is a **curated grid of 24 Lucide icons** relevant to finance/lifestyle:
+
+`Banknote`, `Building2`, `CreditCard`, `Wallet`, `ShoppingCart`, `ShoppingBag`, `Car`, `Utensils`, `Home`, `Heart`, `Plane`, `Gamepad2`, `Dumbbell`, `BookOpen`, `Music`, `Coffee`, `Gift`, `Briefcase`, `TrendingUp`, `TrendingDown`, `Landmark`, `PiggyBank`, `Receipt`, `CircleDollarSign`
+
+Displayed as a 6×4 grid of icon buttons inside a `Popover`. Selected icon shown as preview next to the field.
