@@ -356,13 +356,15 @@ Label and Validated columns are hidden on mobile; accessible via the Edit modal.
 
 **Content**: Budgets grouped by category, each group stacked vertically.
 
-Group header row: category color dot + category name + group aggregate (`€X spent of €Y budgeted`)
+Group header row: category color dot + category name + group aggregate (`€X spent of €Y budgeted`) + `ChevronDown` / `ChevronRight` collapse toggle. Groups are expanded by default; collapsed state shows only the header row.
 
 Within each group: card grid — 3 columns desktop, 2 tablet, 1 mobile.
 
 Uncategorized budgets collected under a "No category" group at the bottom.
 
-**`BudgetCard` anatomy**:
+Active budgets (end date ≥ today, or no end date) appear first within each group. Expired budgets (end date < today) are de-emphasised: 60% opacity, "Ended" muted badge, and collapsed under a "Past budgets" sub-row at the bottom of the group.
+
+**`BudgetCard` anatomy — normal state**:
 
 ```
 ┌─────────────────────────────────┐
@@ -376,7 +378,21 @@ Uncategorized budgets collected under a "No category" group at the bottom.
 └─────────────────────────────────┘
 ```
 
-Progress bar color: emerald < 75%, amber 75–99%, rose ≥ 100%
+**`BudgetCard` anatomy — over-limit state** (spent ≥ budgeted):
+
+```
+┌─────────────────────────────────┐  ← rose border
+│ [Category badge]  [⚠ Over]  [⋯]│
+│ Name                            │
+│ 1 Apr – 30 Apr 2026             │
+│                                 │
+│ ████████████████  100%          │  ← bar capped at 100%, rose
+│ €620.00 spent · Over by €120.00 │  ← "remaining" replaced by "Over by"
+│                    of €500.00   │
+└─────────────────────────────────┘
+```
+
+Progress bar color: emerald < 75%, amber 75–99%, rose ≥ 100% (capped at 100% width)
 
 Actions menu: Edit | Duplicate | Delete
 
@@ -389,16 +405,16 @@ Actions menu: Edit | Duplicate | Delete
 **Fixed summary footer** — always visible at the bottom of the viewport, above the mobile tab bar:
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Total income      Total expenses       Net          │
-│  +€3,200.00        -€2,150.00          +€1,050.00   │
-│  [period label: April 2026]                          │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  Total budgeted    Total spent      Remaining         │
+│  €2,000.00         €1,150.00        €850.00           │
+│  [period label: April 2026]                           │
+└──────────────────────────────────────────────────────┘
 ```
 
-- Income: emerald, prefixed `+`
-- Expenses: rose, prefixed `-`
-- Net: emerald if positive, rose if negative, muted if zero; prefixed `+` or `-`
+- Total budgeted: muted (neutral — it's a plan, not a result)
+- Total spent: rose if any budget is over-limit, muted otherwise
+- Remaining: emerald if positive, rose if negative (total overspend across all budgets)
 - Period label reflects the active period filter (e.g. "April 2026", "1–15 Apr 2026")
 - Updates reactively when filters change
 - Desktop: full-width bar with top `shadow-md`; Mobile: sits above the bottom tab bar
@@ -414,7 +430,8 @@ Inline validation: "End date must be after start date" shown below End date fiel
 #### Modal — Duplicate Budget
 
 - Compact dialog, header: "Duplicate — [budget name]"
-- Fields: Start date only (required), End date (optional)
+- Fields: Start date (required), End date (optional)
+- Pre-filled values: Start = first day of the month after the original's start date; End = last day of that same month (if original had an end date)
 - Helper text: "Name, amount, and filters will be copied from the original."
 - CTA: "Duplicate"
 

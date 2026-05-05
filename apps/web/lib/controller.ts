@@ -10,7 +10,7 @@ export function requireParam(params: Record<string, string>, key: string): strin
   return val;
 }
 
-interface RouteContext {
+export interface RouteContext {
   params: Promise<Record<string, string>>;
 }
 
