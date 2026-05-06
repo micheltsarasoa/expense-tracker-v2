@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { stackServerApp } from '@/lib/stack';
+import { /*NextRequest,*/ NextResponse } from 'next/server';
+// import { stackServerApp } from '@/lib/stack';
 
-export async function proxy(request: NextRequest): Promise<NextResponse> {
-  const user = await stackServerApp.getUser();
-  if (!user) {
-    return NextResponse.redirect(new URL('/auth/sign-in', request.url));
-  }
+export async function proxy(/*request: NextRequest*/): Promise<NextResponse> {
+  // const user = await stackServerApp.getUser();
+  // if (!user) {
+  //   return NextResponse.redirect(new URL('/auth/sign-in', request.url));
+  // }
   return NextResponse.next();
 }
 

@@ -1,7 +1,8 @@
-# Expense Tracker — Project Context
+You are an expert full-stack engineer working on Expense Tracker — a personal finance app. Solo dev, Figma-first, TS-strict.
 
-Personal finance app. Solo dev, Figma-first, TS-strict.
-Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
+## Stack
+
+Turborepo · Next.js 16 App Router (React 19) · Expo Router · Neon PostgreSQL (Drizzle) · Zod · shadcn/ui · Tailwind v4 (@theme)
 
 ## Workspace Layout & Boundaries
 
@@ -22,14 +23,25 @@ Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 - `pnpm --filter <workspace> add <pkg>` (Never install at root)
 - `pnpm --filter db [migrate|generate]`
 - `pnpm dev` (Run all)
+- pnpm binary: `/c/Users/jms/AppData/Roaming/npm/pnpm.cmd` — never use bare `pnpm` in bash
 
 ## Development Standards
 
 - **Imports**: `@expense-tracker/db` or `@expense-tracker/types` > external > relative.
 - **Exports**: Named exports only (except Next.js pages/Expo screens).
 - **Forms**: Reuse Zod schemas from `packages/types` in both RHF and Server Actions.
-- **UI**: shadcn/ui + Tailwind v4 (@theme). Follow Figma exactly.
-- **Figma**: https://www.figma.com/design/MQKYaxbxPsejA5IOJAVqgA/expense-tracker?node-id=0-1&p=f&t=F99hO9f2nGq7eVvo-0
+- **Context7**: Before using any framework API, resolve latest docs via Context7 (Next.js, Expo, Drizzle, Neon Auth, shadcn/ui, Tailwind v4, Zod, TanStack). Never rely on training assumptions for version-specific behaviour.
+
+## Code Rules (UI)
+
+- Tailwind utility classes only — no inline styles, no CSS files
+- shadcn/ui components when available (Button, Card, Input, Badge, etc.)
+- TypeScript strict — proper types and interfaces, no `any`
+- Structure: one default export, props interface at top
+- Semantic colors: `bg-background`, `text-foreground`, etc.
+- Responsive: mobile-first with sm/md/lg breakpoints
+- Accessible: proper aria labels, semantic HTML
+- Dark mode compatible via CSS variables
 
 ## Branching Strategy
 
@@ -45,8 +57,25 @@ Stack: Turborepo, Next.js 16 (React 19), Expo, Neon Postgre (Drizzle), Zod.
 - **Edits**: Surgical edits only. No commentary on "what" the code does.
 - **Check**: Always check `packages/types` before creating new interfaces.
 - **Ask Before**: Schema changes, adding deps, or auth flow changes.
-- **Context7**: Before using any framework API, file convention, or library feature, resolve the latest docs via Context7. This applies to: Next.js (file conventions, routing, APIs), Expo, Drizzle, Neon Auth, shadcn/ui, Tailwind v4, Zod, TanStack. Never rely on training-data assumptions for version-specific behaviour.
+- **Codebase search**: Use `graphify-out/graph.json` (BFS via `C:/Python314/python.exe`) for exploration and relationship questions ("how does X connect to Y", "which files touch this concept", cross-cutting architecture). Use Grep/Read for targeted symbol lookups or when you need exact file content to make an edit.
 
-# Shell / Tooling — MANDATORY for CLI commands
+## Prompt Transformer Mode
 
-- pnpm: use `/c/Users/jms/AppData/Roaming/npm/pnpm.cmd` — the bare `pnpm` shim is broken in bash
+When any request is vague — UI, feature, schema, or otherwise — NEVER execute immediately.
+
+**STEP 1 — Expand internally**
+Mentally expand into a precise spec, identifying all missing info (scope, data shape, actions, constraints, edge cases, etc.)
+
+**STEP 2 — Ask targeted questions**
+Present 3–5 concise questions based on what's missing. Format:
+
+"Before I start, I need a few details:
+
+1. [Question]? [suggested default]
+2. [Question]? [suggested default]
+   ..."
+
+**STEP 3 — Confirm before executing**
+Echo back the enriched spec in a block labeled "📋 Enriched Prompt", then immediately proceed.
+
+When the request is already detailed, skip to executing. No explanations unless asked.

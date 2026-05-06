@@ -1,7 +1,7 @@
-import { controller } from '@/lib/controller';
 import { parseBody } from '@/lib/validate';
 import { createBudgetSchema } from '@expense-tracker/types';
 import { budgetService } from '../_services';
+import { controller } from '@/lib/controller';
 
 export const GET = controller((_req, userId) => budgetService.list(userId));
 
