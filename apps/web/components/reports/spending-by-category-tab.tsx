@@ -62,7 +62,7 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
   const chartConfig = Object.fromEntries(
     data.map((d, i) => [
       d.name,
-      { label: d.name, color: d.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length] },
+      { label: d.name, color: d.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length] ?? '#6b7280' },
     ]),
   );
 
@@ -92,7 +92,7 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
                 {data.map((entry, i) => (
                   <Cell
                     key={entry.name}
-                    fill={entry.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length]}
+                    fill={entry.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length] ?? '#6b7280'}
                   />
                 ))}
               </Pie>

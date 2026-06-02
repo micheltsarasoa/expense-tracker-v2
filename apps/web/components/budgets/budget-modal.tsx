@@ -61,7 +61,7 @@ function toInputDate(display: string): string {
   // expects "D MMM YYYY", converts to YYYY-MM-DD for <input type="date">
   if (!display) return '';
   try {
-    return new Date(display).toISOString().split('T')[0];
+    return new Date(display).toISOString().split('T')[0] ?? '';
   } catch {
     return '';
   }
@@ -95,15 +95,16 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
           amount: String(budget.amount),
           startDate: toInputDate(budget.startDate),
           endDate: toInputDate(budget.endDate),
-          category: budget.category ?? '',
+          // budget.category is the display name; the Select options are keyed by id
+          category: CATEGORIES.find((c) => c.name === budget.category)?.id ?? '',
           label: budget.label ?? '',
         });
       } else {
         const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-          .toISOString()
-          .split('T')[0];
+        const firstDay =
+          new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0] ?? '';
+        const lastDay =
+          new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] ?? '';
         setForm({ ...EMPTY_FORM, startDate: firstDay, endDate: lastDay });
       }
       setErrors({});
@@ -139,9 +140,8 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
       spent: budget?.spent ?? 0,
       startDate: fromInputDate(form.startDate),
       endDate: form.endDate ? fromInputDate(form.endDate) : 'No end date',
-      category: cat?.name,
-      categoryColor: cat?.color,
-      label: form.label || undefined,
+      ...(cat ? { category: cat.name, categoryColor: cat.color } : {}),
+      ...(form.label ? { label: form.label } : {}),
     });
     setSaving(false);
     onOpenChange(false);

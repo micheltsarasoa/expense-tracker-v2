@@ -169,7 +169,7 @@ export function TransactionsTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="size-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="size-7 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
                       >
                         <MoreHorizontal className="size-4" />
                         <span className="sr-only">Row actions</span>

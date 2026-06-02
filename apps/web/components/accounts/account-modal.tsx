@@ -113,7 +113,7 @@ export function AccountModal({ open, onOpenChange, account, onSave }: AccountMod
       type: form.type,
       initialBalance: initial,
       balance: isEdit && account ? account.balance : Number(form.initialBalance),
-      color: form.color || undefined,
+      ...(form.color ? { color: form.color } : {}),
     });
     setSaving(false);
     onOpenChange(false);

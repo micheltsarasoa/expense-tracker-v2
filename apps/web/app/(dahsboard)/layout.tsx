@@ -1,3 +1,5 @@
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return <main className="flex-1 overflow-auto p-6">{children}</main>;
+  // The root layout already provides the <main> landmark and page padding;
+  // this group layout is a passthrough to avoid a nested <main>.
+  return children;
 }

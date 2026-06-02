@@ -41,8 +41,8 @@ export function DuplicateBudgetModal({
         const nextMonth = new Date(orig.getFullYear(), orig.getMonth() + 1, 1);
         const lastDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setStartDate(nextMonth.toISOString().split('T')[0]);
-        setEndDate(lastDay.toISOString().split('T')[0]);
+        setStartDate(nextMonth.toISOString().split('T')[0] ?? '');
+        setEndDate(lastDay.toISOString().split('T')[0] ?? '');
       } catch {
         setStartDate('');
         setEndDate('');

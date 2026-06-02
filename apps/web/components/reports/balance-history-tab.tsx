@@ -84,9 +84,9 @@ export function BalanceHistoryTab({ data, accounts, loading }: Props) {
               tickFormatter={formatEur}
             />
             <Tooltip
-              formatter={(value: number, name: string) => [
-                `€${value.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-                name,
+              formatter={(value, name) => [
+                `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+                String(name),
               ]}
               contentStyle={{
                 fontSize: '12px',

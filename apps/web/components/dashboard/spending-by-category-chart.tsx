@@ -52,7 +52,7 @@ export function SpendingByCategoryChart({ data, total, loading }: SpendingByCate
   const chartConfig = Object.fromEntries(
     data.map((d, i) => [
       d.name,
-      { label: d.name, color: d.color ?? CATEGORY_COLORS[i % CATEGORY_COLORS.length] },
+      { label: d.name, color: d.color ?? CATEGORY_COLORS[i % CATEGORY_COLORS.length] ?? '#6b7280' },
     ]),
   );
 
@@ -86,7 +86,11 @@ export function SpendingByCategoryChart({ data, total, loading }: SpendingByCate
                     {data.map((entry, index) => (
                       <Cell
                         key={entry.name}
-                        fill={entry.color ?? CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                        fill={
+                          entry.color ??
+                          CATEGORY_COLORS[index % CATEGORY_COLORS.length] ??
+                          '#6b7280'
+                        }
                       />
                     ))}
                   </Pie>
