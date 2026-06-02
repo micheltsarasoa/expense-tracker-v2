@@ -13,12 +13,12 @@ export function makeReq(
   if (query) {
     Object.entries(query).forEach(([k, v]) => u.searchParams.set(k, v));
   }
-  const init: RequestInit = { method };
-  if (body !== undefined) {
-    init.body = JSON.stringify(body);
-    init.headers = { 'content-type': 'application/json' };
-  }
-  return new NextRequest(u, init);
+  return new NextRequest(
+    u,
+    body !== undefined
+      ? { method, body: JSON.stringify(body), headers: { 'content-type': 'application/json' } }
+      : { method },
+  );
 }
 
 /**

@@ -46,7 +46,7 @@ const PRESET_COLORS = [
   '#6366f1',
   '#14b8a6',
   '#64748b',
-];
+] as const;
 
 interface CategoryModalProps {
   open: boolean;
@@ -120,7 +120,7 @@ export function CategoryModal({
       name: form.name.trim(),
       type: form.type,
       color: form.color,
-      parentId: form.parentId || undefined,
+      ...(form.parentId ? { parentId: form.parentId } : {}),
     });
     setSaving(false);
     onOpenChange(false);

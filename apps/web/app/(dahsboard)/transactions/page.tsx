@@ -12,7 +12,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Empty } from '@/components/ui/empty';
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from '@/components/ui/empty';
 
 import { TransactionModal, type Transaction } from '@/components/transactions/transaction-modal';
 import { DeleteTransactionModal } from '@/components/transactions/delete-transaction-modal';
@@ -255,33 +262,36 @@ export default function TransactionsPage() {
       {/* ── Table / empty states ────────────────────────────────────────────── */}
       {transactions.length === 0 ? (
         <Empty className="py-20">
-          <Empty.Icon>
-            <ArrowLeftRight className="size-8" />
-          </Empty.Icon>
-          <Empty.Title>No transactions yet</Empty.Title>
-          <Empty.Description>
-            Add your first transaction to start tracking your finances.
-          </Empty.Description>
-          <Button size="sm" className="mt-2 gap-1.5" onClick={() => setCreateOpen(true)}>
-            <Plus className="size-4" />
-            Add transaction
-          </Button>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ArrowLeftRight className="size-8" />
+            </EmptyMedia>
+            <EmptyTitle>No transactions yet</EmptyTitle>
+            <EmptyDescription>
+              Add your first transaction to start tracking your finances.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button size="sm" className="gap-1.5" onClick={() => setCreateOpen(true)}>
+              <Plus className="size-4" />
+              Add transaction
+            </Button>
+          </EmptyContent>
         </Empty>
       ) : paginated.length === 0 && hasActiveFilters ? (
         <Empty className="py-20">
-          <Empty.Icon>
-            <ArrowLeftRight className="size-8" />
-          </Empty.Icon>
-          <Empty.Title>No transactions match your filters</Empty.Title>
-          <Empty.Description>Try adjusting or resetting your active filters.</Empty.Description>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mt-2"
-            onClick={() => handleFiltersChange(defaultFilters)}
-          >
-            Reset filters
-          </Button>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <ArrowLeftRight className="size-8" />
+            </EmptyMedia>
+            <EmptyTitle>No transactions match your filters</EmptyTitle>
+            <EmptyDescription>Try adjusting or resetting your active filters.</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="ghost" size="sm" onClick={() => handleFiltersChange(defaultFilters)}>
+              Reset filters
+            </Button>
+          </EmptyContent>
         </Empty>
       ) : (
         <TransactionsTable
@@ -336,6 +346,7 @@ export default function TransactionsPage() {
       />
 
       <TransactionModal
+        key={editTarget?.id ?? 'edit'}
         open={!!editTarget}
         onOpenChange={(v) => {
           if (!v) setEditTarget(null);

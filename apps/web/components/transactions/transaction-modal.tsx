@@ -66,7 +66,9 @@ export function TransactionModal({
 
   const [type, setType] = useState<TransactionType>(transaction?.type ?? 'expense');
   const [amount, setAmount] = useState(transaction?.amount ?? '');
-  const [date, setDate] = useState(transaction?.date ?? new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(
+    transaction?.date ?? new Date().toISOString().split('T')[0] ?? '',
+  );
   const [accountFrom, setAccountFrom] = useState(transaction?.accountFrom ?? '');
   const [accountTo, setAccountTo] = useState(transaction?.accountTo ?? '');
   const [category, setCategory] = useState(transaction?.category ?? '');

@@ -170,10 +170,7 @@ function flattenCategories(cats: Category[]): Category[] {
 function removeById(cats: Category[], id: string): Category[] {
   return cats
     .filter((c) => c.id !== id)
-    .map((c) => ({
-      ...c,
-      children: c.children ? removeById(c.children, id) : undefined,
-    }));
+    .map((c) => (c.children ? { ...c, children: removeById(c.children, id) } : c));
 }
 
 // ---------- component ----------
@@ -202,7 +199,7 @@ export default function CategoriesPage() {
       const update = (cats: Category[]): Category[] =>
         cats.map((c) => {
           if (c.id === editingCategory.id) return { ...c, ...data };
-          return { ...c, children: c.children ? update(c.children) : undefined };
+          return c.children ? { ...c, children: update(c.children) } : c;
         });
       setCategories(update);
     } else {
@@ -212,8 +209,8 @@ export default function CategoriesPage() {
         name: data.name,
         type: data.type,
         color: data.color,
-        parentId: data.parentId,
         children: [],
+        ...(data.parentId ? { parentId: data.parentId } : {}),
       };
       if (data.parentId) {
         // Add as child of parent
@@ -222,7 +219,7 @@ export default function CategoriesPage() {
             if (c.id === data.parentId) {
               return { ...c, children: [...(c.children ?? []), newCat] };
             }
-            return { ...c, children: c.children ? addChild(c.children) : undefined };
+            return c.children ? { ...c, children: addChild(c.children) } : c;
           });
         setCategories(addChild);
       } else {

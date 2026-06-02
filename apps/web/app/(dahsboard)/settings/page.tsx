@@ -111,7 +111,7 @@ function FieldRow({
   label: string;
   hint?: string;
   children: React.ReactNode;
-  error?: string;
+  error?: string | undefined;
 }) {
   return (
     <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-[200px_1fr] sm:items-start sm:gap-4">
@@ -146,7 +146,7 @@ function LivePreview({
 }) {
   function formatAmount(amount: number): string {
     const parts = amount.toFixed(2).split('.');
-    const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, settings.thousandSeparator);
+    const intPart = (parts[0] ?? '').replace(/\B(?=(\d{3})+(?!\d))/g, settings.thousandSeparator);
     const formatted = `${intPart}${settings.decimalSeparator}${parts[1]}`;
     return settings.currencyPosition === 'before'
       ? `${settings.currencySymbol}${formatted}`

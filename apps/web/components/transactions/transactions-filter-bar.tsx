@@ -184,18 +184,18 @@ export function TransactionsFilterBar({ filters, onChange }: TransactionsFilterB
       <div className="flex items-center gap-1">
         <Input
           type="date"
+          aria-label="From date"
           className="h-8 w-36 text-sm"
           value={filters.dateFrom}
           onChange={(e) => set('dateFrom', e.target.value)}
-          placeholder="From"
         />
         <span className="text-muted-foreground text-xs">to</span>
         <Input
           type="date"
+          aria-label="To date"
           className="h-8 w-36 text-sm"
           value={filters.dateTo}
           onChange={(e) => set('dateTo', e.target.value)}
-          placeholder="To"
         />
       </div>
 
