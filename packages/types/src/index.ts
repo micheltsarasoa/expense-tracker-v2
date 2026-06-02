@@ -7,3 +7,4 @@ export * from './schemas/payment-method';
 export * from './schemas/transaction';
 export * from './schemas/budget';
 export * from './schemas/import';
+export * from './dto';
