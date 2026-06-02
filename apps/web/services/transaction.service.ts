@@ -1,6 +1,9 @@
 import {
+  categories,
+  labels,
   paymentMethods,
   transactions,
+  alias,
   and,
   asc,
   count,
@@ -14,6 +17,7 @@ import type { SelectTransaction } from '@expense-tracker/db';
 import type {
   CreateTransactionInput,
   TransactionFilters,
+  TransactionListItemDTO,
   UpdateTransactionInput,
 } from '@expense-tracker/types';
 import { AppError } from '@expense-tracker/types';
@@ -29,7 +33,7 @@ export class TransactionService extends BaseService {
   async list(
     userId: string,
     filters: TransactionFilters,
-  ): Promise<{ data: SelectTransaction[]; total: number }> {
+  ): Promise<{ data: TransactionListItemDTO[]; total: number }> {
     const conditions = [eq(transactions.userId, userId), eq(transactions.isDeleted, false)];
 
     if (filters.type !== undefined) conditions.push(eq(transactions.type, filters.type));
@@ -47,10 +51,34 @@ export class TransactionService extends BaseService {
     const where = and(...conditions);
     const offset = (filters.page - 1) * filters.pageSize;
 
+    // Self-join payment_methods twice: source (required → inner) and destination (optional → left).
+    const pmFrom = alias(paymentMethods, 'pm_from');
+    const pmTo = alias(paymentMethods, 'pm_to');
+
     const [data, [countRow]] = await Promise.all([
       this.db
-        .select()
+        .select({
+          id: transactions.id,
+          type: transactions.type,
+          amount: transactions.amount,
+          transactionDate: transactions.transactionDate,
+          description: transactions.description,
+          isValidated: transactions.isValidated,
+          categoryId: transactions.categoryId,
+          labelId: transactions.labelId,
+          paymentMethodId: transactions.paymentMethodId,
+          toPaymentMethodId: transactions.toPaymentMethodId,
+          categoryName: categories.name,
+          categoryColor: categories.color,
+          labelName: labels.name,
+          paymentMethodName: pmFrom.name,
+          toPaymentMethodName: pmTo.name,
+        })
         .from(transactions)
+        .innerJoin(pmFrom, eq(pmFrom.id, transactions.paymentMethodId))
+        .leftJoin(pmTo, eq(pmTo.id, transactions.toPaymentMethodId))
+        .leftJoin(categories, eq(categories.id, transactions.categoryId))
+        .leftJoin(labels, eq(labels.id, transactions.labelId))
         .where(where)
         .orderBy(desc(transactions.transactionDate), asc(transactions.createdAt))
         .limit(filters.pageSize)
