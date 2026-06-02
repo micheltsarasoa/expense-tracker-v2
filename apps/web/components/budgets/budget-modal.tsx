@@ -26,7 +26,7 @@ export interface BudgetFormValues {
   amount: string;
   startDate: string;
   endDate: string;
-  categoryId?: string;
+  categoryId: string;
 }
 
 interface BudgetModalProps {
@@ -53,8 +53,6 @@ const EMPTY_FORM: FormState = {
   endDate: '',
   categoryId: '',
 };
-
-const NO_CATEGORY = '__none__';
 
 function monthBounds(): { firstDay: string; lastDay: string } {
   const now = new Date();
@@ -108,6 +106,7 @@ export function BudgetModal({
     if (!form.endDate) next.endDate = 'End date is required.';
     else if (form.startDate && form.endDate <= form.startDate)
       next.endDate = 'End date must be after start date.';
+    if (!form.categoryId) next.categoryId = 'Category is required.';
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -120,7 +119,7 @@ export function BudgetModal({
       amount: form.amount,
       startDate: form.startDate,
       endDate: form.endDate,
-      ...(form.categoryId ? { categoryId: form.categoryId } : {}),
+      categoryId: form.categoryId,
     });
     setSaving(false);
     if (ok) onOpenChange(false);
@@ -193,16 +192,12 @@ export function BudgetModal({
 
           {/* Category */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="budget-category">Category (optional)</Label>
-            <Select
-              value={form.categoryId || NO_CATEGORY}
-              onValueChange={(v) => set('categoryId', v === NO_CATEGORY ? '' : v)}
-            >
+            <Label htmlFor="budget-category">Category</Label>
+            <Select value={form.categoryId} onValueChange={(v) => set('categoryId', v)}>
               <SelectTrigger id="budget-category">
-                <SelectValue placeholder="All categories" />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NO_CATEGORY}>All categories</SelectItem>
                 {categories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>
                     <div className="flex items-center gap-2">
@@ -216,6 +211,7 @@ export function BudgetModal({
                 ))}
               </SelectContent>
             </Select>
+            {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
           </div>
         </div>
 

@@ -34,6 +34,7 @@ const validCreate = {
   name: 'Monthly Food',
   amount: '500.00',
   startDate: '2024-01-01',
+  categoryId: '11111111-1111-1111-1111-111111111111',
 };
 
 describe('GET /budgets', () => {
