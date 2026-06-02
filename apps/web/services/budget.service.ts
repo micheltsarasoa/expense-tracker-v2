@@ -1,6 +1,7 @@
-import { budgets, transactions, and, eq, sql } from '@expense-tracker/db';
+import { budgets, categories, labels, transactions, and, eq, sql } from '@expense-tracker/db';
 import type { SelectBudget } from '@expense-tracker/db';
 import type {
+  BudgetWithSpendingDTO,
   CreateBudgetInput,
   DuplicateBudgetInput,
   UpdateBudgetInput,
@@ -8,28 +9,22 @@ import type {
 import { AppError } from '@expense-tracker/types';
 import { BaseService } from './base.service';
 
-export type BudgetWithSpending = SelectBudget & {
-  spent: string;
-  remaining: string;
-  pct: number;
-};
-
 export class BudgetService extends BaseService {
-  /** Single query — LEFT JOIN with conditional aggregation to avoid N+1. */
-  async list(userId: string): Promise<BudgetWithSpending[]> {
+  /** Single query — LEFT JOINs with conditional aggregation to avoid N+1. */
+  async list(userId: string): Promise<BudgetWithSpendingDTO[]> {
     const rows = await this.db
       .select({
         id: budgets.id,
-        userId: budgets.userId,
         name: budgets.name,
         amount: budgets.amount,
         startDate: budgets.startDate,
         endDate: budgets.endDate,
         categoryId: budgets.categoryId,
+        categoryName: categories.name,
+        categoryColor: categories.color,
         labelId: budgets.labelId,
+        labelName: labels.name,
         isActive: budgets.isActive,
-        createdAt: budgets.createdAt,
-        updatedAt: budgets.updatedAt,
         spent: sql<string>`COALESCE(SUM(CASE
           WHEN ${transactions.isDeleted} = FALSE
             AND ${transactions.type} = 'expense'
@@ -43,30 +38,29 @@ export class BudgetService extends BaseService {
       })
       .from(budgets)
       .leftJoin(transactions, eq(transactions.userId, budgets.userId))
+      .leftJoin(categories, eq(categories.id, budgets.categoryId))
+      .leftJoin(labels, eq(labels.id, budgets.labelId))
       .where(and(eq(budgets.userId, userId), eq(budgets.isActive, true)))
       .groupBy(
         budgets.id,
-        budgets.userId,
         budgets.name,
         budgets.amount,
         budgets.startDate,
         budgets.endDate,
         budgets.categoryId,
+        categories.name,
+        categories.color,
         budgets.labelId,
+        labels.name,
         budgets.isActive,
-        budgets.createdAt,
-        budgets.updatedAt,
       );
 
     return rows.map(this.#enrich);
   }
 
-  async findById(userId: string, id: string): Promise<BudgetWithSpending> {
-    const [row] = await this.list(userId);
+  async findById(userId: string, id: string): Promise<BudgetWithSpendingDTO> {
     const found = (await this.list(userId)).find((b) => b.id === id);
     if (!found) throw AppError.notFound(`Budget ${id} not found`);
-    // Narrower: re-query single budget
-    void row; // list result not used — finding by id after list
     return found;
   }
 
@@ -121,7 +115,9 @@ export class BudgetService extends BaseService {
     return row;
   }
 
-  readonly #enrich = (row: Omit<BudgetWithSpending, 'remaining' | 'pct'>): BudgetWithSpending => {
+  readonly #enrich = (
+    row: Omit<BudgetWithSpendingDTO, 'remaining' | 'pct'>,
+  ): BudgetWithSpendingDTO => {
     const spent = parseFloat(row.spent);
     const amount = parseFloat(row.amount);
     const remaining = (amount - spent).toFixed(2);

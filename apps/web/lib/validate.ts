@@ -31,3 +31,13 @@ export function parseQuery<T>(searchParams: URLSearchParams, schema: ZodType<T, 
   }
   return result.data;
 }
+
+/** Validate an already-parsed value (e.g. a Server Action argument). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function parseInput<T>(value: unknown, schema: ZodType<T, any, any>): T {
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    throw AppError.validation(formatZodError(result.error));
+  }
+  return result.data;
+}
