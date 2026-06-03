@@ -41,7 +41,11 @@ export default async function DashboardPage() {
 
   const [accountRows, trend, spending, budgetRows, txList] = await Promise.all([
     paymentMethodService.list(userId),
-    reportService.incomeVsExpenses(userId, 6),
+    reportService.incomeVsExpenses(
+      userId,
+      isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1))),
+      monthEnd,
+    ),
     reportService.spendingByCategory(userId, monthStart, monthEnd),
     budgetService.list(userId),
     transactionService.list(userId, { page: 1, pageSize: 8 }),
