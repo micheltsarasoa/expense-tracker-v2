@@ -5,7 +5,6 @@ import {
   budgetService,
   transactionService,
 } from '@/services/instances';
-import { formatDay } from '@/lib/format';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { MonthlyTrendChart } from '@/components/dashboard/monthly-trend-chart';
 import { SpendingByCategoryChart } from '@/components/dashboard/spending-by-category-chart';
@@ -14,7 +13,6 @@ import { AccountBalancesWidget } from '@/components/dashboard/account-balances-w
 import { RecentTransactionsWidget } from '@/components/dashboard/recent-transactions-widget';
 import type { AccountBalanceItem } from '@/components/dashboard/account-balances-widget';
 import type { BudgetSummaryItem } from '@/components/dashboard/budget-status-widget';
-import type { Transaction } from '@/components/transactions/transaction-modal';
 
 function isoDay(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -85,18 +83,6 @@ export default async function DashboardPage() {
     expense: parseFloat(t.expenses),
   }));
 
-  const recentTransactions: Transaction[] = txList.data.map((t) => ({
-    id: t.id,
-    type: t.type,
-    amount: t.amount,
-    date: formatDay(t.transactionDate),
-    accountFrom: t.paymentMethodName,
-    ...(t.toPaymentMethodName ? { accountTo: t.toPaymentMethodName } : {}),
-    ...(t.categoryName ? { category: t.categoryName } : {}),
-    ...(t.labelName ? { label: t.labelName } : {}),
-    ...(t.description ? { description: t.description } : {}),
-  }));
-
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -132,7 +118,7 @@ export default async function DashboardPage() {
       {/* Accounts + Recent transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <AccountBalancesWidget accounts={accounts} />
-        <RecentTransactionsWidget transactions={recentTransactions} />
+        <RecentTransactionsWidget transactions={txList.data} />
       </div>
 
       {/* Budget status + Spending by category */}

@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type {
+  CategoryOptionDTO,
+  LabelOptionDTO,
+  PaymentMethodOptionDTO,
+  TransactionListItemDTO,
+} from '@expense-tracker/types';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,115 +27,146 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  TransactionTypeTabs,
-  type TransactionType,
-} from '@/components/transactions/transaction-type-tab';
-export interface Transaction {
-  id: string;
+import { TransactionTypeTabs, type TransactionType } from './transaction-type-tab';
+
+/** Normalized values the modal emits; cleared fields are null. */
+export interface TransactionFormValues {
   type: TransactionType;
   amount: string;
-  date: string;
-  accountFrom: string;
-  accountTo?: string;
-  category?: string;
-  label?: string;
-  description?: string;
+  transactionDate: string;
+  paymentMethodId: string;
+  toPaymentMethodId: string | null;
+  categoryId: string | null;
+  labelId: string | null;
+  description: string | null;
 }
 
 interface TransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  transaction?: Transaction | null;
-  onSave: (data: Omit<Transaction, 'id'>) => Promise<void>;
+  transaction?: TransactionListItemDTO | null;
+  categories: CategoryOptionDTO[];
+  labels: LabelOptionDTO[];
+  paymentMethods: PaymentMethodOptionDTO[];
+  onSubmit: (values: TransactionFormValues) => Promise<boolean>;
 }
 
-const mockAccounts = ['Checking Account', 'Savings Account', 'Cash', 'Credit Card'];
-const mockCategories = [
-  'Food & Dining',
-  'Transportation',
-  'Shopping',
-  'Housing',
-  'Entertainment',
-  'Health',
-  'Salary',
-  'Freelance',
-];
-const mockLabels = ['Personal', 'Business', 'Recurring', 'One-time'];
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export function TransactionModal({
   open,
   onOpenChange,
   transaction,
-  onSave,
+  categories,
+  labels,
+  paymentMethods,
+  onSubmit,
 }: TransactionModalProps) {
   const isEdit = !!transaction;
 
-  const [type, setType] = useState<TransactionType>(transaction?.type ?? 'expense');
-  const [amount, setAmount] = useState(transaction?.amount ?? '');
-  const [date, setDate] = useState(
-    transaction?.date ?? new Date().toISOString().split('T')[0] ?? '',
-  );
-  const [accountFrom, setAccountFrom] = useState(transaction?.accountFrom ?? '');
-  const [accountTo, setAccountTo] = useState(transaction?.accountTo ?? '');
-  const [category, setCategory] = useState(transaction?.category ?? '');
-  const [label, setLabel] = useState(transaction?.label ?? '');
-  const [description, setDescription] = useState(transaction?.description ?? '');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [type, setType] = useState<TransactionType>('expense');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(todayIso());
+  const [paymentMethodId, setPaymentMethodId] = useState('');
+  const [toPaymentMethodId, setToPaymentMethodId] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [labelId, setLabelId] = useState('');
+  const [description, setDescription] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
+  useEffect(() => {
+    if (!open) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setErrors({});
+    setSubmitting(false);
+    if (transaction) {
+      setType(transaction.type);
+      setAmount(transaction.amount);
+      setDate(transaction.transactionDate);
+      setPaymentMethodId(transaction.paymentMethodId);
+      setToPaymentMethodId(transaction.toPaymentMethodId ?? '');
+      setCategoryId(transaction.categoryId ?? '');
+      setLabelId(transaction.labelId ?? '');
+      setDescription(transaction.description ?? '');
+    } else {
+      setType('expense');
+      setAmount('');
+      setDate(todayIso());
+      setPaymentMethodId('');
+      setToPaymentMethodId('');
+      setCategoryId('');
+      setLabelId('');
+      setDescription('');
+    }
+  }, [open, transaction]);
+
+  function handleTypeChange(next: TransactionType) {
+    setType(next);
+    setErrors({});
+    // Switching type clears the fields that no longer apply.
+    if (next === 'transfer') setCategoryId('');
+    else setToPaymentMethodId('');
+  }
+
+  const categoryOptions = categories.filter((c) => c.type === type);
+
+  function validate(): boolean {
+    const next: Record<string, string> = {};
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0)
-      newErrors.amount = 'Enter a valid positive amount';
-    if (!date) newErrors.date = 'Date is required';
-    if (!accountFrom) newErrors.accountFrom = 'Account is required';
-    if (type === 'transfer' && !accountTo) newErrors.accountTo = 'Destination account is required';
-    return newErrors;
-  };
-
-  const handleSave = async () => {
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
+      next.amount = 'Enter a valid positive amount.';
+    if (!date) next.date = 'Date is required.';
+    if (!paymentMethodId) next.paymentMethodId = 'Account is required.';
+    if (type === 'transfer') {
+      if (!toPaymentMethodId) next.toPaymentMethodId = 'Destination account is required.';
+      else if (toPaymentMethodId === paymentMethodId)
+        next.toPaymentMethodId = 'Destination must differ from source.';
+    } else if (!categoryId) {
+      next.categoryId = 'Category is required.';
     }
-    setErrors({});
-    setIsSubmitting(true);
-    try {
-      await onSave({ type, amount, date, accountFrom, accountTo, category, label, description });
-      onOpenChange(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  }
 
-  const handleTypeChange = (newType: TransactionType) => {
-    setType(newType);
-    setErrors({});
-  };
+  async function handleSave() {
+    if (!validate()) return;
+    setSubmitting(true);
+    const ok = await onSubmit({
+      type,
+      amount,
+      transactionDate: date,
+      paymentMethodId,
+      toPaymentMethodId: type === 'transfer' ? toPaymentMethodId : null,
+      categoryId: type === 'transfer' ? null : categoryId,
+      labelId: labelId || null,
+      description: description.trim() || null,
+    });
+    setSubmitting(false);
+    if (ok) onOpenChange(false);
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg shadow-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
-            {isEdit ? 'Edit Transaction' : 'New Transaction'}
-          </DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Transaction' : 'New Transaction'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit
+              ? 'Edit the transaction details.'
+              : 'Record a new income, expense, or transfer.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-5 py-2">
-          {/* Type selector */}
           <TransactionTypeTabs value={type} onChange={handleTypeChange} />
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Amount */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="amount" className="text-sm font-medium">
-                Amount
-              </Label>
+              <Label htmlFor="tx-amount">Amount</Label>
               <Input
-                id="amount"
+                id="tx-amount"
                 type="number"
                 min="0"
                 step="0.01"
@@ -139,14 +177,10 @@ export function TransactionModal({
               />
               {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
             </div>
-
-            {/* Date */}
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="date" className="text-sm font-medium">
-                Date
-              </Label>
+              <Label htmlFor="tx-date">Date</Label>
               <Input
-                id="date"
+                id="tx-date"
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
@@ -156,95 +190,97 @@ export function TransactionModal({
             </div>
           </div>
 
-          {/* Account From */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium">
-              {type === 'transfer' ? 'From Account' : 'Account'}
-            </Label>
-            <Select value={accountFrom} onValueChange={setAccountFrom}>
-              <SelectTrigger className={errors.accountFrom ? 'border-destructive' : ''}>
+            <Label>{type === 'transfer' ? 'From account' : 'Account'}</Label>
+            <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
+              <SelectTrigger className={errors.paymentMethodId ? 'border-destructive' : ''}>
                 <SelectValue placeholder="Select account" />
               </SelectTrigger>
               <SelectContent>
-                {mockAccounts.map((acc) => (
-                  <SelectItem key={acc} value={acc}>
-                    {acc}
+                {paymentMethods.map((pm) => (
+                  <SelectItem key={pm.id} value={pm.id}>
+                    {pm.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.accountFrom && <p className="text-xs text-destructive">{errors.accountFrom}</p>}
+            {errors.paymentMethodId && (
+              <p className="text-xs text-destructive">{errors.paymentMethodId}</p>
+            )}
           </div>
 
-          {/* Account To — transfer only */}
           {type === 'transfer' && (
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium">To Account</Label>
-              <Select value={accountTo} onValueChange={setAccountTo}>
-                <SelectTrigger className={errors.accountTo ? 'border-destructive' : ''}>
+              <Label>To account</Label>
+              <Select value={toPaymentMethodId} onValueChange={setToPaymentMethodId}>
+                <SelectTrigger className={errors.toPaymentMethodId ? 'border-destructive' : ''}>
                   <SelectValue placeholder="Select destination account" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockAccounts
-                    .filter((a) => a !== accountFrom)
-                    .map((acc) => (
-                      <SelectItem key={acc} value={acc}>
-                        {acc}
+                  {paymentMethods
+                    .filter((pm) => pm.id !== paymentMethodId)
+                    .map((pm) => (
+                      <SelectItem key={pm.id} value={pm.id}>
+                        {pm.name}
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
-              {errors.accountTo && <p className="text-xs text-destructive">{errors.accountTo}</p>}
+              {errors.toPaymentMethodId && (
+                <p className="text-xs text-destructive">{errors.toPaymentMethodId}</p>
+              )}
             </div>
           )}
 
-          {/* Category — income / expense only */}
           {type !== 'transfer' && (
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium">
-                Category <span className="text-muted-foreground font-normal">(optional)</span>
-              </Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger>
+              <Label>Category</Label>
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger className={errors.categoryId ? 'border-destructive' : ''}>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                  {categoryOptions.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="size-2 rounded-full shrink-0"
+                          style={{ backgroundColor: c.color ?? '#6b7280' }}
+                        />
+                        {c.name}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
             </div>
           )}
 
-          {/* Label */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium">
+            <Label>
               Label <span className="text-muted-foreground font-normal">(optional)</span>
             </Label>
-            <Select value={label} onValueChange={setLabel}>
+            <Select value={labelId} onValueChange={setLabelId}>
               <SelectTrigger>
                 <SelectValue placeholder="Select label" />
               </SelectTrigger>
               <SelectContent>
-                {mockLabels.map((l) => (
-                  <SelectItem key={l} value={l}>
-                    {l}
+                {labels.map((l) => (
+                  <SelectItem key={l.id} value={l.id}>
+                    {l.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Description */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="description" className="text-sm font-medium">
+            <Label htmlFor="tx-description">
               Description <span className="text-muted-foreground font-normal">(optional)</span>
             </Label>
             <Textarea
-              id="description"
+              id="tx-description"
               placeholder="Add a note..."
               rows={2}
               value={description}
@@ -255,12 +291,12 @@ export function TransactionModal({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={submitting}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSubmitting}>
-            {isSubmitting && <Spinner className="mr-2 size-4" />}
-            {isSubmitting ? 'Saving...' : 'Save'}
+          <Button onClick={handleSave} disabled={submitting}>
+            {submitting && <Spinner className="mr-2 size-4" />}
+            {submitting ? 'Saving...' : 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

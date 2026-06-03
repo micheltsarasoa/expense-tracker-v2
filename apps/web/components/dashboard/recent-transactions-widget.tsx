@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { TrendingUp, TrendingDown, ArrowLeftRight, ArrowRight } from 'lucide-react';
+import type { TransactionListItemDTO } from '@expense-tracker/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/empty';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Transaction } from '@/components/transactions/transaction-modal';
+import { eur, formatDay } from '@/lib/format';
 
 const typeConfig = {
   income: {
@@ -44,7 +45,7 @@ const typeConfig = {
 };
 
 interface RecentTransactionsWidgetProps {
-  transactions: Transaction[];
+  transactions: TransactionListItemDTO[];
   loading?: boolean;
 }
 
@@ -116,15 +117,18 @@ export function RecentTransactionsWidget({ transactions, loading }: RecentTransa
                       )}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {tx.accountFrom}
-                      {tx.category ? ` · ${tx.category}` : ''}
+                      {tx.paymentMethodName}
+                      {tx.categoryName ? ` · ${tx.categoryName}` : ''}
                     </span>
                   </div>
                   <div className="flex flex-col items-end shrink-0 gap-0.5">
                     <span className={cn('text-sm font-medium tabular-nums', config.amountClass)}>
-                      {config.prefix}€{parseFloat(tx.amount || '0').toFixed(2)}
+                      {config.prefix}
+                      {eur(tx.amount)}
                     </span>
-                    <span className="text-xs text-muted-foreground">{tx.date}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDay(tx.transactionDate)}
+                    </span>
                   </div>
                 </li>
               );

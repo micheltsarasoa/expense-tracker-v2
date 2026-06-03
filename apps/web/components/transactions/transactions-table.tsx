@@ -4,6 +4,7 @@ import {
   TrendingUp,
   TrendingDown,
   ArrowLeftRight,
+  ArrowRight,
   CheckCircle,
   Circle,
   MoreHorizontal,
@@ -11,6 +12,7 @@ import {
   Trash2,
   CheckCheck,
 } from 'lucide-react';
+import type { TransactionListItemDTO } from '@expense-tracker/types';
 import {
   Table,
   TableBody,
@@ -29,14 +31,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { Transaction } from './transaction-modal';
+import { eur, formatDay } from '@/lib/format';
 
 interface TransactionsTableProps {
-  transactions: Transaction[];
-  onEdit: (transaction: Transaction) => void;
-  onDelete: (transaction: Transaction) => void;
+  transactions: TransactionListItemDTO[];
+  onEdit: (transaction: TransactionListItemDTO) => void;
+  onDelete: (transaction: TransactionListItemDTO) => void;
   onToggleValidated: (id: string) => void;
-  validatedIds: Set<string>;
 }
 
 const typeConfig = {
@@ -70,7 +71,6 @@ export function TransactionsTable({
   onEdit,
   onDelete,
   onToggleValidated,
-  validatedIds,
 }: TransactionsTableProps) {
   return (
     <div className="rounded-lg border border-border overflow-hidden">
@@ -94,12 +94,10 @@ export function TransactionsTable({
           {transactions.map((tx) => {
             const config = typeConfig[tx.type];
             const TypeIcon = config.icon;
-            const isValidated = validatedIds.has(tx.id);
-
             return (
               <TableRow key={tx.id} className="group">
                 <TableCell className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
-                  {tx.date}
+                  {formatDay(tx.transactionDate)}
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -126,24 +124,38 @@ export function TransactionsTable({
                     config.amountClass,
                   )}
                 >
-                  {config.prefix}€{parseFloat(tx.amount || '0').toFixed(2)}
+                  {config.prefix}
+                  {eur(tx.amount)}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{tx.accountFrom}</TableCell>
+                <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                  {tx.type === 'transfer' && tx.toPaymentMethodName ? (
+                    <span className="flex items-center gap-1">
+                      {tx.paymentMethodName}
+                      <ArrowRight className="size-3 shrink-0" />
+                      {tx.toPaymentMethodName}
+                    </span>
+                  ) : (
+                    tx.paymentMethodName
+                  )}
+                </TableCell>
                 <TableCell className="text-sm">
-                  {tx.category ? (
+                  {tx.categoryName ? (
                     <div className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-primary/60 shrink-0" />
-                      <span className="text-muted-foreground">{tx.category}</span>
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: tx.categoryColor ?? '#6b7280' }}
+                      />
+                      <span className="text-muted-foreground">{tx.categoryName}</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground/40">—</span>
                   )}
                 </TableCell>
                 <TableCell className="text-sm">
-                  {tx.label ? (
+                  {tx.labelName ? (
                     <div className="flex items-center gap-1.5">
                       <span className="size-2 rounded-full bg-violet-400 shrink-0" />
-                      <span className="text-muted-foreground">{tx.label}</span>
+                      <span className="text-muted-foreground">{tx.labelName}</span>
                     </div>
                   ) : (
                     <span className="text-muted-foreground/40">—</span>
@@ -154,9 +166,9 @@ export function TransactionsTable({
                     type="button"
                     onClick={() => onToggleValidated(tx.id)}
                     className="mx-auto flex items-center justify-center"
-                    aria-label={isValidated ? 'Mark as unvalidated' : 'Mark as validated'}
+                    aria-label={tx.isValidated ? 'Mark as unvalidated' : 'Mark as validated'}
                   >
-                    {isValidated ? (
+                    {tx.isValidated ? (
                       <CheckCircle className="size-4 text-emerald-500" />
                     ) : (
                       <Circle className="size-4 text-muted-foreground/40" />
@@ -182,7 +194,7 @@ export function TransactionsTable({
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onToggleValidated(tx.id)}>
                         <CheckCheck className="size-4 mr-2" />
-                        {isValidated ? 'Mark unvalidated' : 'Mark validated'}
+                        {tx.isValidated ? 'Mark unvalidated' : 'Mark validated'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
