@@ -1,8 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -10,13 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import type { Account } from './balance-card';
 
 interface DeactivateAccountModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   account: Account | null;
-  onConfirm: () => void;
+  onConfirm: () => Promise<boolean>;
 }
 
 export function DeactivateAccountModal({
@@ -25,33 +27,31 @@ export function DeactivateAccountModal({
   account,
   onConfirm,
 }: DeactivateAccountModalProps) {
-  const hasTransactions = account?.hasTransactions ?? false;
+  const [working, setWorking] = useState(false);
+
+  async function handleConfirm() {
+    setWorking(true);
+    const ok = await onConfirm();
+    setWorking(false);
+    if (ok) onOpenChange(false);
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {hasTransactions ? `Deactivate "${account?.name}"?` : `Delete "${account?.name}"?`}
-          </AlertDialogTitle>
+          <AlertDialogTitle>Remove &ldquo;{account?.name}&rdquo;?</AlertDialogTitle>
           <AlertDialogDescription>
-            {hasTransactions
-              ? 'This account has transactions and cannot be deleted. It will be marked as inactive and hidden from new transactions.'
-              : 'This will permanently delete the account. This action cannot be undone.'}
+            If this account has transactions it will be deactivated and hidden from new
+            transactions. Otherwise it will be permanently deleted.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className={
-              hasTransactions
-                ? ''
-                : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-            }
-            onClick={onConfirm}
-          >
-            {hasTransactions ? 'Deactivate' : 'Delete'}
-          </AlertDialogAction>
+          <AlertDialogCancel disabled={working}>Cancel</AlertDialogCancel>
+          <Button variant="destructive" onClick={handleConfirm} disabled={working}>
+            {working && <Spinner className="mr-2 size-4" />}
+            {working ? 'Removing…' : 'Remove'}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
