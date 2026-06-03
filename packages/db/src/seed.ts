@@ -10,6 +10,7 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 
 config({ path: resolve(import.meta.dirname, '../../../.env.local') });
+config({ path: resolve(import.meta.dirname, '../../../.env') });
 
 import { faker } from '@faker-js/faker';
 import { db } from './client';
