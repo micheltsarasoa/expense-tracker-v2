@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Plus, ArrowLeftRight } from 'lucide-react';
+import { Plus, ArrowLeftRight, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import type {
   TransactionListItemDTO,
@@ -32,6 +32,7 @@ import {
   type TransactionFormValues,
 } from '@/components/transactions/transaction-modal';
 import { DeleteTransactionModal } from '@/components/transactions/delete-transaction-modal';
+import { ImportTransactionsModal } from '@/components/transactions/import-transactions-modal';
 import {
   TransactionsFilterBar,
   defaultFilterValues,
@@ -69,6 +70,7 @@ export function TransactionsClient({
   const pathname = usePathname();
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<TransactionListItemDTO | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<TransactionListItemDTO | null>(null);
 
@@ -154,10 +156,21 @@ export function TransactionsClient({
             {total} transaction{total !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button size="sm" className="gap-1.5" onClick={() => setCreateOpen(true)}>
-          <Plus className="size-4" />
-          Add transaction
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+            onClick={() => setImportOpen(true)}
+          >
+            <Upload className="size-4" />
+            Import
+          </Button>
+          <Button size="sm" className="gap-1.5" onClick={() => setCreateOpen(true)}>
+            <Plus className="size-4" />
+            Add transaction
+          </Button>
+        </div>
       </div>
 
       <TransactionsFilterBar
@@ -266,6 +279,11 @@ export function TransactionsClient({
         }}
         transaction={deleteTarget}
         onDelete={handleDelete}
+      />
+      <ImportTransactionsModal
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={() => router.refresh()}
       />
     </div>
   );
