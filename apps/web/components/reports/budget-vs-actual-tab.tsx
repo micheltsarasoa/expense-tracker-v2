@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 
 export interface BudgetActualRow {
   id: string;
@@ -53,6 +54,7 @@ function getBudgetMeta(spent: number, budgeted: number) {
 }
 
 export function BudgetVsActualTab({ data, loading }: Props) {
+  const { money } = useFormat();
   if (loading) {
     return (
       <div className="space-y-3">
@@ -112,8 +114,9 @@ export function BudgetVsActualTab({ data, loading }: Props) {
                   <div className="flex items-center gap-3 shrink-0 text-sm tabular-nums">
                     <span className={cn('font-semibold', textClass)}>{pct.toFixed(0)}%</span>
                     <span className="text-muted-foreground">
-                      €{row.spent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      {' / '}€{row.budgeted.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {money(row.spent)}
+                      {' / '}
+                      {money(row.budgeted)}
                     </span>
                   </div>
                 </div>
@@ -124,9 +127,7 @@ export function BudgetVsActualTab({ data, loading }: Props) {
                     indicatorClassName={indicatorClass}
                   />
                   <span className="text-xs text-muted-foreground tabular-nums w-24 text-right shrink-0">
-                    {remaining >= 0
-                      ? `€${remaining.toLocaleString('en-US', { minimumFractionDigits: 2 })} left`
-                      : `-€${Math.abs(remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })} over`}
+                    {remaining >= 0 ? `${money(remaining)} left` : `${money(remaining)} over`}
                   </span>
                 </div>
               </div>
@@ -158,8 +159,8 @@ export function BudgetVsActualTab({ data, loading }: Props) {
             <CardContent className="py-4 px-5">
               <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
               <p className={cn('text-xl font-bold tabular-nums', item.colorClass)}>
-                {item.label === 'Remaining' && item.value < 0 ? '-' : ''}€
-                {Math.abs(item.value).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                {item.label === 'Remaining' && item.value < 0 ? '-' : ''}
+                {money(Math.abs(item.value))}
               </p>
             </CardContent>
           </Card>

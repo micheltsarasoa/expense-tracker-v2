@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { useFormat } from '@/lib/settings-context';
 
 const FALLBACK_COLORS = [
   '#10b981',
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export function SpendingByCategoryTab({ data, loading }: Props) {
+  const { money } = useFormat();
   const total = data.reduce((s, d) => s + d.value, 0);
 
   if (loading) {
@@ -88,13 +90,7 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
                 ))}
               </Pie>
               <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    formatter={(value) =>
-                      `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-                    }
-                  />
-                }
+                content={<ChartTooltipContent formatter={(value) => money(Number(value))} />}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -133,7 +129,7 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
                         </div>
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums font-medium">
-                        €{row.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                        {money(row.value)}
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                         {pct}%
@@ -146,7 +142,7 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
                 <tr className="border-t border-border bg-muted/30">
                   <td className="px-4 py-2.5 text-xs font-semibold text-muted-foreground">Total</td>
                   <td className="px-4 py-2.5 text-right tabular-nums font-semibold">
-                    €{total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    {money(total)}
                   </td>
                   <td className="px-4 py-2.5 text-right text-muted-foreground">100%</td>
                 </tr>

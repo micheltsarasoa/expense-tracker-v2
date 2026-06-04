@@ -16,6 +16,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 
 export interface MonthlyEntry {
   month: string;
@@ -34,11 +35,8 @@ const chartConfig = {
   net: { label: 'Net', color: '#8b5cf6' },
 };
 
-function formatEur(val: number) {
-  return `€${Math.abs(val).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
-}
-
 export function IncomeVsExpensesTab({ data, loading }: Props) {
+  const { money, settings } = useFormat();
   if (loading) {
     return <Skeleton className="h-72 rounded-xl" />;
   }
@@ -79,7 +77,9 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
               tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={formatEur}
+              tickFormatter={(v) =>
+                `${settings.currencySymbol}${Math.abs(Number(v)).toLocaleString('en-US', { minimumFractionDigits: 0 })}`
+              }
             />
             <YAxis
               yAxisId="line"
@@ -87,7 +87,9 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
               tick={{ fontSize: 12, fill: '#8b5cf6' }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={formatEur}
+              tickFormatter={(v) =>
+                `${settings.currencySymbol}${Math.abs(Number(v)).toLocaleString('en-US', { minimumFractionDigits: 0 })}`
+              }
             />
             <ChartTooltip
               content={
@@ -95,10 +97,7 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
                   formatter={(value, name) => {
                     const label =
                       name === 'income' ? 'Income' : name === 'expense' ? 'Expenses' : 'Net';
-                    return [
-                      `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-                      label,
-                    ];
+                    return [money(Number(value)), label];
                   }}
                 />
               }
@@ -164,8 +163,8 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
             <CardContent className="py-4 px-5">
               <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
               <p className={cn('text-xl font-bold tabular-nums', item.colorClass)}>
-                {totalNet < 0 && item.label === 'Net' ? '-' : ''}€
-                {Math.abs(item.value).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                {totalNet < 0 && item.label === 'Net' ? '-' : ''}
+                {money(Math.abs(item.value))}
               </p>
             </CardContent>
           </Card>
@@ -197,10 +196,10 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
                 <tr key={row.month} className="hover:bg-muted/40 transition-colors">
                   <td className="px-4 py-2.5 font-medium">{row.month}</td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-emerald-600 dark:text-emerald-400">
-                    +€{row.income.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    +{money(row.income)}
                   </td>
                   <td className="px-4 py-2.5 text-right tabular-nums text-rose-600 dark:text-rose-400">
-                    -€{row.expense.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    -{money(row.expense)}
                   </td>
                   <td
                     className={cn(
@@ -210,8 +209,8 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
                         : 'text-rose-600 dark:text-rose-400',
                     )}
                   >
-                    {row.net >= 0 ? '+' : '-'}€
-                    {Math.abs(row.net).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    {row.net >= 0 ? '+' : '-'}
+                    {money(Math.abs(row.net))}
                   </td>
                 </tr>
               ))}
