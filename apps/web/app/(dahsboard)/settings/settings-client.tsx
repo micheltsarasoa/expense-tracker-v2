@@ -51,6 +51,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { formatMoney } from '@/lib/format';
 import { updateSettings } from './actions';
 
 // ---------------------------------------------------------------------------
@@ -157,12 +158,7 @@ function LivePreview({
   >;
 }) {
   function formatAmount(amount: number): string {
-    const parts = amount.toFixed(2).split('.');
-    const intPart = (parts[0] ?? '').replace(/\B(?=(\d{3})+(?!\d))/g, settings.thousandSeparator);
-    const formatted = `${intPart}${settings.decimalSeparator}${parts[1]}`;
-    return settings.currencyPosition === 'before'
-      ? `${settings.currencySymbol}${formatted}`
-      : `${formatted} ${settings.currencySymbol}`;
+    return formatMoney(amount, settings);
   }
 
   function formatDate(fmt: DateFormat): string {
