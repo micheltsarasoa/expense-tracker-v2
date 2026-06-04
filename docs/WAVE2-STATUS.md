@@ -44,7 +44,7 @@
 | 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                         | new modal vs `import` routes | not done (deferred)     |
 | –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done        | Edit                         | ✅ done                 |
 | –     | Cleanup: removed dead **Export CSV** buttons from all 4 reports tabs (no onClick; locked-decision dead control) | Edit                         | ✅ done                 |
-| –     | Cleanup: dashboard **period selector** (D2) via searchParams                                                    | —                            | deferred                |
+| –     | D2 dashboard **period selector** via searchParams (presets + custom range; drives stat cards + spending donut)  | `lib/period.ts` + selector   | ✅ done                 |
 | –     | Cleanup: budget **label-scoping** in modal                                                                      | —                            | deferred                |
 | –     | B6 footer/group **float totals → integer cents**                                                                | —                            | ❌ won't-fix (see note) |
 

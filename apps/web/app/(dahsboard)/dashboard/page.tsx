@@ -5,6 +5,8 @@ import {
   budgetService,
   transactionService,
 } from '@/services/instances';
+import { resolvePeriod, isDashboardPeriod } from '@/lib/period';
+import { PeriodSelector } from '@/components/dashboard/period-selector';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { MonthlyTrendChart } from '@/components/dashboard/monthly-trend-chart';
 import { SpendingByCategoryChart } from '@/components/dashboard/spending-by-category-chart';
@@ -27,38 +29,52 @@ function monthLabel(ym: string): string {
   });
 }
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const userId = await getUserId();
+  const sp = await searchParams;
+
+  const periodParam = typeof sp.period === 'string' ? sp.period : 'this-month';
+  const period = isDashboardPeriod(periodParam) ? periodParam : 'this-month';
+  const fromParam = typeof sp.from === 'string' ? sp.from : undefined;
+  const toParam = typeof sp.to === 'string' ? sp.to : undefined;
+  const { from, to, prevFrom, prevTo, label } = resolvePeriod(period, fromParam, toParam);
 
   const now = new Date();
-  const monthStart = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)));
-  const monthEnd = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)));
-  const curKey = monthStart.slice(0, 7);
-  const prevKey = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))).slice(
-    0,
-    7,
-  );
+  const trendFrom = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1)));
+  const trendTo = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)));
 
-  const [accountRows, trend, spending, budgetRows, txList] = await Promise.all([
+  const [accountRows, curRows, prevRows, spending, trend, budgetRows, txList] = await Promise.all([
     paymentMethodService.list(userId),
-    reportService.incomeVsExpenses(
-      userId,
-      isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1))),
-      monthEnd,
-    ),
-    reportService.spendingByCategory(userId, monthStart, monthEnd),
+    reportService.incomeVsExpenses(userId, from, to),
+    reportService.incomeVsExpenses(userId, prevFrom, prevTo),
+    reportService.spendingByCategory(userId, from, to),
+    reportService.incomeVsExpenses(userId, trendFrom, trendTo),
     budgetService.list(userId),
     transactionService.list(userId, { page: 1, pageSize: 8 }),
   ]);
 
-  // Stat cards — current month income/expense/net vs the previous month.
-  const cur = trend.find((t) => t.month === curKey);
-  const prev = trend.find((t) => t.month === prevKey);
-  const income = cur ? parseFloat(cur.income) : 0;
-  const expense = cur ? parseFloat(cur.expenses) : 0;
+  // Stat cards — selected period income/expense/net vs the previous equal period.
+  const sumRows = (rows: { income: string; expenses: string }[]) =>
+    rows.reduce(
+      (acc, r) => ({
+        income: acc.income + parseFloat(r.income),
+        expense: acc.expense + parseFloat(r.expenses),
+      }),
+      { income: 0, expense: 0 },
+    );
+
+  const cur = sumRows(curRows);
+  const prev = sumRows(prevRows);
+  const income = cur.income;
+  const expense = cur.expense;
   const net = income - expense;
-  const prevIncome = prev ? parseFloat(prev.income) : 0;
-  const prevExpense = prev ? parseFloat(prev.expenses) : 0;
+  const prevIncome = prev.income;
+  const prevExpense = prev.expense;
+  const prevNet = prev.income - prev.expense;
 
   const accounts: AccountBalanceItem[] = accountRows.map((a) => ({
     id: a.id,
@@ -89,30 +105,32 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
+        </div>
+        <PeriodSelector period={period} from={from} to={to} />
       </div>
 
       {/* Stat cards — income / expense / net */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          label="Income this month"
+          label="Income"
           value={income}
           previousValue={prevIncome}
           colorClass="text-emerald-600 dark:text-emerald-400"
         />
         <StatCard
-          label="Expenses this month"
+          label="Expenses"
           value={expense}
           previousValue={prevExpense}
           colorClass="text-rose-600 dark:text-rose-400"
         />
         <StatCard
-          label="Net this month"
+          label="Net"
           value={net}
+          previousValue={prevNet}
           colorClass={
             net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
           }
