@@ -38,14 +38,21 @@
 
 ## Next / Not done
 
-| Order | What                                                                                                     | How                          | Status              |
-| ----- | -------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------- |
-| 1     | Verify `/reports` renders with live data                                                                 | manual                       | **NEXT (user)**     |
-| 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                  | new modal vs `import` routes | not done (deferred) |
-| –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done | Edit                         | ✅ done             |
-| –     | Cleanup: dashboard **period selector** (D2) via searchParams                                             | —                            | deferred            |
-| –     | Cleanup: budget **label-scoping** in modal                                                               | —                            | deferred            |
-| –     | Cleanup: footer/group **float totals → integer cents** (B6 residual)                                     | —                            | deferred            |
+| Order | What                                                                                                            | How                          | Status                  |
+| ----- | --------------------------------------------------------------------------------------------------------------- | ---------------------------- | ----------------------- |
+| 1     | Verify `/reports` renders with live data (risk now LOW — see below)                                             | manual                       | **NEXT (user)**         |
+| 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                         | new modal vs `import` routes | not done (deferred)     |
+| –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done        | Edit                         | ✅ done                 |
+| –     | Cleanup: removed dead **Export CSV** buttons from all 4 reports tabs (no onClick; locked-decision dead control) | Edit                         | ✅ done                 |
+| –     | Cleanup: dashboard **period selector** (D2) via searchParams                                                    | —                            | deferred                |
+| –     | Cleanup: budget **label-scoping** in modal                                                                      | —                            | deferred                |
+| –     | B6 footer/group **float totals → integer cents**                                                                | —                            | ❌ won't-fix (see note) |
+
+### Notes on the above
+
+- **B6 won't-fix:** the 5 footer/widget sums (`reduce` over euro `number`s) are **display-only** (rendered `€{value}`, never branched on or persisted). Float64 summation error at this scale is ~1e-11; to flip a `toFixed(2)` boundary you'd need ~millions of additions. A `sumCents` patch would produce **byte-identical output** = pure churn. The only real money-rounding quirk is single-value representation (`2.675.toFixed(2)` → `"2.67"`), which lives in the shared `eur()` formatter — if fidelity ever matters, fix it **once there**, not scattered across sums.
+- **`/reports` risk downgraded to LOW:** `transaction_date` is a `timestamp` column, so `balanceHistory`'s raw SQL (window over `t.transaction_date`, `::numeric` casts) is type-valid and every referenced column exists. Empty data → empty charts, not a crash. Still wants one eyeball.
+- **Latent (not this session):** range queries compare a `timestamp` column `<= ${to}` where `to` is a date string → coerced to `00:00:00`, so transactions later on the `to` day are **excluded**. Pre-existing in `spendingByCategory`/`incomeVsExpenses`. Fix later by using `< to + 1 day` or casting the column to `::date`.
 
 ## Decisions locked (this session)
 
