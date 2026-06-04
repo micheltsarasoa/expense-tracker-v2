@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { useFormat } from '@/lib/settings-context';
 
 export interface BudgetFormValues {
   name: string;
@@ -81,6 +82,7 @@ export function BudgetModal({
   onSubmit,
 }: BudgetModalProps) {
   const isEdit = !!budget;
+  const { settings } = useFormat();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<FormState>>({});
@@ -167,7 +169,7 @@ export function BudgetModal({
             <Label htmlFor="budget-amount">Amount</Label>
             <div className="relative">
               <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                €
+                {settings.currencySymbol}
               </span>
               <Input
                 id="budget-amount"

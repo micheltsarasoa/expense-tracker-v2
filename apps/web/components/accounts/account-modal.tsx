@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { useFormat } from '@/lib/settings-context';
 import type { Account, AccountType } from './balance-card';
 
 const ACCOUNT_TYPES: { value: AccountType; label: string }[] = [
@@ -76,6 +77,7 @@ const EMPTY_FORM: FormState = {
 };
 
 export function AccountModal({ open, onOpenChange, account, onSubmit }: AccountModalProps) {
+  const { money, settings } = useFormat();
   const isEdit = !!account;
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
@@ -179,7 +181,7 @@ export function AccountModal({ open, onOpenChange, account, onSubmit }: AccountM
             {isEdit ? (
               <>
                 <div className="flex h-9 items-center rounded-md border border-border bg-muted px-3 text-sm text-muted-foreground">
-                  €{account?.initialBalance.toFixed(2)}
+                  {money(account?.initialBalance ?? 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">Cannot be changed after saving.</p>
               </>
@@ -187,7 +189,7 @@ export function AccountModal({ open, onOpenChange, account, onSubmit }: AccountM
               <>
                 <div className="relative">
                   <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                    €
+                    {settings.currencySymbol}
                   </span>
                   <Input
                     id="acc-balance"

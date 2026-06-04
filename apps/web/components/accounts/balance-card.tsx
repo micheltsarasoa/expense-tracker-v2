@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 
 export type AccountType =
   | 'cash'
@@ -57,6 +58,7 @@ const typeConfig: Record<AccountType, { label: string; icon: React.ElementType }
 };
 
 export function BalanceCard({ account, onEdit, onDeactivateOrDelete }: BalanceCardProps) {
+  const { money } = useFormat();
   const config = typeConfig[account.type];
   const Icon = config.icon;
 
@@ -106,7 +108,7 @@ export function BalanceCard({ account, onEdit, onDeactivateOrDelete }: BalanceCa
       {/* Balance */}
       <div className="flex flex-col items-end gap-1 shrink-0">
         <span className={cn('text-lg font-bold tabular-nums', balanceClass)}>
-          €{account.balance.toFixed(2)}
+          {money(account.balance)}
         </span>
       </div>
 
