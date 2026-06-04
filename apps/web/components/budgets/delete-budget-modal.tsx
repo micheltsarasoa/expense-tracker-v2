@@ -1,8 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -10,13 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { Budget } from './budget-card';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import type { BudgetWithSpendingDTO } from '@expense-tracker/types';
 
 interface DeleteBudgetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  budget: Budget | null;
-  onConfirm: () => void;
+  budget: BudgetWithSpendingDTO | null;
+  onConfirm: () => Promise<boolean>;
 }
 
 export function DeleteBudgetModal({
@@ -25,6 +27,15 @@ export function DeleteBudgetModal({
   budget,
   onConfirm,
 }: DeleteBudgetModalProps) {
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    setDeleting(true);
+    const ok = await onConfirm();
+    setDeleting(false);
+    if (ok) onOpenChange(false);
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -35,13 +46,11 @@ export function DeleteBudgetModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            onClick={onConfirm}
-          >
-            Delete
-          </AlertDialogAction>
+          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+            {deleting && <Spinner className="mr-2 size-4" />}
+            {deleting ? 'Deleting…' : 'Delete'}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

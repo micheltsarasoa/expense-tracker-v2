@@ -5,3 +5,4 @@ export * from './with-user-scope';
 
 // Re-export Drizzle operators so consumers use one shared drizzle-orm instance.
 export { and, asc, count, desc, eq, gte, isNull, lte, or, sql, sum, ilike, ne } from 'drizzle-orm';
+export { alias } from 'drizzle-orm/pg-core';

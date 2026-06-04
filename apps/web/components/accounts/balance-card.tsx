@@ -8,7 +8,6 @@ import {
   CircleDollarSign,
   MoreHorizontal,
   Pencil,
-  PowerOff,
   Trash2,
   EyeOff,
 } from 'lucide-react';
@@ -126,24 +125,11 @@ export function BalanceCard({ account, onEdit, onDeactivateOrDelete }: BalanceCa
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className={
-              account.hasTransactions
-                ? 'text-muted-foreground'
-                : 'text-destructive focus:text-destructive'
-            }
+            className="text-destructive focus:text-destructive"
             onClick={() => onDeactivateOrDelete(account)}
           >
-            {account.hasTransactions ? (
-              <>
-                <PowerOff className="size-4 mr-2" />
-                Deactivate
-              </>
-            ) : (
-              <>
-                <Trash2 className="size-4 mr-2" />
-                Delete
-              </>
-            )}
+            <Trash2 className="size-4 mr-2" />
+            Remove
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

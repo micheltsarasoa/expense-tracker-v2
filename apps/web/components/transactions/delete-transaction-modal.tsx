@@ -12,14 +12,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import type { Transaction } from './transaction-modal';
+import type { TransactionListItemDTO } from '@expense-tracker/types';
+import { eur, formatDay } from '@/lib/format';
 
 interface DeleteTransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  transaction: Transaction | null;
-  onDelete: (id: string) => Promise<void>;
+  transaction: TransactionListItemDTO | null;
+  onDelete: () => Promise<boolean>;
 }
+
+const sign = { income: '+', expense: '-', transfer: '' } as const;
 
 export function DeleteTransactionModal({
   open,
@@ -29,16 +32,12 @@ export function DeleteTransactionModal({
 }: DeleteTransactionModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    if (!transaction) return;
+  async function handleDelete() {
     setIsDeleting(true);
-    try {
-      await onDelete(transaction.id);
-      onOpenChange(false);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    const ok = await onDelete();
+    setIsDeleting(false);
+    if (ok) onOpenChange(false);
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -50,8 +49,8 @@ export function DeleteTransactionModal({
               <span>This action cannot be undone.</span>
               {transaction && (
                 <span className="mt-1 text-sm font-medium text-foreground">
-                  {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
-                  {transaction.amount} &middot; {transaction.date}
+                  {sign[transaction.type]}
+                  {eur(transaction.amount)} &middot; {formatDay(transaction.transactionDate)}
                 </span>
               )}
             </div>

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -48,13 +49,21 @@ const PRESET_COLORS = [
   '#64748b',
 ] as const;
 
+export interface CategoryFormValues {
+  name: string;
+  type: CategoryType;
+  color: string;
+  parentId?: string;
+}
+
 interface CategoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category?: Category | null;
   /** Root-level categories of both types (for parent selection) */
   rootCategories: Category[];
-  onSave: (data: Partial<Category>) => void;
+  /** Returns true on success (modal then closes), false on failure. */
+  onSubmit: (values: CategoryFormValues) => Promise<boolean>;
 }
 
 interface FormState {
@@ -69,7 +78,7 @@ export function CategoryModal({
   onOpenChange,
   category,
   rootCategories,
-  onSave,
+  onSubmit,
 }: CategoryModalProps) {
   const isEdit = !!category;
   const [form, setForm] = useState<FormState>({
@@ -115,15 +124,14 @@ export function CategoryModal({
       return;
     }
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    onSave({
+    const ok = await onSubmit({
       name: form.name.trim(),
       type: form.type,
       color: form.color,
       ...(form.parentId ? { parentId: form.parentId } : {}),
     });
     setSaving(false);
-    onOpenChange(false);
+    if (ok) onOpenChange(false);
   }
 
   const TYPE_OPTIONS: { value: CategoryType; label: string; activeClass: string }[] = [
@@ -146,6 +154,9 @@ export function CategoryModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Category' : 'New Category'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the category details.' : 'Create a new category.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">

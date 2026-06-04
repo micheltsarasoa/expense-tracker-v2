@@ -77,7 +77,7 @@ describe('GET /reports/budget-vs-actual', () => {
 });
 
 describe('GET /reports/income-vs-expenses', () => {
-  it('returns 200 with default months=6 when no query param', async () => {
+  it('returns 200 with a default range when no query param', async () => {
     const mockData = [{ month: '2024-01', income: '3000.00', expenses: '1500.00' }];
     vi.mocked(reportService.incomeVsExpenses).mockResolvedValue(mockData as never);
 
@@ -86,23 +86,34 @@ describe('GET /reports/income-vs-expenses', () => {
 
     expect(res.status).toBe(200);
     expect(body.success).toBe(true);
-    expect(vi.mocked(reportService.incomeVsExpenses)).toHaveBeenCalledWith('user-123', 6);
+    expect(vi.mocked(reportService.incomeVsExpenses)).toHaveBeenCalledWith(
+      'user-123',
+      expect.any(String),
+      expect.any(String),
+    );
   });
 
-  it('uses provided months query param', async () => {
+  it('uses provided from/to query params', async () => {
     vi.mocked(reportService.incomeVsExpenses).mockResolvedValue([] as never);
 
     await INCOME_VS_EXPENSES(
-      makeReq('GET', `${BASE}/income-vs-expenses`, undefined, { months: '12' }),
+      makeReq('GET', `${BASE}/income-vs-expenses`, undefined, {
+        from: '2024-01-01',
+        to: '2024-06-30',
+      }),
       makeCtx(),
     );
 
-    expect(vi.mocked(reportService.incomeVsExpenses)).toHaveBeenCalledWith('user-123', 12);
+    expect(vi.mocked(reportService.incomeVsExpenses)).toHaveBeenCalledWith(
+      'user-123',
+      '2024-01-01',
+      '2024-06-30',
+    );
   });
 
-  it('returns 400 when months exceeds maximum of 24', async () => {
+  it('returns 400 when from is not a valid date', async () => {
     const res = await INCOME_VS_EXPENSES(
-      makeReq('GET', `${BASE}/income-vs-expenses`, undefined, { months: '25' }),
+      makeReq('GET', `${BASE}/income-vs-expenses`, undefined, { from: 'not-a-date' }),
       makeCtx(),
     );
     const body = await res.json();

@@ -11,8 +11,6 @@ import {
   Legend,
   ReferenceLine,
 } from 'recharts';
-import { Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -65,13 +63,6 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Download className="size-3.5" />
-          Export CSV
-        </Button>
-      </div>
-
       {/* Chart */}
       <ChartContainer config={chartConfig} className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">

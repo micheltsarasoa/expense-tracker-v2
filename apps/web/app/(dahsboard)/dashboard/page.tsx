@@ -1,244 +1,156 @@
-'use client';
-
-import { useState } from 'react';
+import { getUserId } from '@/lib/auth';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  paymentMethodService,
+  reportService,
+  budgetService,
+  transactionService,
+} from '@/services/instances';
+import { resolvePeriod, isDashboardPeriod } from '@/lib/period';
+import { PeriodSelector } from '@/components/dashboard/period-selector';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { MonthlyTrendChart } from '@/components/dashboard/monthly-trend-chart';
 import { SpendingByCategoryChart } from '@/components/dashboard/spending-by-category-chart';
 import { BudgetStatusWidget } from '@/components/dashboard/budget-status-widget';
 import { AccountBalancesWidget } from '@/components/dashboard/account-balances-widget';
 import { RecentTransactionsWidget } from '@/components/dashboard/recent-transactions-widget';
-import type { Transaction } from '@/components/transactions/transaction-modal';
 import type { AccountBalanceItem } from '@/components/dashboard/account-balances-widget';
 import type { BudgetSummaryItem } from '@/components/dashboard/budget-status-widget';
 
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
+function isoDay(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
 
-const ACCOUNTS: AccountBalanceItem[] = [
-  { id: '1', name: 'Main Checking', type: 'bank_account', balance: 4_250.8 },
-  { id: '2', name: 'Savings', type: 'bank_account', balance: 12_000.0 },
-  { id: '3', name: 'Visa Credit', type: 'credit_card', balance: -320.45 },
-  { id: '4', name: 'Cash Wallet', type: 'cash', balance: 85.0 },
-  { id: '5', name: 'PayPal', type: 'digital_wallet', balance: 210.6 },
-];
+function monthLabel(ym: string): string {
+  const [y, m] = ym.split('-').map(Number);
+  if (!y || !m) return ym;
+  return new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('en-US', {
+    month: 'short',
+    timeZone: 'UTC',
+  });
+}
 
-const BUDGETS: BudgetSummaryItem[] = [
-  { id: 'b1', name: 'Groceries', spent: 380, amount: 400 },
-  { id: 'b2', name: 'Dining Out', spent: 230, amount: 200 },
-  { id: 'b3', name: 'Transport', spent: 95, amount: 150 },
-  { id: 'b4', name: 'Entertainment', spent: 185, amount: 200 },
-  { id: 'b5', name: 'Utilities', spent: 60, amount: 120 },
-];
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const userId = await getUserId();
+  const sp = await searchParams;
 
-const CATEGORY_SPENDING = [
-  { name: 'Groceries', value: 380, color: '#10b981' },
-  { name: 'Dining', value: 230, color: '#f43f5e' },
-  { name: 'Transport', value: 95, color: '#8b5cf6' },
-  { name: 'Entertainment', value: 185, color: '#f59e0b' },
-  { name: 'Utilities', value: 60, color: '#3b82f6' },
-  { name: 'Other', value: 142, color: '#6b7280' },
-];
+  const periodParam = typeof sp.period === 'string' ? sp.period : 'this-month';
+  const period = isDashboardPeriod(periodParam) ? periodParam : 'this-month';
+  const fromParam = typeof sp.from === 'string' ? sp.from : undefined;
+  const toParam = typeof sp.to === 'string' ? sp.to : undefined;
+  const { from, to, prevFrom, prevTo, label } = resolvePeriod(period, fromParam, toParam);
 
-const MONTHLY_TREND = [
-  { month: 'Nov', income: 3_200, expense: 2_100 },
-  { month: 'Dec', income: 4_100, expense: 3_400 },
-  { month: 'Jan', income: 3_200, expense: 1_980 },
-  { month: 'Feb', income: 3_200, expense: 2_340 },
-  { month: 'Mar', income: 3_750, expense: 2_560 },
-  { month: 'Apr', income: 3_200, expense: 1_092 },
-];
+  const now = new Date();
+  const trendFrom = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1)));
+  const trendTo = isoDay(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)));
 
-const RECENT_TRANSACTIONS: Transaction[] = [
-  {
-    id: 't1',
-    type: 'expense',
-    date: 'Apr 14, 2026',
-    description: 'Supermarket — weekly shop',
-    amount: '94.30',
-    accountFrom: 'Main Checking',
-    category: 'Groceries',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't2',
-    type: 'income',
-    date: 'Apr 1, 2026',
-    description: 'Monthly salary',
-    amount: '3200.00',
-    accountFrom: 'Main Checking',
-    category: 'Salary',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't3',
-    type: 'expense',
-    date: 'Apr 13, 2026',
-    description: 'Netflix subscription',
-    amount: '15.99',
-    accountFrom: 'Visa Credit',
-    category: 'Entertainment',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't4',
-    type: 'transfer',
-    date: 'Apr 10, 2026',
-    description: 'Savings transfer',
-    amount: '500.00',
-    accountFrom: 'Main Checking',
-    category: '',
-    label: '',
-    accountTo: 'Savings',
-  },
-  {
-    id: 't5',
-    type: 'expense',
-    date: 'Apr 9, 2026',
-    description: 'Restaurant dinner',
-    amount: '64.00',
-    accountFrom: 'Visa Credit',
-    category: 'Dining',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't6',
-    type: 'expense',
-    date: 'Apr 8, 2026',
-    description: 'Monthly metro pass',
-    amount: '38.50',
-    accountFrom: 'Main Checking',
-    category: 'Transport',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't7',
-    type: 'expense',
-    date: 'Apr 7, 2026',
-    description: 'Electricity bill',
-    amount: '60.20',
-    accountFrom: 'Main Checking',
-    category: 'Utilities',
-    label: '',
-    accountTo: '',
-  },
-  {
-    id: 't8',
-    type: 'income',
-    date: 'Apr 5, 2026',
-    description: 'Freelance invoice #12',
-    amount: '550.00',
-    accountFrom: 'Main Checking',
-    category: 'Freelance',
-    label: '',
-    accountTo: '',
-  },
-];
+  const [accountRows, curRows, prevRows, spending, trend, budgetRows, txList] = await Promise.all([
+    paymentMethodService.list(userId),
+    reportService.incomeVsExpenses(userId, from, to),
+    reportService.incomeVsExpenses(userId, prevFrom, prevTo),
+    reportService.spendingByCategory(userId, from, to),
+    reportService.incomeVsExpenses(userId, trendFrom, trendTo),
+    budgetService.list(userId),
+    transactionService.list(userId, { page: 1, pageSize: 8 }),
+  ]);
 
-// Period-dependent stats
-const PERIOD_STATS: Record<
-  'current_month' | 'last_30_days' | 'current_year',
-  { income: number; prevIncome: number; expense: number; prevExpense: number }
-> = {
-  current_month: {
-    income: 3_750,
-    prevIncome: 3_200,
-    expense: 1_092,
-    prevExpense: 2_560,
-  },
-  last_30_days: {
-    income: 4_100,
-    prevIncome: 3_750,
-    expense: 2_340,
-    prevExpense: 2_100,
-  },
-  current_year: {
-    income: 19_650,
-    prevIncome: 16_200,
-    expense: 13_472,
-    prevExpense: 12_980,
-  },
-};
+  // Stat cards — selected period income/expense/net vs the previous equal period.
+  const sumRows = (rows: { income: string; expenses: string }[]) =>
+    rows.reduce(
+      (acc, r) => ({
+        income: acc.income + parseFloat(r.income),
+        expense: acc.expense + parseFloat(r.expenses),
+      }),
+      { income: 0, expense: 0 },
+    );
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+  const cur = sumRows(curRows);
+  const prev = sumRows(prevRows);
+  const income = cur.income;
+  const expense = cur.expense;
+  const net = income - expense;
+  const prevIncome = prev.income;
+  const prevExpense = prev.expense;
+  const prevNet = prev.income - prev.expense;
 
-export default function DashboardPage() {
-  const [period, setPeriod] = useState<'current_month' | 'last_30_days' | 'current_year'>(
-    'current_month',
-  );
+  const accounts: AccountBalanceItem[] = accountRows.map((a) => ({
+    id: a.id,
+    name: a.name,
+    type: a.type,
+    balance: parseFloat(a.currentBalance),
+    ...(a.color ? { color: a.color } : {}),
+  }));
 
-  const stats = PERIOD_STATS[period];
-  const totalCategorySpend = CATEGORY_SPENDING.reduce((s, c) => s + c.value, 0);
+  const budgets: BudgetSummaryItem[] = budgetRows.map((b) => ({
+    id: b.id,
+    name: b.name,
+    spent: parseFloat(b.spent),
+    amount: parseFloat(b.amount),
+  }));
 
-  const periodLabel: Record<string, string> = {
-    current_month: 'April 2026',
-    last_30_days: 'Last 30 days',
-    current_year: 'Year 2026',
-  };
+  const categorySpending = spending.map((s) => ({
+    name: s.categoryName,
+    value: parseFloat(s.total),
+  }));
+  const totalCategorySpend = categorySpending.reduce((sum, c) => sum + c.value, 0);
+
+  const monthlyTrend = trend.map((t) => ({
+    month: monthLabel(t.month),
+    income: parseFloat(t.income),
+    expense: parseFloat(t.expenses),
+  }));
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{periodLabel[period]}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{label}</p>
         </div>
-        <Select value={period} onValueChange={(v) => setPeriod(v as typeof period)}>
-          <SelectTrigger className="w-44 h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="current_month">Current month</SelectItem>
-            <SelectItem value="last_30_days">Last 30 days</SelectItem>
-            <SelectItem value="current_year">Current year</SelectItem>
-          </SelectContent>
-        </Select>
+        <PeriodSelector period={period} from={from} to={to} />
       </div>
 
-      {/* Stat cards — 2 col */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Stat cards — income / expense / net */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          label="Income this period"
-          value={stats.income || 0}
-          previousValue={stats.prevIncome}
+          label="Income"
+          value={income}
+          previousValue={prevIncome}
           colorClass="text-emerald-600 dark:text-emerald-400"
         />
         <StatCard
-          label="Expenses this period"
-          value={stats.expense}
-          previousValue={stats.prevExpense}
+          label="Expenses"
+          value={expense}
+          previousValue={prevExpense}
           colorClass="text-rose-600 dark:text-rose-400"
+        />
+        <StatCard
+          label="Net"
+          value={net}
+          previousValue={prevNet}
+          colorClass={
+            net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+          }
         />
       </div>
 
+      {/* Accounts + Recent transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <AccountBalancesWidget accounts={ACCOUNTS} />
-        <RecentTransactionsWidget transactions={RECENT_TRANSACTIONS} />
+        <AccountBalancesWidget accounts={accounts} />
+        <RecentTransactionsWidget transactions={txList.data} />
       </div>
 
-      {/* Budget Status + Spending by Category — 2 col */}
+      {/* Budget status + Spending by category */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <BudgetStatusWidget budgets={BUDGETS} />
-        <SpendingByCategoryChart data={CATEGORY_SPENDING} total={totalCategorySpend} />
+        <BudgetStatusWidget budgets={budgets} />
+        <SpendingByCategoryChart data={categorySpending} total={totalCategorySpend} />
       </div>
 
-      {/* Monthly Trend — full width */}
-      <MonthlyTrendChart data={MONTHLY_TREND} />
+      {/* Monthly trend */}
+      <MonthlyTrendChart data={monthlyTrend} />
     </div>
   );
 }

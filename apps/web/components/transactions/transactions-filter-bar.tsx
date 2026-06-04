@@ -1,6 +1,11 @@
 'use client';
 
 import { X, TrendingUp, TrendingDown, ArrowLeftRight } from 'lucide-react';
+import type {
+  CategoryOptionDTO,
+  LabelOptionDTO,
+  PaymentMethodOptionDTO,
+} from '@expense-tracker/types';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -12,29 +17,32 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-export interface TransactionFilters {
-  type: string;
-  category: string;
-  label: string;
-  account: string;
-  dateFrom: string;
-  dateTo: string;
-  validated: string;
+export interface TransactionFilterValues {
+  type: string; // 'all' | income | expense | transfer
+  categoryId: string; // 'all' | uuid
+  labelId: string; // 'all' | uuid
+  paymentMethodId: string; // 'all' | uuid
+  from: string;
+  to: string;
+  isValidated: string; // 'all' | 'true' | 'false'
 }
 
-const defaultFilters: TransactionFilters = {
+export const defaultFilterValues: TransactionFilterValues = {
   type: 'all',
-  category: 'all',
-  label: 'all',
-  account: 'all',
-  dateFrom: '',
-  dateTo: '',
-  validated: 'all',
+  categoryId: 'all',
+  labelId: 'all',
+  paymentMethodId: 'all',
+  from: '',
+  to: '',
+  isValidated: 'all',
 };
 
-interface TransactionsFilterBarProps {
-  filters: TransactionFilters;
-  onChange: (filters: TransactionFilters) => void;
+interface Props {
+  value: TransactionFilterValues;
+  categories: CategoryOptionDTO[];
+  labels: LabelOptionDTO[];
+  paymentMethods: PaymentMethodOptionDTO[];
+  onChange: (next: TransactionFilterValues) => void;
 }
 
 const typeOptions: {
@@ -43,11 +51,7 @@ const typeOptions: {
   icon?: React.ElementType;
   activeClass: string;
 }[] = [
-  {
-    value: 'all',
-    label: 'All',
-    activeClass: 'bg-primary text-primary-foreground border-primary',
-  },
+  { value: 'all', label: 'All', activeClass: 'bg-primary text-primary-foreground border-primary' },
   {
     value: 'income',
     label: 'Income',
@@ -71,51 +75,36 @@ const typeOptions: {
   },
 ];
 
-const validatedOptions = [
-  { value: 'all', label: 'All' },
-  { value: 'validated', label: 'Validated' },
-  { value: 'unvalidated', label: 'Unvalidated' },
-];
-
-const mockCategories = [
-  'Food & Dining',
-  'Transportation',
-  'Shopping',
-  'Housing',
-  'Entertainment',
-  'Health',
-  'Salary',
-];
-const mockLabels = ['Personal', 'Business', 'Recurring', 'One-time'];
-const mockAccounts = ['Checking Account', 'Savings Account', 'Cash', 'Credit Card'];
-
-function hasActiveFilters(filters: TransactionFilters) {
+function isActiveFilter(v: TransactionFilterValues): boolean {
   return (
-    filters.type !== 'all' ||
-    filters.category !== 'all' ||
-    filters.label !== 'all' ||
-    filters.account !== 'all' ||
-    filters.dateFrom !== '' ||
-    filters.dateTo !== '' ||
-    filters.validated !== 'all'
+    v.type !== 'all' ||
+    v.categoryId !== 'all' ||
+    v.labelId !== 'all' ||
+    v.paymentMethodId !== 'all' ||
+    v.from !== '' ||
+    v.to !== '' ||
+    v.isValidated !== 'all'
   );
 }
 
-export function TransactionsFilterBar({ filters, onChange }: TransactionsFilterBarProps) {
-  const active = hasActiveFilters(filters);
-
-  const set = <K extends keyof TransactionFilters>(key: K, value: TransactionFilters[K]) =>
-    onChange({ ...filters, [key]: value });
-
-  const reset = () => onChange(defaultFilters);
+export function TransactionsFilterBar({
+  value,
+  categories,
+  labels,
+  paymentMethods,
+  onChange,
+}: Props) {
+  const set = <K extends keyof TransactionFilterValues>(
+    key: K,
+    v: TransactionFilterValues[K],
+  ): void => onChange({ ...value, [key]: v });
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Type segmented */}
       <div className="flex gap-1.5">
         {typeOptions.map((opt) => {
           const Icon = opt.icon;
-          const isActive = filters.type === opt.value;
+          const active = value.type === opt.value;
           return (
             <button
               key={opt.value}
@@ -123,7 +112,7 @@ export function TransactionsFilterBar({ filters, onChange }: TransactionsFilterB
               onClick={() => set('type', opt.value)}
               className={cn(
                 'flex items-center gap-1 rounded-md border px-2.5 py-1 text-sm font-medium transition-colors',
-                isActive
+                active
                   ? opt.activeClass
                   : 'border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted',
               )}
@@ -135,90 +124,82 @@ export function TransactionsFilterBar({ filters, onChange }: TransactionsFilterB
         })}
       </div>
 
-      {/* Category */}
-      <Select value={filters.category} onValueChange={(v) => set('category', v)}>
+      <Select value={value.categoryId} onValueChange={(v) => set('categoryId', v)}>
         <SelectTrigger className="h-8 w-40 text-sm">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All categories</SelectItem>
-          {mockCategories.map((c) => (
-            <SelectItem key={c} value={c}>
-              {c}
+          {categories.map((c) => (
+            <SelectItem key={c.id} value={c.id}>
+              {c.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Label */}
-      <Select value={filters.label} onValueChange={(v) => set('label', v)}>
+      <Select value={value.labelId} onValueChange={(v) => set('labelId', v)}>
         <SelectTrigger className="h-8 w-36 text-sm">
           <SelectValue placeholder="Label" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All labels</SelectItem>
-          {mockLabels.map((l) => (
-            <SelectItem key={l} value={l}>
-              {l}
+          {labels.map((l) => (
+            <SelectItem key={l.id} value={l.id}>
+              {l.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Account */}
-      <Select value={filters.account} onValueChange={(v) => set('account', v)}>
+      <Select value={value.paymentMethodId} onValueChange={(v) => set('paymentMethodId', v)}>
         <SelectTrigger className="h-8 w-40 text-sm">
           <SelectValue placeholder="Account" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All accounts</SelectItem>
-          {mockAccounts.map((a) => (
-            <SelectItem key={a} value={a}>
-              {a}
+          {paymentMethods.map((p) => (
+            <SelectItem key={p.id} value={p.id}>
+              {p.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      {/* Date range */}
       <div className="flex items-center gap-1">
         <Input
           type="date"
           aria-label="From date"
           className="h-8 w-36 text-sm"
-          value={filters.dateFrom}
-          onChange={(e) => set('dateFrom', e.target.value)}
+          value={value.from}
+          onChange={(e) => set('from', e.target.value)}
         />
         <span className="text-muted-foreground text-xs">to</span>
         <Input
           type="date"
           aria-label="To date"
           className="h-8 w-36 text-sm"
-          value={filters.dateTo}
-          onChange={(e) => set('dateTo', e.target.value)}
+          value={value.to}
+          onChange={(e) => set('to', e.target.value)}
         />
       </div>
 
-      {/* Validated */}
-      <Select value={filters.validated} onValueChange={(v) => set('validated', v)}>
+      <Select value={value.isValidated} onValueChange={(v) => set('isValidated', v)}>
         <SelectTrigger className="h-8 w-36 text-sm">
           <SelectValue placeholder="Validated" />
         </SelectTrigger>
         <SelectContent>
-          {validatedOptions.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </SelectItem>
-          ))}
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="true">Validated</SelectItem>
+          <SelectItem value="false">Unvalidated</SelectItem>
         </SelectContent>
       </Select>
 
-      {/* Reset */}
-      {active && (
+      {isActiveFilter(value) && (
         <Button
           variant="ghost"
           size="sm"
-          onClick={reset}
+          onClick={() => onChange(defaultFilterValues)}
           className="h-8 gap-1.5 text-muted-foreground"
         >
           <X className="size-3.5" />
@@ -228,5 +209,3 @@ export function TransactionsFilterBar({ filters, onChange }: TransactionsFilterB
     </div>
   );
 }
-
-export { defaultFilters };

@@ -1,5 +1,15 @@
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
+import { DashboardNavbar } from '@/components/dashboard-navbar';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // The root layout already provides the <main> landmark and page padding;
-  // this group layout is a passthrough to avoid a nested <main>.
-  return children;
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <DashboardNavbar />
+        <main className="flex-1 overflow-auto p-6">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }

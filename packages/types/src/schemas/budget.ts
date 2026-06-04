@@ -11,7 +11,7 @@ const baseBudgetShape = z.object({
   amount: decimalAmount,
   startDate: z.string().date(),
   endDate: z.string().date().optional(),
-  categoryId: z.string().uuid().optional(),
+  categoryId: z.string().uuid(),
   labelId: z.string().uuid().optional(),
 });
 

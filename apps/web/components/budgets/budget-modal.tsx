@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type {
+  BudgetWithSpendingDTO,
+  CategoryOptionDTO,
+  LabelOptionDTO,
+} from '@expense-tracker/types';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,24 +25,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import type { Budget } from './budget-card';
 
-const CATEGORIES = [
-  { id: 'food', name: 'Food & Dining', color: '#10b981' },
-  { id: 'transport', name: 'Transport', color: '#3b82f6' },
-  { id: 'housing', name: 'Housing', color: '#8b5cf6' },
-  { id: 'health', name: 'Health', color: '#ef4444' },
-  { id: 'entertainment', name: 'Entertainment', color: '#f59e0b' },
-  { id: 'shopping', name: 'Shopping', color: '#ec4899' },
-];
-
-const LABELS = ['Personal', 'Work', 'Family', 'Vacation'];
+export interface BudgetFormValues {
+  name: string;
+  amount: string;
+  startDate: string;
+  endDate: string;
+  categoryId: string;
+  labelId?: string;
+}
 
 interface BudgetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  budget?: Budget | null;
-  onSave: (budget: Partial<Budget>) => void;
+  budget?: BudgetWithSpendingDTO | null;
+  categories: CategoryOptionDTO[];
+  labels: LabelOptionDTO[];
+  /** Returns true on success (modal then closes), false on failure (stays open). */
+  onSubmit: (values: BudgetFormValues) => Promise<boolean>;
 }
 
 interface FormState {
@@ -44,8 +50,8 @@ interface FormState {
   amount: string;
   startDate: string;
   endDate: string;
-  category: string;
-  label: string;
+  categoryId: string;
+  labelId: string;
 }
 
 const EMPTY_FORM: FormState = {
@@ -53,63 +59,50 @@ const EMPTY_FORM: FormState = {
   amount: '',
   startDate: '',
   endDate: '',
-  category: '',
-  label: '',
+  categoryId: '',
+  labelId: '',
 };
 
-function toInputDate(display: string): string {
-  // expects "D MMM YYYY", converts to YYYY-MM-DD for <input type="date">
-  if (!display) return '';
-  try {
-    return new Date(display).toISOString().split('T')[0] ?? '';
-  } catch {
-    return '';
-  }
+const NO_LABEL = '__none__';
+
+function monthBounds(): { firstDay: string; lastDay: string } {
+  const now = new Date();
+  const first = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const last = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0));
+  return { firstDay: first.toISOString().slice(0, 10), lastDay: last.toISOString().slice(0, 10) };
 }
 
-function fromInputDate(value: string): string {
-  if (!value) return '';
-  try {
-    return new Date(value).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  } catch {
-    return value;
-  }
-}
-
-export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalProps) {
+export function BudgetModal({
+  open,
+  onOpenChange,
+  budget,
+  categories,
+  labels,
+  onSubmit,
+}: BudgetModalProps) {
   const isEdit = !!budget;
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<FormState>>({});
 
   useEffect(() => {
-    if (open) {
-      if (budget) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setForm({
-          name: budget.name,
-          amount: String(budget.amount),
-          startDate: toInputDate(budget.startDate),
-          endDate: toInputDate(budget.endDate),
-          // budget.category is the display name; the Select options are keyed by id
-          category: CATEGORIES.find((c) => c.name === budget.category)?.id ?? '',
-          label: budget.label ?? '',
-        });
-      } else {
-        const now = new Date();
-        const firstDay =
-          new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0] ?? '';
-        const lastDay =
-          new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0] ?? '';
-        setForm({ ...EMPTY_FORM, startDate: firstDay, endDate: lastDay });
-      }
-      setErrors({});
-      setSaving(false);
+    if (!open) return;
+    if (budget) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm({
+        name: budget.name,
+        amount: budget.amount,
+        startDate: budget.startDate,
+        endDate: budget.endDate ?? '',
+        categoryId: budget.categoryId ?? '',
+        labelId: budget.labelId ?? '',
+      });
+    } else {
+      const { firstDay, lastDay } = monthBounds();
+      setForm({ ...EMPTY_FORM, startDate: firstDay, endDate: lastDay });
     }
+    setErrors({});
+    setSaving(false);
   }, [open, budget]);
 
   function set(field: keyof FormState, value: string) {
@@ -123,8 +116,10 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       next.amount = 'Enter a valid positive amount.';
     if (!form.startDate) next.startDate = 'Start date is required.';
-    if (form.endDate && form.startDate && form.endDate < form.startDate)
+    if (!form.endDate) next.endDate = 'End date is required.';
+    else if (form.startDate && form.endDate <= form.startDate)
       next.endDate = 'End date must be after start date.';
+    if (!form.categoryId) next.categoryId = 'Category is required.';
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -132,34 +127,26 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
   async function handleSave() {
     if (!validate()) return;
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    const cat = CATEGORIES.find((c) => c.id === form.category);
-    onSave({
+    const ok = await onSubmit({
       name: form.name.trim(),
-      amount: Number(form.amount),
-      spent: budget?.spent ?? 0,
-      startDate: fromInputDate(form.startDate),
-      endDate: form.endDate ? fromInputDate(form.endDate) : 'No end date',
-      ...(cat ? { category: cat.name, categoryColor: cat.color } : {}),
-      ...(form.label ? { label: form.label } : {}),
+      amount: form.amount,
+      startDate: form.startDate,
+      endDate: form.endDate,
+      categoryId: form.categoryId,
+      ...(form.labelId ? { labelId: form.labelId } : {}),
     });
     setSaving(false);
-    onOpenChange(false);
+    if (ok) onOpenChange(false);
   }
-
-  const isValid =
-    form.name.trim() !== '' &&
-    form.amount !== '' &&
-    !isNaN(Number(form.amount)) &&
-    Number(form.amount) > 0 &&
-    form.startDate !== '' &&
-    (!form.endDate || form.endDate >= form.startDate);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Budget' : 'New Budget'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the budget details.' : 'Create a new budget.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
@@ -222,18 +209,18 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
 
           {/* Category */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="budget-category">Category (optional)</Label>
-            <Select value={form.category} onValueChange={(v) => set('category', v)}>
+            <Label htmlFor="budget-category">Category</Label>
+            <Select value={form.categoryId} onValueChange={(v) => set('categoryId', v)}>
               <SelectTrigger id="budget-category">
-                <SelectValue placeholder="All categories" />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((c) => (
+                {categories.map((c) => (
                   <SelectItem key={c.id} value={c.id}>
                     <div className="flex items-center gap-2">
                       <span
                         className="size-2 rounded-full shrink-0"
-                        style={{ backgroundColor: c.color }}
+                        style={{ backgroundColor: c.color ?? '#6b7280' }}
                       />
                       {c.name}
                     </div>
@@ -241,19 +228,32 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
                 ))}
               </SelectContent>
             </Select>
+            {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
           </div>
 
-          {/* Label */}
+          {/* Label (optional) */}
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="budget-label">Label (optional)</Label>
-            <Select value={form.label} onValueChange={(v) => set('label', v)}>
+            <Label htmlFor="budget-label">
+              Label <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
+            <Select
+              value={form.labelId || NO_LABEL}
+              onValueChange={(v) => set('labelId', v === NO_LABEL ? '' : v)}
+            >
               <SelectTrigger id="budget-label">
                 <SelectValue placeholder="No label" />
               </SelectTrigger>
               <SelectContent>
-                {LABELS.map((l) => (
-                  <SelectItem key={l} value={l}>
-                    {l}
+                <SelectItem value={NO_LABEL}>No label</SelectItem>
+                {labels.map((l) => (
+                  <SelectItem key={l.id} value={l.id}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: l.color ?? '#6b7280' }}
+                      />
+                      {l.name}
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -262,10 +262,10 @@ export function BudgetModal({ open, onOpenChange, budget, onSave }: BudgetModalP
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!isValid || saving}>
+          <Button onClick={handleSave} disabled={saving}>
             {saving ? <Spinner className="mr-2 size-4" /> : null}
             {saving ? 'Saving…' : 'Save'}
           </Button>

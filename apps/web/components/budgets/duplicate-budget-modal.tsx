@@ -13,13 +13,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import type { Budget } from './budget-card';
+import type { BudgetWithSpendingDTO } from '@expense-tracker/types';
 
 interface DuplicateBudgetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  budget: Budget | null;
-  onDuplicate: (startDate: string, endDate: string) => void;
+  budget: BudgetWithSpendingDTO | null;
+  /** Returns true on success (modal then closes). Dates are ISO YYYY-MM-DD. */
+  onDuplicate: (startDate: string, endDate: string) => Promise<boolean>;
+}
+
+function nextMonthBounds(): { start: string; end: string } {
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 2, 0));
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
 }
 
 export function DuplicateBudgetModal({
@@ -34,35 +42,28 @@ export function DuplicateBudgetModal({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (open && budget) {
-      // Pre-fill: first day of month after original's start, last day of that month
-      try {
-        const orig = new Date(budget.startDate);
-        const nextMonth = new Date(orig.getFullYear(), orig.getMonth() + 1, 1);
-        const lastDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setStartDate(nextMonth.toISOString().split('T')[0] ?? '');
-        setEndDate(lastDay.toISOString().split('T')[0] ?? '');
-      } catch {
-        setStartDate('');
-        setEndDate('');
-      }
-      setDateError('');
-      setSaving(false);
-    }
-  }, [open, budget]);
+    if (!open) return;
+    const { start, end } = nextMonthBounds();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStartDate(start);
+    setEndDate(end);
+    setDateError('');
+    setSaving(false);
+  }, [open]);
 
-  function handleSave() {
-    if (endDate && endDate < startDate) {
+  async function handleSave() {
+    if (!startDate) {
+      setDateError('Start date is required.');
+      return;
+    }
+    if (endDate && endDate <= startDate) {
       setDateError('End date must be after start date.');
       return;
     }
     setSaving(true);
-    setTimeout(() => {
-      onDuplicate(startDate, endDate);
-      setSaving(false);
-      onOpenChange(false);
-    }, 600);
+    const ok = await onDuplicate(startDate, endDate);
+    setSaving(false);
+    if (ok) onOpenChange(false);
   }
 
   return (
@@ -71,7 +72,7 @@ export function DuplicateBudgetModal({
         <DialogHeader>
           <DialogTitle>Duplicate — {budget?.name}</DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Name, amount, and filters will be copied from the original.
+            Name, amount, and filters are copied from the original; pick a new date range.
           </DialogDescription>
         </DialogHeader>
 
@@ -89,7 +90,7 @@ export function DuplicateBudgetModal({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="dup-end">End date (optional)</Label>
+            <Label htmlFor="dup-end">End date</Label>
             <Input
               id="dup-end"
               type="date"
@@ -104,7 +105,7 @@ export function DuplicateBudgetModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={!startDate || saving}>

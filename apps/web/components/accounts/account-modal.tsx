@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -45,11 +46,19 @@ const PRESET_COLORS = [
   '#64748b',
 ];
 
+export interface AccountFormValues {
+  name: string;
+  type: AccountType;
+  initialBalance: string;
+  color?: string;
+}
+
 interface AccountModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   account?: Account | null;
-  onSave: (data: Partial<Account>) => void;
+  /** Returns true on success (modal then closes), false on failure. */
+  onSubmit: (values: AccountFormValues) => Promise<boolean>;
 }
 
 interface FormState {
@@ -66,7 +75,7 @@ const EMPTY_FORM: FormState = {
   color: '',
 };
 
-export function AccountModal({ open, onOpenChange, account, onSave }: AccountModalProps) {
+export function AccountModal({ open, onOpenChange, account, onSubmit }: AccountModalProps) {
   const isEdit = !!account;
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
@@ -106,17 +115,14 @@ export function AccountModal({ open, onOpenChange, account, onSave }: AccountMod
   async function handleSave() {
     if (!validate()) return;
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    const initial = isEdit && account ? account.initialBalance : Number(form.initialBalance);
-    onSave({
+    const ok = await onSubmit({
       name: form.name.trim(),
       type: form.type,
-      initialBalance: initial,
-      balance: isEdit && account ? account.balance : Number(form.initialBalance),
+      initialBalance: form.initialBalance,
       ...(form.color ? { color: form.color } : {}),
     });
     setSaving(false);
-    onOpenChange(false);
+    if (ok) onOpenChange(false);
   }
 
   const isValid = form.name.trim() !== '' && (isEdit || !isNaN(Number(form.initialBalance)));
@@ -126,6 +132,9 @@ export function AccountModal({ open, onOpenChange, account, onSave }: AccountMod
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Account' : 'New Account'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the account details.' : 'Add a new account or payment method.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">

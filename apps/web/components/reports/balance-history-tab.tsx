@@ -10,8 +10,6 @@ import {
   Legend,
   Tooltip,
 } from 'recharts';
-import { Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { ChartContainer } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
@@ -60,13 +58,6 @@ export function BalanceHistoryTab({ data, accounts, loading }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Download className="size-3.5" />
-          Export CSV
-        </Button>
-      </div>
-
       <ChartContainer config={chartConfig} className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 4, right: 20, bottom: 0, left: 0 }}>

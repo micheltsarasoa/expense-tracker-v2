@@ -1,8 +1,6 @@
 'use client';
 
 import { Pie, PieChart, Cell, ResponsiveContainer } from 'recharts';
-import { Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -68,13 +66,6 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Download className="size-3.5" />
-          Export CSV
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Donut chart */}
         <ChartContainer config={chartConfig} className="h-72 w-full">

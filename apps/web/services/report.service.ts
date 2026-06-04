@@ -66,7 +66,7 @@ export class ReportService extends BaseService {
     }));
   }
 
-  async incomeVsExpenses(userId: string, months = 6): Promise<IncomeVsExpenses[]> {
+  async incomeVsExpenses(userId: string, from: string, to: string): Promise<IncomeVsExpenses[]> {
     const rows = await this.db
       .select({
         month: sql<string>`TO_CHAR(DATE_TRUNC('month', ${transactions.transactionDate}::timestamp), 'YYYY-MM')`,
@@ -78,7 +78,8 @@ export class ReportService extends BaseService {
         and(
           eq(transactions.userId, userId),
           eq(transactions.isDeleted, false),
-          sql`${transactions.transactionDate} >= NOW() - INTERVAL '${sql.raw(String(months))} months'`,
+          sql`${transactions.transactionDate} >= ${from}`,
+          sql`${transactions.transactionDate} <= ${to}`,
         ),
       )
       .groupBy(sql`DATE_TRUNC('month', ${transactions.transactionDate}::timestamp)`)

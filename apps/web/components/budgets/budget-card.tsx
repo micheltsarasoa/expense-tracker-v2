@@ -1,6 +1,7 @@
 'use client';
 
 import { MoreHorizontal, Pencil, Copy, Trash2, AlertCircle, AlertTriangle } from 'lucide-react';
+import type { BudgetWithSpendingDTO } from '@expense-tracker/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,25 +13,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-
-export interface Budget {
-  id: string;
-  name: string;
-  amount: number;
-  spent: number;
-  startDate: string;
-  endDate: string;
-  category?: string;
-  categoryColor: string | '#ccc';
-  label?: string;
-  isExpired?: boolean;
-}
+import { eur, formatDay } from '@/lib/format';
 
 interface BudgetCardProps {
-  budget: Budget;
-  onEdit: (budget: Budget) => void;
-  onDuplicate: (budget: Budget) => void;
-  onDelete: (budget: Budget) => void;
+  budget: BudgetWithSpendingDTO;
+  onEdit: (budget: BudgetWithSpendingDTO) => void;
+  onDuplicate: (budget: BudgetWithSpendingDTO) => void;
+  onDelete: (budget: BudgetWithSpendingDTO) => void;
 }
 
 function getProgressColor(pct: number) {
@@ -40,25 +29,27 @@ function getProgressColor(pct: number) {
 }
 
 export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCardProps) {
-  const rawPct = budget.amount > 0 ? (budget.spent / budget.amount) * 100 : 0;
-  const pct = Math.min(rawPct, 100);
-  const remaining = budget.amount - budget.spent;
-  const isOver = rawPct >= 100;
-  const isWarn = rawPct >= 75 && rawPct < 100;
-  const progressColor = getProgressColor(rawPct);
+  const pct = budget.pct; // server-computed, clamped 0..999
+  const barPct = Math.min(pct, 100);
+  const isOver = pct >= 100;
+  const isWarn = pct >= 75 && pct < 100;
+  const remaining = parseFloat(budget.remaining);
+  const today = new Date().toISOString().slice(0, 10);
+  const isEnded = budget.endDate !== null && budget.endDate < today;
+  const progressColor = getProgressColor(pct);
 
   return (
     <div
       className={cn(
         'relative flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-opacity',
         isOver && 'border-rose-300 dark:border-rose-800',
-        budget.isExpired && 'opacity-60',
+        isEnded && 'opacity-60',
       )}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          {budget.category && (
+          {budget.categoryName && (
             <Badge variant="outline" className="flex items-center gap-1 text-xs">
               {budget.categoryColor && (
                 <span
@@ -66,7 +57,7 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
                   style={{ backgroundColor: budget.categoryColor }}
                 />
               )}
-              {budget.category}
+              {budget.categoryName}
             </Badge>
           )}
           {isOver && (
@@ -87,7 +78,7 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
               Warning
             </Badge>
           )}
-          {budget.isExpired && (
+          {isEnded && (
             <Badge
               variant="outline"
               className="flex items-center gap-1 text-xs text-muted-foreground"
@@ -129,29 +120,25 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
       <div>
         <p className="text-base font-medium leading-tight">{budget.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {budget.startDate} – {budget.endDate}
+          {formatDay(budget.startDate)} – {budget.endDate ? formatDay(budget.endDate) : 'ongoing'}
         </p>
       </div>
 
       {/* Progress */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{Math.round(rawPct)}%</span>
-          <span className="tabular-nums font-medium text-foreground">
-            €{budget.amount.toFixed(2)}
-          </span>
+          <span>{pct}%</span>
+          <span className="tabular-nums font-medium text-foreground">{eur(budget.amount)}</span>
         </div>
-        <Progress value={pct} className="h-2" indicatorClassName={progressColor} />
+        <Progress value={barPct} className="h-2" indicatorClassName={progressColor} />
         <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground tabular-nums">
-            €{budget.spent.toFixed(2)} spent
-          </span>
+          <span className="text-muted-foreground tabular-nums">{eur(budget.spent)} spent</span>
           {isOver ? (
             <span className="text-rose-600 dark:text-rose-400 tabular-nums font-medium">
-              Over by €{Math.abs(remaining).toFixed(2)}
+              Over by {eur(Math.abs(remaining).toFixed(2))}
             </span>
           ) : (
-            <span className="text-muted-foreground tabular-nums">€{remaining.toFixed(2)} left</span>
+            <span className="text-muted-foreground tabular-nums">{eur(budget.remaining)} left</span>
           )}
         </div>
       </div>

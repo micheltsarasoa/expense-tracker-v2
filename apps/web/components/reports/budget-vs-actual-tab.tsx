@@ -1,7 +1,6 @@
 'use client';
 
-import { Download, AlertCircle, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -89,13 +88,6 @@ export function BudgetVsActualTab({ data, loading }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5">
-          <Download className="size-3.5" />
-          Export CSV
-        </Button>
-      </div>
-
       <Card className="shadow-sm">
         <CardContent className="py-4 px-6 divide-y divide-border">
           {sorted.map((row) => {
