@@ -69,6 +69,7 @@ export class ImportService extends BaseService {
       const result = Papa.parse<Record<string, string>>(text, {
         header: true,
         skipEmptyLines: true,
+        delimiter: ';',
       });
       return result.data;
     }

@@ -99,9 +99,11 @@ export function ImportTransactionsModal({
         <div className="flex flex-col gap-4 py-2">
           {/* Format hint + template */}
           <div className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-            <p className="font-medium text-foreground">Expected columns</p>
+            <p className="font-medium text-foreground">
+              Expected columns (semicolon <code>;</code> separated)
+            </p>
             <p className="mt-1">
-              <code>date, type, amount, account, category, toAccount, label, description</code>
+              <code>date;type;amount;account;category;toAccount;label;description</code>
             </p>
             <ul className="mt-2 list-disc pl-4 space-y-0.5">
               <li>
