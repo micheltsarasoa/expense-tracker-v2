@@ -28,7 +28,7 @@ export function formatMoney(value: number | string, fmt: MoneyFormat): string {
   const withSymbol =
     fmt.currencyPosition === 'before'
       ? `${fmt.currencySymbol}${body}`
-      : `${body} ${fmt.currencySymbol}`;
+      : `${body} ${fmt.currencySymbol}`;
   return `${sign}${withSymbol}`;
 }
 
