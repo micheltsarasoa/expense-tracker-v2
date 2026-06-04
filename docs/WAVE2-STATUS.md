@@ -38,14 +38,14 @@
 
 ## Next / Not done
 
-| Order | What                                                                                                    | How                          | Status              |
-| ----- | ------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------- |
-| 1     | Verify `/reports` renders with live data                                                                | manual                       | **NEXT (user)**     |
-| 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                 | new modal vs `import` routes | not done (deferred) |
-| –     | Cleanup: `DialogDescription` on budget/duplicate/category modals (a11y warning) — tx modal already done | Edit                         | not done            |
-| –     | Cleanup: dashboard **period selector** (D2) via searchParams                                            | —                            | deferred            |
-| –     | Cleanup: budget **label-scoping** in modal                                                              | —                            | deferred            |
-| –     | Cleanup: footer/group **float totals → integer cents** (B6 residual)                                    | —                            | deferred            |
+| Order | What                                                                                                     | How                          | Status              |
+| ----- | -------------------------------------------------------------------------------------------------------- | ---------------------------- | ------------------- |
+| 1     | Verify `/reports` renders with live data                                                                 | manual                       | **NEXT (user)**     |
+| 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                  | new modal vs `import` routes | not done (deferred) |
+| –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done | Edit                         | ✅ done             |
+| –     | Cleanup: dashboard **period selector** (D2) via searchParams                                             | —                            | deferred            |
+| –     | Cleanup: budget **label-scoping** in modal                                                               | —                            | deferred            |
+| –     | Cleanup: footer/group **float totals → integer cents** (B6 residual)                                     | —                            | deferred            |
 
 ## Decisions locked (this session)
 

@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -131,6 +132,9 @@ export function AccountModal({ open, onOpenChange, account, onSubmit }: AccountM
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Account' : 'New Account'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the account details.' : 'Add a new account or payment method.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">

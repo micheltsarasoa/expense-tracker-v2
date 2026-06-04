@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -153,6 +154,9 @@ export function CategoryModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Category' : 'New Category'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the category details.' : 'Create a new category.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">

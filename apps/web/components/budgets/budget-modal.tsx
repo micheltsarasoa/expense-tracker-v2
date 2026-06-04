@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -130,6 +131,9 @@ export function BudgetModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Budget' : 'New Budget'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {isEdit ? 'Edit the budget details.' : 'Create a new budget.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
