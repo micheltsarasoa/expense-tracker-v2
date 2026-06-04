@@ -1,13 +1,9 @@
 /**
- * Display-only formatting helpers. Money stays a string end-to-end; these parse
- * once at the leaf for rendering. A future settings-driven variant can replace
- * these with `formatAmount`/`formatDate` from @expense-tracker/types.
+ * Display-only formatting helpers, driven by the user's settings. Money stays a
+ * string end-to-end and is parsed once at the leaf for rendering; components
+ * should use the bound `money`/`date` from `useFormat()` rather than calling
+ * these directly.
  */
-
-/** Render a numeric(15,2) string as a euro amount, e.g. "320.00" → "€320.00". */
-export function eur(value: string): string {
-  return `€${parseFloat(value).toFixed(2)}`;
-}
 
 export interface MoneyFormat {
   currencySymbol: string;
@@ -32,7 +28,7 @@ export function formatMoney(value: number | string, fmt: MoneyFormat): string {
   const withSymbol =
     fmt.currencyPosition === 'before'
       ? `${fmt.currencySymbol}${body}`
-      : `${body} ${fmt.currencySymbol}`;
+      : `${body} ${fmt.currencySymbol}`;
   return `${sign}${withSymbol}`;
 }
 
@@ -53,19 +49,4 @@ export function formatDate(iso: string, fmt: DateFormat = 'YYYY-MM-DD'): string 
     default:
       return `${y}-${m}-${d}`;
   }
-}
-
-/** Format an ISO `YYYY-MM-DD` as "1 Apr 2026" without timezone drift. */
-export function formatDay(iso: string): string {
-  const parts = iso.split('-');
-  const y = Number(parts[0]);
-  const m = Number(parts[1]);
-  const d = Number(parts[2]);
-  if (!y || !m || !d) return iso;
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
 }
