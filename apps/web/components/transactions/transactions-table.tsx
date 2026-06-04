@@ -31,10 +31,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { eur, formatDay } from '@/lib/format';
+import { eur, formatDate, type DateFormat } from '@/lib/format';
 
 interface TransactionsTableProps {
   transactions: TransactionListItemDTO[];
+  dateFormat: DateFormat;
   onEdit: (transaction: TransactionListItemDTO) => void;
   onDelete: (transaction: TransactionListItemDTO) => void;
   onToggleValidated: (id: string) => void;
@@ -68,6 +69,7 @@ const typeConfig = {
 
 export function TransactionsTable({
   transactions,
+  dateFormat,
   onEdit,
   onDelete,
   onToggleValidated,
@@ -97,7 +99,7 @@ export function TransactionsTable({
             return (
               <TableRow key={tx.id} className="group">
                 <TableCell className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
-                  {formatDay(tx.transactionDate)}
+                  {formatDate(tx.transactionDate, dateFormat)}
                 </TableCell>
                 <TableCell>
                   <Badge

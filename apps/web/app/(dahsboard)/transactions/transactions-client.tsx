@@ -10,6 +10,7 @@ import type {
   LabelOptionDTO,
   PaymentMethodOptionDTO,
 } from '@expense-tracker/types';
+import type { DateFormat } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import {
   Pagination,
@@ -54,6 +55,7 @@ interface TransactionsClientProps {
   categories: CategoryOptionDTO[];
   labels: LabelOptionDTO[];
   paymentMethods: PaymentMethodOptionDTO[];
+  dateFormat: DateFormat;
 }
 
 export function TransactionsClient({
@@ -65,6 +67,7 @@ export function TransactionsClient({
   categories,
   labels,
   paymentMethods,
+  dateFormat,
 }: TransactionsClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -212,6 +215,7 @@ export function TransactionsClient({
       ) : (
         <TransactionsTable
           transactions={transactions}
+          dateFormat={dateFormat}
           onEdit={(tx) => setEditTarget(tx)}
           onDelete={(tx) => setDeleteTarget(tx)}
           onToggleValidated={handleToggleValidated}
