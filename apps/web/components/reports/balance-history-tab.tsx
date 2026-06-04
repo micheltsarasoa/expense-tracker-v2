@@ -13,6 +13,7 @@ import {
 import { ChartContainer } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { useFormat } from '@/lib/settings-context';
 
 export interface BalanceDataPoint {
   date: string;
@@ -30,11 +31,8 @@ interface Props {
   loading?: boolean;
 }
 
-function formatEur(val: number) {
-  return `€${Number(val).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
-}
-
 export function BalanceHistoryTab({ data, accounts, loading }: Props) {
+  const { money, date, settings } = useFormat();
   if (loading) {
     return <Skeleton className="h-72 rounded-xl" />;
   }
@@ -64,6 +62,7 @@ export function BalanceHistoryTab({ data, accounts, loading }: Props) {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
             <XAxis
               dataKey="date"
+              tickFormatter={(v) => date(String(v))}
               tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
@@ -72,13 +71,12 @@ export function BalanceHistoryTab({ data, accounts, loading }: Props) {
               tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={formatEur}
+              tickFormatter={(v) =>
+                `${settings.currencySymbol}${Number(v).toLocaleString('en-US', { minimumFractionDigits: 0 })}`
+              }
             />
             <Tooltip
-              formatter={(value, name) => [
-                `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-                String(name),
-              ]}
+              formatter={(value, name) => [money(Number(value)), String(name)]}
               contentStyle={{
                 fontSize: '12px',
                 borderRadius: '8px',

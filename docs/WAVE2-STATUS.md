@@ -34,20 +34,28 @@
 
 - **Migration `0001` applied** to the DB (dropped `period_type`/`password_hash`, made budget `category_id`/`label_id` nullable, added tx CHECK constraints). Was previously unapplied.
 - `seed.ts` given the same `.env` fallback (uncommitted, harmless) — **seed intentionally NOT run** (user declined).
+- **Provisioning email-collision fix.** `ensureAppUser` used `onConflictDoNothing()` (no target) — when a `public.users` row already held the Stack user's email under a **different id**, the insert silently skipped, so the new Stack id was never provisioned → every write FK-failed (`*_user_id_fkey`). Hardened to `onConflictDoNothing({ target: users.id })` so it only no-ops on a genuine "already provisioned" case and a real email collision throws loudly. One-off data fix: re-homed the stale row's data (`micheltsarasoa@gmail.com`, 43 cats / 8 accts / 993 txs / 15 budgets / 4 labels) to the live Stack id `ab4115ab…` in a single transaction (free email → insert new id row → `UPDATE … SET user_id` across budgets/categories/labels/payment_methods/transactions/user_settings → delete old row). FKs are `ON UPDATE NO ACTION`, so the PK can't be updated in place — children must be repointed.
 - **Dropped rogue v1 trigger** `transaction_balance_update` (+ fn `update_payment_method_balance`) on `transactions` — it double-counted balances alongside `TransactionService` (a -620 expense showed -1240). Recomputed `current_balance = initial_balance + Σ tx`. Spec mandates app-managed balances, no triggers. Manual SQL in Neon (triggers aren't in the Drizzle schema, so a fresh DB won't have it). **⚠️ The Import flow must insert via `TransactionService` now (no trigger to fall back on).**
 
 ## Next / Not done
 
-| Order | What                                                                                                                | How                          | Status                  |
-| ----- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ----------------------- |
-| 1     | Verify `/reports` renders with live data (risk now LOW — see below)                                                 | manual                       | **NEXT (user)**         |
-| 2     | Transactions **Import** flow (T3) — must insert via `TransactionService` (trigger gone)                             | new modal vs `import` routes | not done (deferred)     |
-| –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done            | Edit                         | ✅ done                 |
-| –     | Cleanup: removed dead **Export CSV** buttons from all 4 reports tabs (no onClick; locked-decision dead control)     | Edit                         | ✅ done                 |
-| –     | D2 dashboard **period selector** via searchParams (presets + custom range; drives stat cards + spending donut)      | `lib/period.ts` + selector   | ✅ done                 |
-| –     | Budget **label-scoping** in modal (optional Label `<Select>`, set/change only — no schema change)                   | Edit                         | ✅ done                 |
-| –     | Budgets page **period selector** (reuses dashboard `PeriodSelector`; filters list by date-overlap, spent unchanged) | searchParams + RSC filter    | ✅ done                 |
-| –     | B6 footer/group **float totals → integer cents**                                                                    | —                            | ❌ won't-fix (see note) |
+| Order | What                                                                                                                                                               | How                        | Status                  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- | ----------------------- |
+| 1     | Verify `/reports` renders with live data (risk now LOW — see below)                                                                                                | manual                     | **NEXT (user)**         |
+| 2     | Transactions **Import** flow (T3) — CSV modal: Server Actions `validateImport`/`commitImport` → `ImportService` (already inserts via `TransactionService` in a tx) | modal + actions            | ✅ done                 |
+| –     | Cleanup: `DialogDescription` on budget/category/account modals (a11y warning) — tx/duplicate/delete done                                                           | Edit                       | ✅ done                 |
+| –     | Cleanup: removed dead **Export CSV** buttons from all 4 reports tabs (no onClick; locked-decision dead control)                                                    | Edit                       | ✅ done                 |
+| –     | D2 dashboard **period selector** via searchParams (presets + custom range; drives stat cards + spending donut)                                                     | `lib/period.ts` + selector | ✅ done                 |
+| –     | Budget **label-scoping** in modal (optional Label `<Select>`, set/change only — no schema change)                                                                  | Edit                       | ✅ done                 |
+| –     | Budgets page **period selector** (reuses dashboard `PeriodSelector`; filters list by date-overlap, spent unchanged)                                                | searchParams + RSC filter  | ✅ done                 |
+| –     | B6 footer/group **float totals → integer cents**                                                                                                                   | —                          | ❌ won't-fix (see note) |
+
+### Import flow notes
+
+- UI = `ImportTransactionsModal` (two-step: pick CSV → **Preview** via `validateImport` → **Import N rows** via `commitImport`). Server Actions live in `transactions/actions.ts`; mime is forced to `text/csv` when the filename ends in `.csv` (browsers tag CSVs as `application/vnd.ms-excel`, which the parser rejects).
+- **Backend was already built** — `ImportService.commit()` inserts each valid row via `txService.create()` inside `db.transaction()`, so the dropped-trigger constraint is satisfied. Existing REST routes (`/api/v1/transactions/import[/validate|/template]`) are left in place (mobile/external).
+- **CSV date must be `YYYY-MM-DD`** (`createTransactionSchema` uses `z.string().date()`); the modal states this. Template is header-only (`date,type,amount,account,category,toAccount,label,description`).
+- **v1 limitations:** no dedup/idempotency (re-uploading the same file duplicates rows); only the first 20 invalid rows are listed (`…and N more`). `MAX_ROWS=1000`.
 
 ### Notes on the above
 

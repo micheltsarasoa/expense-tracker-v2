@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 
 export interface BudgetSummaryItem {
   id: string;
@@ -26,6 +27,7 @@ function getProgressColor(pct: number) {
 }
 
 export function BudgetStatusWidget({ budgets, loading }: BudgetStatusWidgetProps) {
+  const { money } = useFormat();
   if (loading) {
     return (
       <Card className="shadow-sm">
@@ -105,8 +107,8 @@ export function BudgetStatusWidget({ budgets, loading }: BudgetStatusWidgetProps
                   </div>
                   <Progress value={pct} className="h-1.5" indicatorClassName={progressColor} />
                   <div className="flex items-center justify-between text-xs text-muted-foreground tabular-nums">
-                    <span>€{budget.spent.toFixed(2)} spent</span>
-                    <span>of €{budget.amount.toFixed(2)}</span>
+                    <span>{money(budget.spent)} spent</span>
+                    <span>of {money(budget.amount)}</span>
                   </div>
                 </li>
               );

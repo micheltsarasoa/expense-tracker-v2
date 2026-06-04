@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { format, parseISO } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { type DateRange } from 'react-day-picker';
 import {
   Select,
   SelectContent,
@@ -9,8 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { DashboardPeriod } from '@/lib/period';
 
 const PRESETS: { value: DashboardPeriod; label: string }[] = [
@@ -31,23 +35,31 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [selected, setSelected] = useState<DashboardPeriod>(period);
-  const [localFrom, setLocalFrom] = useState(from);
-  const [localTo, setLocalTo] = useState(to);
-
-  function pushPeriod(next: DashboardPeriod) {
-    const params = new URLSearchParams();
-    params.set('period', next);
-    if (next === 'custom') {
-      if (localFrom) params.set('from', localFrom);
-      if (localTo) params.set('to', localTo);
-    }
-    router.push(`${pathname}?${params.toString()}`);
-  }
+  const [range, setRange] = useState<DateRange | undefined>({
+    from: parseISO(from),
+    to: parseISO(to),
+  });
+  const [open, setOpen] = useState(false);
 
   function onPresetChange(value: string) {
     const next = value as DashboardPeriod;
     setSelected(next);
-    if (next !== 'custom') pushPeriod(next);
+    if (next !== 'custom') {
+      router.push(`${pathname}?period=${next}`);
+    }
+  }
+
+  function onRangeSelect(next: DateRange | undefined) {
+    setRange(next);
+    if (next?.from && next.to) {
+      setOpen(false);
+      const params = new URLSearchParams({
+        period: 'custom',
+        from: format(next.from, 'yyyy-MM-dd'),
+        to: format(next.to, 'yyyy-MM-dd'),
+      });
+      router.push(`${pathname}?${params.toString()}`);
+    }
   }
 
   return (
@@ -66,25 +78,38 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
       </Select>
 
       {selected === 'custom' && (
-        <>
-          <Input
-            type="date"
-            value={localFrom}
-            onChange={(e) => setLocalFrom(e.target.value)}
-            className="h-8 text-sm"
-            aria-label="From date"
-          />
-          <Input
-            type="date"
-            value={localTo}
-            onChange={(e) => setLocalTo(e.target.value)}
-            className="h-8 text-sm"
-            aria-label="To date"
-          />
-          <Button size="sm" className="h-8" onClick={() => pushPeriod('custom')}>
-            Apply
-          </Button>
-        </>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              id="period-range"
+              variant="outline"
+              className="h-8 justify-start px-2.5 text-sm font-normal"
+            >
+              <CalendarIcon className="size-3.5" />
+              {range?.from ? (
+                range.to ? (
+                  <>
+                    {format(range.from, 'LLL dd, y')} – {format(range.to, 'LLL dd, y')}
+                  </>
+                ) : (
+                  format(range.from, 'LLL dd, y')
+                )
+              ) : (
+                <span>Pick a date range</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="range"
+              {...(range?.from ? { defaultMonth: range.from } : {})}
+              selected={range}
+              onSelect={onRangeSelect}
+              numberOfMonths={2}
+              autoFocus
+            />
+          </PopoverContent>
+        </Popover>
       )}
     </div>
   );

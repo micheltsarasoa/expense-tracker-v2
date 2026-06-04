@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { eur, formatDay } from '@/lib/format';
+import { useFormat } from '@/lib/settings-context';
 
 interface BudgetCardProps {
   budget: BudgetWithSpendingDTO;
@@ -29,6 +29,7 @@ function getProgressColor(pct: number) {
 }
 
 export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCardProps) {
+  const { money, date } = useFormat();
   const pct = budget.pct; // server-computed, clamped 0..999
   const barPct = Math.min(pct, 100);
   const isOver = pct >= 100;
@@ -120,7 +121,7 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
       <div>
         <p className="text-base font-medium leading-tight">{budget.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {formatDay(budget.startDate)} – {budget.endDate ? formatDay(budget.endDate) : 'ongoing'}
+          {date(budget.startDate)} – {budget.endDate ? date(budget.endDate) : 'ongoing'}
         </p>
       </div>
 
@@ -128,17 +129,19 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{pct}%</span>
-          <span className="tabular-nums font-medium text-foreground">{eur(budget.amount)}</span>
+          <span className="tabular-nums font-medium text-foreground">{money(budget.amount)}</span>
         </div>
         <Progress value={barPct} className="h-2" indicatorClassName={progressColor} />
         <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground tabular-nums">{eur(budget.spent)} spent</span>
+          <span className="text-muted-foreground tabular-nums">{money(budget.spent)} spent</span>
           {isOver ? (
             <span className="text-rose-600 dark:text-rose-400 tabular-nums font-medium">
-              Over by {eur(Math.abs(remaining).toFixed(2))}
+              Over by {money(Math.abs(remaining))}
             </span>
           ) : (
-            <span className="text-muted-foreground tabular-nums">{eur(budget.remaining)} left</span>
+            <span className="text-muted-foreground tabular-nums">
+              {money(budget.remaining)} left
+            </span>
           )}
         </div>
       </div>

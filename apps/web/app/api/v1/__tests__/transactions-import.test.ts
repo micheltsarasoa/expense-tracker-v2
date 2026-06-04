@@ -22,7 +22,7 @@ import { POST as COMMIT } from '../transactions/import/route';
 const BASE = 'http://localhost/api/v1/transactions/import';
 
 const CSV_CONTENT =
-  'date,type,amount,account,category,toAccount,label,description\n2024-01-01,expense,100.00,Cash,Food,,Lunch,';
+  'date;type;amount;account;category;toAccount;label;description\n2024-01-01;expense;100.00;Cash;Food;;Lunch;';
 
 function makeFileFormData(
   filename = 'import.csv',
@@ -54,7 +54,7 @@ describe('GET /transactions/import/template', () => {
     const res = await TEMPLATE();
     const text = await res.text();
 
-    expect(text).toContain('date,type,amount,account,category,toAccount,label,description');
+    expect(text).toContain('date;type;amount;account;category;toAccount;label;description');
   });
 });
 

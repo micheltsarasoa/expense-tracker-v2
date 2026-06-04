@@ -2,6 +2,7 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFormat } from '@/lib/settings-context';
 import {
   ChartContainer,
   ChartTooltip,
@@ -25,6 +26,7 @@ const chartConfig = {
 };
 
 export function MonthlyTrendChart({ data, loading }: MonthlyTrendChartProps) {
+  const { money, settings } = useFormat();
   if (loading) {
     return (
       <Card className="shadow-sm">
@@ -59,17 +61,13 @@ export function MonthlyTrendChart({ data, loading }: MonthlyTrendChartProps) {
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 11 }}
-                tickFormatter={(v) => `€${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                tickFormatter={(v) =>
+                  `${settings.currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`
+                }
                 className="text-muted-foreground"
               />
               <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    formatter={(value) =>
-                      `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-                    }
-                  />
-                }
+                content={<ChartTooltipContent formatter={(value) => money(Number(value))} />}
               />
               <ChartLegend content={<ChartLegendContent />} />
               <Bar dataKey="income" fill={INCOME_COLOR} radius={[4, 4, 0, 0]} maxBarSize={40} />

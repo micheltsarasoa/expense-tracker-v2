@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 import { BalanceCard, type Account } from '@/components/accounts/balance-card';
 import { AccountModal, type AccountFormValues } from '@/components/accounts/account-modal';
 import { DeactivateAccountModal } from '@/components/accounts/deactivate-account-modal';
@@ -15,6 +16,7 @@ interface AccountsClientProps {
 }
 
 export function AccountsClient({ accounts }: AccountsClientProps) {
+  const { money } = useFormat();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
   const [removeOpen, setRemoveOpen] = useState(false);
@@ -135,7 +137,7 @@ export function AccountsClient({ accounts }: AccountsClientProps) {
                 <div className="flex items-center gap-1.5 text-sm">
                   <span className="text-muted-foreground">Total balance:</span>
                   <span className={cn('font-semibold tabular-nums', totalBalanceClass)}>
-                    €{totalBalance.toFixed(2)}
+                    {money(totalBalance)}
                   </span>
                 </div>
               </div>

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/empty';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { eur, formatDay } from '@/lib/format';
+import { useFormat } from '@/lib/settings-context';
 
 const typeConfig = {
   income: {
@@ -50,6 +50,7 @@ interface RecentTransactionsWidgetProps {
 }
 
 export function RecentTransactionsWidget({ transactions, loading }: RecentTransactionsWidgetProps) {
+  const { money, date } = useFormat();
   if (loading) {
     return (
       <Card className="shadow-sm">
@@ -124,10 +125,10 @@ export function RecentTransactionsWidget({ transactions, loading }: RecentTransa
                   <div className="flex flex-col items-end shrink-0 gap-0.5">
                     <span className={cn('text-sm font-medium tabular-nums', config.amountClass)}>
                       {config.prefix}
-                      {eur(tx.amount)}
+                      {money(tx.amount)}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {formatDay(tx.transactionDate)}
+                      {date(tx.transactionDate)}
                     </span>
                   </div>
                 </li>

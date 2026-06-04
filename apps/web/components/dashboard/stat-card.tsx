@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 
 interface StatCardProps {
   label: string;
@@ -14,6 +15,7 @@ interface StatCardProps {
 }
 
 export function StatCard({ label, value, previousValue, colorClass, loading }: StatCardProps) {
+  const { money } = useFormat();
   const diff = previousValue !== undefined ? value - previousValue : undefined;
   const pct =
     previousValue !== undefined && previousValue !== 0
@@ -39,9 +41,7 @@ export function StatCard({ label, value, previousValue, colorClass, loading }: S
     <Card className="shadow-sm">
       <CardContent className="p-5">
         <p className="text-sm text-muted-foreground">{label}</p>
-        <p className={cn('text-2xl font-bold tabular-nums mt-1', colorClass)}>
-          €{value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
+        <p className={cn('text-2xl font-bold tabular-nums mt-1', colorClass)}>{money(value)}</p>
         {pct !== undefined && diff !== undefined && (
           <div
             className={cn(

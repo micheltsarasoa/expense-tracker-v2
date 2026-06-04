@@ -1,4 +1,4 @@
-const CSV_TEMPLATE = 'date,type,amount,account,category,toAccount,label,description\n';
+const CSV_TEMPLATE = 'date;type;amount;account;category;toAccount;label;description\n';
 
 export function GET() {
   return new Response(CSV_TEMPLATE, {
