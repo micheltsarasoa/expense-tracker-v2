@@ -20,7 +20,7 @@ async function ensureAppUser(user: {
       email: user.primaryEmail ?? `${user.id}@no-email.local`,
       name: user.displayName ?? 'User',
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing({ target: users.id });
 }
 
 export async function getAuthenticatedUser(): Promise<{ userId: string }> {
