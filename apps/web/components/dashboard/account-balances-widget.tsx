@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 import type { AccountType } from '@/components/accounts/balance-card';
 
 const typeConfig: Record<AccountType, { label: string; icon: React.ElementType }> = {
@@ -36,6 +37,7 @@ function balanceClass(n: number) {
 }
 
 export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidgetProps) {
+  const { money } = useFormat();
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
   if (loading) {
@@ -67,7 +69,7 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-base font-medium">Account Balances</CardTitle>
         <span className={cn('text-base font-bold tabular-nums', balanceClass(totalBalance))}>
-          €{totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          {money(totalBalance)}
         </span>
       </CardHeader>
       <CardContent>
@@ -97,7 +99,7 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
                     balanceClass(account.balance),
                   )}
                 >
-                  €{account.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  {money(account.balance)}
                 </span>
               </li>
             );
@@ -110,7 +112,7 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">Total</span>
               <span className={cn('text-sm font-bold tabular-nums', balanceClass(totalBalance))}>
-                €{totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                {money(totalBalance)}
               </span>
             </div>
           </>

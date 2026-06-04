@@ -30,6 +30,7 @@ export function useFormat() {
     throw new Error('useFormat must be used within a SettingsProvider');
   }
   return {
+    settings,
     money: (value: number | string) => formatMoney(value, settings),
     date: (iso: string) => formatDate(iso, settings.dateFormat),
   };

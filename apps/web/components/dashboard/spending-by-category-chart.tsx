@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { useFormat } from '@/lib/settings-context';
 
 const CATEGORY_COLORS = [
   '#10b981', // emerald
@@ -28,6 +29,7 @@ interface SpendingByCategoryChartProps {
 }
 
 export function SpendingByCategoryChart({ data, total, loading }: SpendingByCategoryChartProps) {
+  const { money } = useFormat();
   if (loading) {
     return (
       <Card className="shadow-sm">
@@ -95,13 +97,7 @@ export function SpendingByCategoryChart({ data, total, loading }: SpendingByCate
                     ))}
                   </Pie>
                   <ChartTooltip
-                    content={
-                      <ChartTooltipContent
-                        formatter={(value) =>
-                          `€${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-                        }
-                      />
-                    }
+                    content={<ChartTooltipContent formatter={(value) => money(Number(value))} />}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -123,9 +119,7 @@ export function SpendingByCategoryChart({ data, total, loading }: SpendingByCate
                     </div>
                     <div className="flex items-center gap-2 shrink-0 tabular-nums">
                       <span className="text-xs text-muted-foreground">{pct}%</span>
-                      <span className="font-medium">
-                        €{entry.value.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      </span>
+                      <span className="font-medium">{money(entry.value)}</span>
                     </div>
                   </li>
                 );
