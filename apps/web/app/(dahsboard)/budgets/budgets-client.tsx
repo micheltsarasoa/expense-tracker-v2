@@ -3,9 +3,15 @@
 import { useMemo, useState } from 'react';
 import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
-import type { BudgetWithSpendingDTO, CategoryOptionDTO } from '@expense-tracker/types';
+import type {
+  BudgetWithSpendingDTO,
+  CategoryOptionDTO,
+  LabelOptionDTO,
+} from '@expense-tracker/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import type { DashboardPeriod } from '@/lib/period';
+import { PeriodSelector } from '@/components/dashboard/period-selector';
 import { BudgetCard } from '@/components/budgets/budget-card';
 import { BudgetModal, type BudgetFormValues } from '@/components/budgets/budget-modal';
 import { DuplicateBudgetModal } from '@/components/budgets/duplicate-budget-modal';
@@ -15,11 +21,26 @@ import { createBudget, updateBudget, deleteBudget, duplicateBudget } from './act
 interface BudgetsClientProps {
   budgets: BudgetWithSpendingDTO[];
   categories: CategoryOptionDTO[];
+  labels: LabelOptionDTO[];
+  hasAnyBudgets: boolean;
+  period: DashboardPeriod;
+  from: string;
+  to: string;
+  periodLabel: string;
 }
 
 const NONE_KEY = '__none__';
 
-export function BudgetsClient({ budgets, categories }: BudgetsClientProps) {
+export function BudgetsClient({
+  budgets,
+  categories,
+  labels,
+  hasAnyBudgets,
+  period,
+  from,
+  to,
+  periodLabel,
+}: BudgetsClientProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<BudgetWithSpendingDTO | null>(null);
 
@@ -104,12 +125,18 @@ export function BudgetsClient({ budgets, categories }: BudgetsClientProps) {
   return (
     <div className="flex flex-col min-h-full pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 pb-5 border-b border-border">
-        <h1 className="text-2xl font-semibold">Budgets</h1>
-        <Button onClick={openCreate}>
-          <Plus className="size-4 mr-1.5" />
-          Add budget
-        </Button>
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-border">
+        <div>
+          <h1 className="text-2xl font-semibold">Budgets</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">{periodLabel}</p>
+        </div>
+        <div className="flex flex-wrap items-end gap-3">
+          <PeriodSelector period={period} from={from} to={to} />
+          <Button onClick={openCreate}>
+            <Plus className="size-4 mr-1.5" />
+            Add budget
+          </Button>
+        </div>
       </div>
 
       {/* Content */}
@@ -142,9 +169,13 @@ export function BudgetsClient({ budgets, categories }: BudgetsClientProps) {
               </svg>
             </div>
             <div>
-              <p className="text-base font-medium">No budgets yet</p>
+              <p className="text-base font-medium">
+                {hasAnyBudgets ? `No budgets for ${periodLabel}` : 'No budgets yet'}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
-                Create your first budget to start tracking your spending.
+                {hasAnyBudgets
+                  ? 'Try a different period, or add a budget for this one.'
+                  : 'Create your first budget to start tracking your spending.'}
               </p>
             </div>
             <Button onClick={openCreate}>
@@ -262,6 +293,7 @@ export function BudgetsClient({ budgets, categories }: BudgetsClientProps) {
         onOpenChange={setModalOpen}
         budget={editing}
         categories={categories}
+        labels={labels}
         onSubmit={handleSubmit}
       />
       <DuplicateBudgetModal

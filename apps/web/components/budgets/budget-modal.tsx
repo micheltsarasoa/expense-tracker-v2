@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { BudgetWithSpendingDTO, CategoryOptionDTO } from '@expense-tracker/types';
+import type {
+  BudgetWithSpendingDTO,
+  CategoryOptionDTO,
+  LabelOptionDTO,
+} from '@expense-tracker/types';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +32,7 @@ export interface BudgetFormValues {
   startDate: string;
   endDate: string;
   categoryId: string;
+  labelId?: string;
 }
 
 interface BudgetModalProps {
@@ -35,6 +40,7 @@ interface BudgetModalProps {
   onOpenChange: (open: boolean) => void;
   budget?: BudgetWithSpendingDTO | null;
   categories: CategoryOptionDTO[];
+  labels: LabelOptionDTO[];
   /** Returns true on success (modal then closes), false on failure (stays open). */
   onSubmit: (values: BudgetFormValues) => Promise<boolean>;
 }
@@ -45,6 +51,7 @@ interface FormState {
   startDate: string;
   endDate: string;
   categoryId: string;
+  labelId: string;
 }
 
 const EMPTY_FORM: FormState = {
@@ -53,7 +60,10 @@ const EMPTY_FORM: FormState = {
   startDate: '',
   endDate: '',
   categoryId: '',
+  labelId: '',
 };
+
+const NO_LABEL = '__none__';
 
 function monthBounds(): { firstDay: string; lastDay: string } {
   const now = new Date();
@@ -67,6 +77,7 @@ export function BudgetModal({
   onOpenChange,
   budget,
   categories,
+  labels,
   onSubmit,
 }: BudgetModalProps) {
   const isEdit = !!budget;
@@ -84,6 +95,7 @@ export function BudgetModal({
         startDate: budget.startDate,
         endDate: budget.endDate ?? '',
         categoryId: budget.categoryId ?? '',
+        labelId: budget.labelId ?? '',
       });
     } else {
       const { firstDay, lastDay } = monthBounds();
@@ -121,6 +133,7 @@ export function BudgetModal({
       startDate: form.startDate,
       endDate: form.endDate,
       categoryId: form.categoryId,
+      ...(form.labelId ? { labelId: form.labelId } : {}),
     });
     setSaving(false);
     if (ok) onOpenChange(false);
@@ -216,6 +229,35 @@ export function BudgetModal({
               </SelectContent>
             </Select>
             {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
+          </div>
+
+          {/* Label (optional) */}
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="budget-label">
+              Label <span className="text-muted-foreground font-normal">(optional)</span>
+            </Label>
+            <Select
+              value={form.labelId || NO_LABEL}
+              onValueChange={(v) => set('labelId', v === NO_LABEL ? '' : v)}
+            >
+              <SelectTrigger id="budget-label">
+                <SelectValue placeholder="No label" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NO_LABEL}>No label</SelectItem>
+                {labels.map((l) => (
+                  <SelectItem key={l.id} value={l.id}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: l.color ?? '#6b7280' }}
+                      />
+                      {l.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
