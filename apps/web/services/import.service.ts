@@ -20,6 +20,17 @@ interface EntityMaps {
 
 const MAX_ROWS = 1000;
 
+// Accept European amounts (comma decimal, optional dot thousands): "1.234,56" →
+// "1234.56", "12,50" → "12.50". Only a comma triggers this — a plain "12.50"
+// (dot decimal) is left untouched so it isn't read as "1250".
+function normalizeAmount(raw: string): string {
+  const value = raw.trim();
+  if (value.includes(',')) {
+    return value.replace(/\./g, '').replace(/,/g, '.');
+  }
+  return value;
+}
+
 export class ImportService extends BaseService {
   constructor(
     db: Database,
@@ -135,7 +146,7 @@ export class ImportService extends BaseService {
 
     return {
       type,
-      amount: row['amount'] ?? '',
+      amount: normalizeAmount(row['amount'] ?? ''),
       transactionDate: row['date'] ?? '',
       paymentMethodId: accountId,
       ...(type === 'transfer' ? { toPaymentMethodId: toAccountId } : { categoryId }),

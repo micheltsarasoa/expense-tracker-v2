@@ -110,6 +110,10 @@ export function ImportTransactionsModal({
                 <strong>date</strong> in <code>YYYY-MM-DD</code> format
               </li>
               <li>
+                <strong>amount</strong> with <code>.</code> or <code>,</code> decimals (
+                <code>12.50</code> or <code>12,50</code>)
+              </li>
+              <li>
                 <strong>type</strong> is income, expense, or transfer
               </li>
               <li>
