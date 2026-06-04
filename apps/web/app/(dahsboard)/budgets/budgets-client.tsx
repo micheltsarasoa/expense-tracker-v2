@@ -10,6 +10,7 @@ import type {
 } from '@expense-tracker/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useFormat } from '@/lib/settings-context';
 import type { DashboardPeriod } from '@/lib/period';
 import { PeriodSelector } from '@/components/dashboard/period-selector';
 import { BudgetCard } from '@/components/budgets/budget-card';
@@ -41,6 +42,7 @@ export function BudgetsClient({
   to,
   periodLabel,
 }: BudgetsClientProps) {
+  const { money } = useFormat();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<BudgetWithSpendingDTO | null>(null);
 
@@ -204,7 +206,7 @@ export function BudgetsClient({
                     )}
                     <span className="text-base font-semibold">{group.name}</span>
                     <span className="text-sm text-muted-foreground">
-                      €{groupSpent.toFixed(2)} spent of €{groupTotal.toFixed(2)} budgeted
+                      {money(groupSpent)} spent of {money(groupTotal)} budgeted
                     </span>
                     <span className="ml-auto text-muted-foreground">
                       {isCollapsed ? (
@@ -252,7 +254,7 @@ export function BudgetsClient({
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">Total budgeted</span>
                 <span className="text-sm font-semibold tabular-nums text-muted-foreground">
-                  €{totalBudgeted.toFixed(2)}
+                  {money(totalBudgeted)}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -263,7 +265,7 @@ export function BudgetsClient({
                     anyOver ? 'text-rose-600 dark:text-rose-400' : 'text-muted-foreground',
                   )}
                 >
-                  €{totalSpent.toFixed(2)}
+                  {money(totalSpent)}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -278,7 +280,7 @@ export function BudgetsClient({
                         : 'text-muted-foreground',
                   )}
                 >
-                  €{Math.abs(totalRemaining).toFixed(2)}
+                  {money(Math.abs(totalRemaining))}
                   {totalRemaining < 0 ? ' over' : ''}
                 </span>
               </div>
