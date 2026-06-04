@@ -31,11 +31,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { eur, formatDate, type DateFormat } from '@/lib/format';
+import { useFormat } from '@/lib/settings-context';
 
 interface TransactionsTableProps {
   transactions: TransactionListItemDTO[];
-  dateFormat: DateFormat;
   onEdit: (transaction: TransactionListItemDTO) => void;
   onDelete: (transaction: TransactionListItemDTO) => void;
   onToggleValidated: (id: string) => void;
@@ -69,11 +68,11 @@ const typeConfig = {
 
 export function TransactionsTable({
   transactions,
-  dateFormat,
   onEdit,
   onDelete,
   onToggleValidated,
 }: TransactionsTableProps) {
+  const { money, date } = useFormat();
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       <Table>
@@ -99,7 +98,7 @@ export function TransactionsTable({
             return (
               <TableRow key={tx.id} className="group">
                 <TableCell className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
-                  {formatDate(tx.transactionDate, dateFormat)}
+                  {date(tx.transactionDate)}
                 </TableCell>
                 <TableCell>
                   <Badge
@@ -127,7 +126,7 @@ export function TransactionsTable({
                   )}
                 >
                   {config.prefix}
-                  {eur(tx.amount)}
+                  {money(tx.amount)}
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                   {tx.type === 'transfer' && tx.toPaymentMethodName ? (

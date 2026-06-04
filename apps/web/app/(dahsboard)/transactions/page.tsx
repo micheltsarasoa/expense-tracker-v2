@@ -10,9 +10,7 @@ import {
   categoryService,
   labelService,
   paymentMethodService,
-  settingsService,
 } from '@/services/instances';
-import type { DateFormat } from '@/lib/format';
 import type { TransactionFilterValues } from '@/components/transactions/transactions-filter-bar';
 import { TransactionsClient } from './transactions-client';
 
@@ -33,15 +31,12 @@ export default async function TransactionsPage({
   const parsed = transactionFiltersSchema.safeParse(raw);
   const filters = parsed.success ? parsed.data : transactionFiltersSchema.parse({});
 
-  const [list, categoryRows, labelRows, pmRows, settings] = await Promise.all([
+  const [list, categoryRows, labelRows, pmRows] = await Promise.all([
     transactionService.list(userId, filters),
     categoryService.list(userId),
     labelService.list(userId),
     paymentMethodService.list(userId),
-    settingsService.getByUserId(userId).catch(() => null),
   ]);
-
-  const dateFormat: DateFormat = (settings?.dateFormat as DateFormat) ?? 'MM/DD/YYYY';
 
   const categories: CategoryOptionDTO[] = categoryRows.map((c) => ({
     id: c.id,
@@ -80,7 +75,6 @@ export default async function TransactionsPage({
       categories={categories}
       labels={labels}
       paymentMethods={paymentMethods}
-      dateFormat={dateFormat}
     />
   );
 }

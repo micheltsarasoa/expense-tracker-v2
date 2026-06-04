@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { TransactionListItemDTO } from '@expense-tracker/types';
-import { eur, formatDay } from '@/lib/format';
+import { useFormat } from '@/lib/settings-context';
 
 interface DeleteTransactionModalProps {
   open: boolean;
@@ -30,6 +30,7 @@ export function DeleteTransactionModal({
   transaction,
   onDelete,
 }: DeleteTransactionModalProps) {
+  const { money, date } = useFormat();
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
@@ -50,7 +51,7 @@ export function DeleteTransactionModal({
               {transaction && (
                 <span className="mt-1 text-sm font-medium text-foreground">
                   {sign[transaction.type]}
-                  {eur(transaction.amount)} &middot; {formatDay(transaction.transactionDate)}
+                  {money(transaction.amount)} &middot; {date(transaction.transactionDate)}
                 </span>
               )}
             </div>
