@@ -1,17 +1,16 @@
-import { sql } from 'drizzle-orm';
 import {
   boolean,
   foreignKey,
   index,
   numeric,
   pgTable,
-  timestamp,
   unique,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
 
 import { paymentMethodType } from './enums';
+import { timestamps } from './_shared';
 import { users } from './users';
 
 export const paymentMethods = pgTable(
@@ -30,12 +29,7 @@ export const paymentMethods = pgTable(
     icon: varchar({ length: 50 }),
     color: varchar({ length: 7 }),
     isActive: boolean('is_active').default(true).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
+    ...timestamps,
   },
   (table) => [
     index('idx_payment_methods_user_id').using('btree', table.userId.asc().nullsLast()),
