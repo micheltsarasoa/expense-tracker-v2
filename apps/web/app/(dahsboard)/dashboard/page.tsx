@@ -84,12 +84,15 @@ export default async function DashboardPage({
     ...(a.color ? { color: a.color } : {}),
   }));
 
-  const budgets: BudgetSummaryItem[] = budgetRows.map((b) => ({
-    id: b.id,
-    name: b.name,
-    spent: parseFloat(b.spent),
-    amount: parseFloat(b.amount),
-  }));
+  // Only budgets whose own date range overlaps the selected period (matches /budgets).
+  const budgets: BudgetSummaryItem[] = budgetRows
+    .filter((b) => b.startDate <= to && (b.endDate === null || b.endDate >= from))
+    .map((b) => ({
+      id: b.id,
+      name: b.name,
+      spent: parseFloat(b.spent),
+      amount: parseFloat(b.amount),
+    }));
 
   const categorySpending = spending.map((s) => ({
     name: s.categoryName,
