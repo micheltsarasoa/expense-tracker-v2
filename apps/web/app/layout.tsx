@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from 'next/font/google';
 import './globals.css';
 import { StackProvider, StackTheme } from '@stackframe/stack';
 import { cn } from '@/lib/utils';
+import { ThemeProvider } from '@/components/theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
 import { stackServerApp } from '@/lib/stack';
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         'h-full',
         'antialiased',
@@ -39,14 +41,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       )}
     >
       <body className="min-h-full flex flex-col">
-        <StackProvider app={stackServerApp}>
-          <StackTheme>
-            <TooltipProvider>
-              {children}
-              <Toaster />
-            </TooltipProvider>
-          </StackTheme>
-        </StackProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StackProvider app={stackServerApp}>
+            <StackTheme>
+              <TooltipProvider>
+                {children}
+                <Toaster />
+              </TooltipProvider>
+            </StackTheme>
+          </StackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

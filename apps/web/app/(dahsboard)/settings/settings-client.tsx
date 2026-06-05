@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { useUser } from '@stackframe/stack';
 import {
   User,
   Palette,
@@ -58,7 +60,6 @@ import { updateSettings } from './actions';
 // Types
 // ---------------------------------------------------------------------------
 
-type Theme = 'light' | 'dark' | 'system';
 type CurrencyPosition = 'before' | 'after';
 type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 type TimeFormat = '12h' | '24h';
@@ -81,7 +82,6 @@ interface SettingsClientProps {
 interface Settings extends SettingsInitial {
   displayName: string;
   email: string;
-  theme: Theme;
 }
 
 // ---------------------------------------------------------------------------
@@ -205,9 +205,15 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
   const [settings, setSettings] = useState<Settings>({
     displayName: profile.displayName,
     email: profile.email,
-    theme: 'system',
     ...initial,
   });
+
+  const user = useUser();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Change password dialog
   const [pwDialogOpen, setPwDialogOpen] = useState(false);
@@ -223,6 +229,7 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
   // Saving state
   const [savingProfile, setSavingProfile] = useState(false);
   const [savedProfile, setSavedProfile] = useState(false);
+  const [updatingPw, setUpdatingPw] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -239,12 +246,34 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
   }
 
   async function handleSaveProfile() {
-    // Profile name/email are owned by Stack Auth — wiring deferred.
+    if (!user) return;
     setSavingProfile(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setSavingProfile(false);
-    setSavedProfile(true);
-    setTimeout(() => setSavedProfile(false), 2500);
+    try {
+      await user.update({ displayName: settings.displayName.trim() });
+      setSavedProfile(true);
+      toast.success('Profile updated');
+      setTimeout(() => setSavedProfile(false), 2500);
+    } catch {
+      toast.error('Could not update your profile. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function handleUpdatePassword() {
+    if (!user) return;
+    setUpdatingPw(true);
+    const err = await user.updatePassword({ oldPassword: currentPw, newPassword: newPw });
+    setUpdatingPw(false);
+    if (err) {
+      toast.error(err.message ?? 'Could not update your password.');
+      return;
+    }
+    toast.success('Password updated');
+    setPwDialogOpen(false);
+    setCurrentPw('');
+    setNewPw('');
+    setConfirmPw('');
   }
 
   async function handleSaveAll() {
@@ -297,14 +326,8 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
                 className="h-9"
               />
             </FieldRow>
-            <FieldRow label="Email">
-              <Input
-                value={settings.email}
-                onChange={(e) => set('email', e.target.value)}
-                type="email"
-                placeholder="you@example.com"
-                className="h-9"
-              />
+            <FieldRow label="Email" hint="Managed by your login — can't be changed here.">
+              <Input value={settings.email} type="email" readOnly disabled className="h-9" />
             </FieldRow>
             <FieldRow label="Password">
               <Button
@@ -350,8 +373,8 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
             <FieldRow label="Theme">
               <ToggleGroup
                 type="single"
-                value={settings.theme}
-                onValueChange={(v) => v && set('theme', v as Theme)}
+                value={mounted ? (theme ?? 'system') : 'system'}
+                onValueChange={(v) => v && setTheme(v)}
                 className="justify-start gap-1"
               >
                 <ToggleGroupItem value="light" className="gap-1.5 text-sm h-8 px-3">
@@ -661,15 +684,12 @@ export function SettingsClient({ initial, profile }: SettingsClientProps) {
               Cancel
             </Button>
             <Button
-              disabled={!currentPw || !newPw || newPw !== confirmPw || newPw.length < 8}
-              onClick={() => {
-                setPwDialogOpen(false);
-                setCurrentPw('');
-                setNewPw('');
-                setConfirmPw('');
-              }}
+              disabled={
+                !currentPw || !newPw || newPw !== confirmPw || newPw.length < 8 || updatingPw
+              }
+              onClick={handleUpdatePassword}
             >
-              Update password
+              {updatingPw ? 'Updating…' : 'Update password'}
             </Button>
           </DialogFooter>
         </DialogContent>
