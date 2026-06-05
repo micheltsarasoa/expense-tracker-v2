@@ -17,6 +17,7 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -62,6 +63,8 @@ export function DashboardNavbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
+
         <Button variant="ghost" size="icon" className="size-8 text-muted-foreground">
           <Bell className="size-4" />
           <span className="sr-only">Notifications</span>
