@@ -1,7 +1,7 @@
-import { sql } from 'drizzle-orm';
-import { boolean, foreignKey, index, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { boolean, foreignKey, index, pgTable, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { categoryType } from './enums';
+import { timestamps } from './_shared';
 import { users } from './users';
 
 export const categories = pgTable(
@@ -15,12 +15,7 @@ export const categories = pgTable(
     icon: varchar({ length: 50 }),
     color: varchar({ length: 7 }),
     isDefault: boolean('is_default').default(false).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
+    ...timestamps,
   },
   (table) => [
     index('idx_categories_user_id').using('btree', table.userId.asc().nullsLast()),

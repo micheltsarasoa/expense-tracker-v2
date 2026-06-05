@@ -8,11 +8,11 @@ import {
   numeric,
   pgTable,
   text,
-  timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 
 import { transactionType } from './enums';
+import { timestamps } from './_shared';
 import { categories } from './categories';
 import { labels } from './labels';
 import { paymentMethods } from './payment-methods';
@@ -33,12 +33,7 @@ export const transactions = pgTable(
     description: text(),
     isValidated: boolean('is_validated').default(false).notNull(),
     isDeleted: boolean('is_deleted').default(false).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
+    ...timestamps,
   },
   (table) => [
     index('idx_transactions_user_id').using('btree', table.userId.asc().nullsLast()),
