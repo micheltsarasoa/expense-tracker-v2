@@ -31,13 +31,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Pull Vercel environment
-        run: npx vercel pull --yes --cwd apps/web --environment=${{ github.event.inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel pull --yes --environment=${{ github.event.inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      - name: Show pulled project settings
+        run: cat .vercel/project.json
+
       - name: Build
-        run: npx vercel build --cwd apps/web ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel build ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -47,7 +50,7 @@ jobs:
           STACK_SECRET_SERVER_KEY: ${{ secrets.STACK_SECRET_SERVER_KEY }}
 
       - name: Deploy
-        run: npx vercel deploy --prebuilt --cwd apps/web ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: npx vercel deploy --prebuilt ${{ github.event.inputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
