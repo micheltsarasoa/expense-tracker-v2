@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getUserId } from '@/lib/auth';
 import { stackServerApp } from '@/lib/stack';
 import { settingsService } from '@/services/instances';
@@ -27,5 +28,17 @@ export default async function SettingsPage() {
     email: user?.primaryEmail ?? '',
   };
 
-  return <SettingsClient initial={initial} profile={profile} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto w-full max-w-2xl space-y-6 py-2">
+          <div className="h-8 w-40 animate-pulse rounded-md bg-muted" />
+          <div className="h-48 animate-pulse rounded-lg bg-muted" />
+          <div className="h-48 animate-pulse rounded-lg bg-muted" />
+        </div>
+      }
+    >
+      <SettingsClient initial={initial} profile={profile} />
+    </Suspense>
+  );
 }

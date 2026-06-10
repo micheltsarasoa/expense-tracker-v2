@@ -53,7 +53,7 @@ describe('GET /reports/balance-history', () => {
 });
 
 describe('GET /reports/budget-vs-actual', () => {
-  it('returns 200 with budget vs actual data on success', async () => {
+  it('returns 200 with a default range when no query param', async () => {
     const mockData = [{ budgetName: 'Food', budgeted: '500.00', actual: '420.00' }];
     vi.mocked(reportService.budgetVsActual).mockResolvedValue(mockData as never);
 
@@ -63,6 +63,40 @@ describe('GET /reports/budget-vs-actual', () => {
     expect(res.status).toBe(200);
     expect(body.success).toBe(true);
     expect(body.data).toEqual(mockData);
+    expect(vi.mocked(reportService.budgetVsActual)).toHaveBeenCalledWith(
+      'user-123',
+      expect.any(String),
+      expect.any(String),
+    );
+  });
+
+  it('uses provided from/to query params', async () => {
+    vi.mocked(reportService.budgetVsActual).mockResolvedValue([] as never);
+
+    await BUDGET_VS_ACTUAL(
+      makeReq('GET', `${BASE}/budget-vs-actual`, undefined, {
+        from: '2024-01-01',
+        to: '2024-06-30',
+      }),
+      makeCtx(),
+    );
+
+    expect(vi.mocked(reportService.budgetVsActual)).toHaveBeenCalledWith(
+      'user-123',
+      '2024-01-01',
+      '2024-06-30',
+    );
+  });
+
+  it('returns 400 when from is not a valid date', async () => {
+    const res = await BUDGET_VS_ACTUAL(
+      makeReq('GET', `${BASE}/budget-vs-actual`, undefined, { from: 'not-a-date' }),
+      makeCtx(),
+    );
+    const body = await res.json();
+
+    expect(res.status).toBe(400);
+    expect(body.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('returns 401 when unauthenticated', async () => {

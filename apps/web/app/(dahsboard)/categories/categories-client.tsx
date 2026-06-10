@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { CategoryRow } from '@/components/categories/category-row';
 import {
   CategoryModal,
@@ -60,29 +61,39 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
     setModalOpen(true);
   }
 
-  function renderSection(label: string, count: number, items: Category[]) {
+  function renderSection(
+    label: string,
+    count: number,
+    items: Category[],
+    tone: 'income' | 'expense',
+  ) {
+    const headerClass =
+      tone === 'income'
+        ? 'bg-emerald-50 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-50'
+        : 'bg-orange-50 text-orange-900 dark:bg-orange-950/40 dark:text-orange-50';
+
     return (
-      <section>
-        <div className="mb-3 flex items-center gap-2">
-          <h2 className="text-lg font-semibold">{label}</h2>
-          <span className="text-xs text-muted-foreground">
+      <section className="overflow-hidden rounded-xl border border-border">
+        <div className={cn('flex items-center gap-2 px-4 py-3', headerClass)}>
+          <h2 className="text-base font-semibold">{label}</h2>
+          <span className="text-xs opacity-70">
             {count} {count === 1 ? 'category' : 'categories'}
           </span>
         </div>
 
-        {items.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              No {label.toLowerCase()} categories yet.
-            </p>
-            <Button variant="outline" size="sm" onClick={openCreate}>
-              <Plus className="size-3.5 mr-1" />
-              Add category
-            </Button>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-border overflow-hidden">
-            <div className="flex flex-col divide-y divide-border">
+        <div className="p-3">
+          {items.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-12 text-center">
+              <p className="text-sm text-muted-foreground">
+                No {label.toLowerCase()} categories yet.
+              </p>
+              <Button variant="outline" size="sm" onClick={openCreate}>
+                <Plus className="size-3.5 mr-1" />
+                Add category
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
               {items.map((cat) => (
                 <CategoryRow
                   key={cat.id}
@@ -98,8 +109,8 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
                 />
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </section>
     );
   }
@@ -116,8 +127,8 @@ export function CategoriesClient({ categories }: CategoriesClientProps) {
 
       <div className="flex-1 py-6">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-6">
-          {renderSection('Income', incomeCount, incomeCategories)}
-          {renderSection('Expense', expenseCount, expenseCategories)}
+          {renderSection('Income', incomeCount, incomeCategories, 'income')}
+          {renderSection('Expenses', expenseCount, expenseCategories, 'expense')}
         </div>
       </div>
 

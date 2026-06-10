@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/date-picker';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -189,21 +190,19 @@ export function BudgetModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="budget-start">Start date</Label>
-              <Input
+              <DatePicker
                 id="budget-start"
-                type="date"
                 value={form.startDate}
-                onChange={(e) => set('startDate', e.target.value)}
+                onChange={(v) => set('startDate', v)}
               />
               {errors.startDate && <p className="text-xs text-destructive">{errors.startDate}</p>}
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="budget-end">End date</Label>
-              <Input
+              <DatePicker
                 id="budget-end"
-                type="date"
                 value={form.endDate}
-                onChange={(e) => set('endDate', e.target.value)}
+                onChange={(v) => set('endDate', v)}
               />
               {errors.endDate && <p className="text-xs text-destructive">{errors.endDate}</p>}
             </div>

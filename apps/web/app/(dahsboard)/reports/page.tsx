@@ -40,7 +40,7 @@ export default async function ReportsPage({
     reportService.spendingByCategory(userId, from, to),
     reportService.incomeVsExpenses(userId, from, to),
     reportService.balanceHistory(userId),
-    reportService.budgetVsActual(userId),
+    reportService.budgetVsActual(userId, from, to),
   ]);
 
   const spending: CategorySlice[] = spendingRows.map((s) => ({

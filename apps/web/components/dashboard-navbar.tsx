@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useUser } from '@stackframe/stack';
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -15,6 +17,14 @@ import {
 } from 'lucide-react';
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
+
+function getInitials(name: string | null | undefined): string {
+  if (!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  const a = parts[0]?.[0] ?? '';
+  const b = parts[1]?.[0] ?? '';
+  return (parts.length === 1 ? a : a + b).toUpperCase();
+}
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -48,6 +58,7 @@ function getPageInfo(pathname: string) {
 
 export function DashboardNavbar() {
   const pathname = usePathname();
+  const user = useUser();
   const pageInfo = getPageInfo(pathname);
   const PageIcon = pageInfo.icon;
 
@@ -75,27 +86,32 @@ export function DashboardNavbar() {
             <Button variant="ghost" className="flex items-center gap-2 h-8 px-2">
               <Avatar className="size-6">
                 <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                  JD
+                  {getInitials(user?.displayName)}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium hidden sm:block">John Doe</span>
+              <span className="text-sm font-medium hidden sm:block">{user?.displayName ?? ''}</span>
               <ChevronDown className="size-3 text-muted-foreground hidden sm:block" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium">John Doe</span>
-                <span className="text-xs text-muted-foreground">john@example.com</span>
+                <span className="text-sm font-medium">{user?.displayName ?? ''}</span>
+                <span className="text-xs text-muted-foreground">{user?.primaryEmail ?? ''}</span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Settings className="size-4 mr-2" />
-              Settings
+            <DropdownMenuItem asChild>
+              <Link href="/settings">
+                <Settings className="size-4 mr-2" />
+                Settings
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => user?.signOut()}
+            >
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -2,9 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { format, parseISO } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import { type DateRange } from 'react-day-picker';
 import {
   Select,
   SelectContent,
@@ -12,9 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { DateRangePicker } from '@/components/date-range-picker';
 import type { DashboardPeriod } from '@/lib/period';
 
 const PRESETS: { value: DashboardPeriod; label: string }[] = [
@@ -35,11 +30,6 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [selected, setSelected] = useState<DashboardPeriod>(period);
-  const [range, setRange] = useState<DateRange | undefined>({
-    from: parseISO(from),
-    to: parseISO(to),
-  });
-  const [open, setOpen] = useState(false);
 
   function onPresetChange(value: string) {
     const next = value as DashboardPeriod;
@@ -49,17 +39,9 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
     }
   }
 
-  function onRangeSelect(next: DateRange | undefined) {
-    setRange(next);
-    if (next?.from && next.to) {
-      setOpen(false);
-      const params = new URLSearchParams({
-        period: 'custom',
-        from: format(next.from, 'yyyy-MM-dd'),
-        to: format(next.to, 'yyyy-MM-dd'),
-      });
-      router.push(`${pathname}?${params.toString()}`);
-    }
+  function handleRangeChange(nextFrom: string, nextTo: string): void {
+    const params = new URLSearchParams({ period: 'custom', from: nextFrom, to: nextTo });
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -78,38 +60,13 @@ export function PeriodSelector({ period, from, to }: PeriodSelectorProps) {
       </Select>
 
       {selected === 'custom' && (
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              id="period-range"
-              variant="outline"
-              className="h-8 justify-start px-2.5 text-sm font-normal"
-            >
-              <CalendarIcon className="size-3.5" />
-              {range?.from ? (
-                range.to ? (
-                  <>
-                    {format(range.from, 'LLL dd, y')} – {format(range.to, 'LLL dd, y')}
-                  </>
-                ) : (
-                  format(range.from, 'LLL dd, y')
-                )
-              ) : (
-                <span>Pick a date range</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="range"
-              {...(range?.from ? { defaultMonth: range.from } : {})}
-              selected={range}
-              onSelect={onRangeSelect}
-              numberOfMonths={2}
-              autoFocus
-            />
-          </PopoverContent>
-        </Popover>
+        <DateRangePicker
+          id="period-range"
+          from={from}
+          to={to}
+          onChange={handleRangeChange}
+          placeholder="Pick a date range"
+        />
       )}
     </div>
   );

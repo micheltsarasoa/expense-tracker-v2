@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/date-picker';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -179,11 +180,10 @@ export function TransactionModal({
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="tx-date">Date</Label>
-              <Input
+              <DatePicker
                 id="tx-date"
-                type="date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={setDate}
                 className={errors.date ? 'border-destructive' : ''}
               />
               {errors.date && <p className="text-xs text-destructive">{errors.date}</p>}

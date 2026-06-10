@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { BarChart3 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
+import { DateRangePicker } from '@/components/date-range-picker';
 import {
   SpendingByCategoryTab,
   type CategorySlice,
@@ -50,15 +49,10 @@ export function ReportsClient({
   const router = useRouter();
   const pathname = usePathname();
   const [tab, setTab] = useState('spending');
-  const [localFrom, setLocalFrom] = useState(from);
-  const [localTo, setLocalTo] = useState(to);
 
-  function apply() {
-    const params = new URLSearchParams();
-    if (localFrom) params.set('from', localFrom);
-    if (localTo) params.set('to', localTo);
-    const qs = params.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname);
+  function handleRangeChange(nextFrom: string, nextTo: string): void {
+    const params = new URLSearchParams({ from: nextFrom, to: nextTo });
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (
@@ -77,34 +71,18 @@ export function ReportsClient({
 
       {/* Date-range filter */}
       <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex flex-col gap-1 min-w-32.5">
-            <label htmlFor="rep-from" className="text-xs font-medium text-muted-foreground">
-              From
-            </label>
-            <Input
-              id="rep-from"
-              type="date"
-              value={localFrom}
-              onChange={(e) => setLocalFrom(e.target.value)}
-              className="h-8 text-sm"
-            />
-          </div>
-          <div className="flex flex-col gap-1 min-w-32.5">
-            <label htmlFor="rep-to" className="text-xs font-medium text-muted-foreground">
-              To
-            </label>
-            <Input
-              id="rep-to"
-              type="date"
-              value={localTo}
-              onChange={(e) => setLocalTo(e.target.value)}
-              className="h-8 text-sm"
-            />
-          </div>
-          <Button size="sm" className="h-8" onClick={apply}>
-            Apply
-          </Button>
+        <div className="flex flex-col gap-1">
+          <label htmlFor="rep-range" className="text-xs font-medium text-muted-foreground">
+            Date range
+          </label>
+          <DateRangePicker
+            id="rep-range"
+            from={from}
+            to={to}
+            onChange={handleRangeChange}
+            placeholder="Pick a date range"
+            className="w-fit"
+          />
         </div>
       </div>
 
