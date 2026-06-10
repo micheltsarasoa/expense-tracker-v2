@@ -10,7 +10,7 @@ import type {
 } from '@expense-tracker/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useFormat } from '@/lib/settings-context';
+import { Money } from '@/components/ui/money';
 import type { DashboardPeriod } from '@/lib/period';
 import { PeriodSelector } from '@/components/dashboard/period-selector';
 import { BudgetCard } from '@/components/budgets/budget-card';
@@ -42,7 +42,6 @@ export function BudgetsClient({
   to,
   periodLabel,
 }: BudgetsClientProps) {
-  const { money } = useFormat();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<BudgetWithSpendingDTO | null>(null);
 
@@ -206,7 +205,7 @@ export function BudgetsClient({
                     )}
                     <span className="text-base font-semibold">{group.name}</span>
                     <span className="text-sm text-muted-foreground">
-                      {money(groupSpent)} spent of {money(groupTotal)} budgeted
+                      <Money value={groupSpent} /> spent of <Money value={groupTotal} /> budgeted
                     </span>
                     <span className="ml-auto text-muted-foreground">
                       {isCollapsed ? (
@@ -253,26 +252,26 @@ export function BudgetsClient({
             <div className="flex items-center gap-8">
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">Total budgeted</span>
-                <span className="text-sm font-semibold tabular-nums text-muted-foreground">
-                  {money(totalBudgeted)}
-                </span>
+                <Money
+                  value={totalBudgeted}
+                  className="text-sm font-semibold text-muted-foreground"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">Total spent</span>
-                <span
+                <Money
+                  value={totalSpent}
                   className={cn(
-                    'text-sm font-semibold tabular-nums',
+                    'text-sm font-semibold',
                     anyOver ? 'text-rose-600 dark:text-rose-400' : 'text-muted-foreground',
                   )}
-                >
-                  {money(totalSpent)}
-                </span>
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs text-muted-foreground">Remaining</span>
                 <span
                   className={cn(
-                    'text-sm font-semibold tabular-nums',
+                    'text-sm font-semibold',
                     totalRemaining > 0
                       ? 'text-emerald-600 dark:text-emerald-400'
                       : totalRemaining < 0
@@ -280,7 +279,7 @@ export function BudgetsClient({
                         : 'text-muted-foreground',
                   )}
                 >
-                  {money(Math.abs(totalRemaining))}
+                  <Money value={Math.abs(totalRemaining)} />
                   {totalRemaining < 0 ? ' over' : ''}
                 </span>
               </div>

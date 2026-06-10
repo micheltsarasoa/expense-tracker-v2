@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import { DateRangePicker } from '@/components/date-range-picker';
 import { cn } from '@/lib/utils';
 
 export interface TransactionFilterValues {
@@ -166,23 +166,11 @@ export function TransactionsFilterBar({
         </SelectContent>
       </Select>
 
-      <div className="flex items-center gap-1">
-        <Input
-          type="date"
-          aria-label="From date"
-          className="h-8 w-36 text-sm"
-          value={value.from}
-          onChange={(e) => set('from', e.target.value)}
-        />
-        <span className="text-muted-foreground text-xs">to</span>
-        <Input
-          type="date"
-          aria-label="To date"
-          className="h-8 w-36 text-sm"
-          value={value.to}
-          onChange={(e) => set('to', e.target.value)}
-        />
-      </div>
+      <DateRangePicker
+        from={value.from}
+        to={value.to}
+        onChange={(from, to) => onChange({ ...value, from, to })}
+      />
 
       <Select value={value.isValidated} onValueChange={(v) => set('isValidated', v)}>
         <SelectTrigger className="h-8 w-36 text-sm">

@@ -14,6 +14,14 @@ import {
   TrendingDown,
 } from 'lucide-react';
 
+function getInitials(name: string | null | undefined): string {
+  if (!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  const a = parts[0]?.[0] ?? '';
+  const b = parts[1]?.[0] ?? '';
+  return (parts.length === 1 ? a : a + b).toUpperCase();
+}
+
 import {
   Sidebar,
   SidebarContent,
@@ -42,7 +50,12 @@ const secondaryNavItems = [
   { title: 'Settings', href: '/settings', icon: Settings },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  displayName: string | null;
+  primaryEmail: string | null;
+}
+
+export function AppSidebar({ displayName, primaryEmail }: AppSidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -109,11 +122,13 @@ export function AppSidebar() {
       <SidebarFooter className="pb-4">
         <div className="flex items-center gap-2 rounded-md px-2 py-1.5 overflow-hidden group-data-[collapsible=icon]:justify-center">
           <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-medium">
-            U
+            {getInitials(displayName)}
           </div>
           <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
-            <span className="truncate text-xs font-medium text-sidebar-foreground">John Doe</span>
-            <span className="truncate text-xs text-muted-foreground">john@example.com</span>
+            <span className="truncate text-xs font-medium text-sidebar-foreground">
+              {displayName ?? ''}
+            </span>
+            <span className="truncate text-xs text-muted-foreground">{primaryEmail ?? ''}</span>
           </div>
         </div>
       </SidebarFooter>

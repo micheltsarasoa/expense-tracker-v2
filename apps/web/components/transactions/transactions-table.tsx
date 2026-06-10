@@ -121,7 +121,7 @@ export function TransactionsTable({
                 </TableCell>
                 <TableCell
                   className={cn(
-                    'text-sm font-medium tabular-nums text-right whitespace-nowrap',
+                    'font-mono text-sm font-medium tabular-nums text-right whitespace-nowrap',
                     config.amountClass,
                   )}
                 >
@@ -166,13 +166,14 @@ export function TransactionsTable({
                   <button
                     type="button"
                     onClick={() => onToggleValidated(tx.id)}
-                    className="mx-auto flex items-center justify-center"
+                    className="mx-auto flex size-9 items-center justify-center rounded-md text-muted-foreground/40 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
                     aria-label={tx.isValidated ? 'Mark as unvalidated' : 'Mark as validated'}
+                    aria-pressed={tx.isValidated}
                   >
                     {tx.isValidated ? (
                       <CheckCircle className="size-4 text-emerald-500" />
                     ) : (
-                      <Circle className="size-4 text-muted-foreground/40" />
+                      <Circle className="size-4" />
                     )}
                   </button>
                 </TableCell>

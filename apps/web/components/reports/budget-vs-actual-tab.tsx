@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { Money } from '@/components/ui/money';
 import { cn } from '@/lib/utils';
 import { useFormat } from '@/lib/settings-context';
 
@@ -114,9 +115,9 @@ export function BudgetVsActualTab({ data, loading }: Props) {
                   <div className="flex items-center gap-3 shrink-0 text-sm tabular-nums">
                     <span className={cn('font-semibold', textClass)}>{pct.toFixed(0)}%</span>
                     <span className="text-muted-foreground">
-                      {money(row.spent)}
+                      <Money value={row.spent} />
                       {' / '}
-                      {money(row.budgeted)}
+                      <Money value={row.budgeted} />
                     </span>
                   </div>
                 </div>
@@ -126,8 +127,8 @@ export function BudgetVsActualTab({ data, loading }: Props) {
                     className="flex-1 h-2"
                     indicatorClassName={indicatorClass}
                   />
-                  <span className="text-xs text-muted-foreground tabular-nums w-24 text-right shrink-0">
-                    {remaining >= 0 ? `${money(remaining)} left` : `${money(remaining)} over`}
+                  <span className="text-xs text-muted-foreground w-24 text-right shrink-0">
+                    <Money value={remaining} /> {remaining >= 0 ? 'left' : 'over'}
                   </span>
                 </div>
               </div>
@@ -158,7 +159,7 @@ export function BudgetVsActualTab({ data, loading }: Props) {
           <Card key={item.label} className="shadow-sm">
             <CardContent className="py-4 px-5">
               <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-              <p className={cn('text-xl font-bold tabular-nums', item.colorClass)}>
+              <p className={cn('font-mono text-xl font-bold tabular-nums', item.colorClass)}>
                 {item.label === 'Remaining' && item.value < 0 ? '-' : ''}
                 {money(Math.abs(item.value))}
               </p>

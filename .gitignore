@@ -41,3 +41,5 @@ _bmad/
 _bmad-output/
 
 graphify-out/
+.fallow/
+.fallowrc.json

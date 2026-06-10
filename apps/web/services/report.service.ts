@@ -128,10 +128,9 @@ export class ReportService extends BaseService {
     }));
   }
 
-  async budgetVsActual(userId: string): Promise<BudgetVsActual[]> {
+  async budgetVsActual(userId: string, from: string, to: string): Promise<BudgetVsActual[]> {
     const rows = await this.db
       .select({
-        budgetId: budgets.id,
         name: budgets.name,
         amount: budgets.amount,
         spent: sql<string>`COALESCE(SUM(CASE
@@ -139,6 +138,8 @@ export class ReportService extends BaseService {
             AND ${transactions.type} = 'expense'
             AND ${transactions.transactionDate} >= ${budgets.startDate}
             AND (${budgets.endDate} IS NULL OR ${transactions.transactionDate} <= ${budgets.endDate})
+            AND ${transactions.transactionDate} >= ${from}
+            AND ${transactions.transactionDate} <= ${to}
             AND (${budgets.categoryId} IS NULL OR ${transactions.categoryId} = ${budgets.categoryId})
           THEN ${transactions.amount}::numeric
           ELSE 0
@@ -146,20 +147,31 @@ export class ReportService extends BaseService {
       })
       .from(budgets)
       .leftJoin(transactions, eq(transactions.userId, budgets.userId))
-      .where(and(eq(budgets.userId, userId), eq(budgets.isActive, true)))
+      .where(
+        and(
+          eq(budgets.userId, userId),
+          eq(budgets.isActive, true),
+          sql`${budgets.startDate} <= ${to}`,
+          sql`(${budgets.endDate} IS NULL OR ${budgets.endDate} >= ${from})`,
+        ),
+      )
       .groupBy(budgets.id, budgets.name, budgets.amount);
 
-    return rows.map((r) => {
-      const spent = parseFloat(r.spent);
-      const amount = parseFloat(r.amount);
-      return {
-        budgetId: r.budgetId,
-        name: r.name,
-        amount: r.amount,
-        spent: r.spent,
-        remaining: (amount - spent).toFixed(2),
-        pct: Math.min(amount > 0 ? Math.round((spent / amount) * 100) : 0, 999),
-      };
-    });
+    const byName = new Map<string, { amount: number; spent: number }>();
+    for (const r of rows) {
+      const acc = byName.get(r.name) ?? { amount: 0, spent: 0 };
+      acc.amount += parseFloat(r.amount);
+      acc.spent += parseFloat(r.spent);
+      byName.set(r.name, acc);
+    }
+
+    return Array.from(byName, ([name, { amount, spent }]) => ({
+      budgetId: name,
+      name,
+      amount: amount.toFixed(2),
+      spent: spent.toFixed(2),
+      remaining: (amount - spent).toFixed(2),
+      pct: Math.min(amount > 0 ? Math.round((spent / amount) * 100) : 0, 999),
+    }));
   }
 }

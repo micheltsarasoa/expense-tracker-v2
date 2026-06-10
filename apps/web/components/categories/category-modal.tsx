@@ -29,6 +29,7 @@ export interface Category {
   name: string;
   type: CategoryType;
   color: string;
+  icon?: string | null;
   parentId?: string;
   isSystem?: boolean;
   children?: Category[];

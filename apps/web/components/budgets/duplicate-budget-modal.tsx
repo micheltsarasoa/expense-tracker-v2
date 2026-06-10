@@ -10,7 +10,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/date-picker';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import type { BudgetWithSpendingDTO } from '@expense-tracker/types';
@@ -79,24 +79,22 @@ export function DuplicateBudgetModal({
         <div className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="dup-start">Start date</Label>
-            <Input
+            <DatePicker
               id="dup-start"
-              type="date"
               value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value);
+              onChange={(v) => {
+                setStartDate(v);
                 setDateError('');
               }}
             />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="dup-end">End date</Label>
-            <Input
+            <DatePicker
               id="dup-end"
-              type="date"
               value={endDate}
-              onChange={(e) => {
-                setEndDate(e.target.value);
+              onChange={(v) => {
+                setEndDate(v);
                 setDateError('');
               }}
             />

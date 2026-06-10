@@ -123,7 +123,12 @@ export function RecentTransactionsWidget({ transactions, loading }: RecentTransa
                     </span>
                   </div>
                   <div className="flex flex-col items-end shrink-0 gap-0.5">
-                    <span className={cn('text-sm font-medium tabular-nums', config.amountClass)}>
+                    <span
+                      className={cn(
+                        'font-mono text-sm font-medium tabular-nums',
+                        config.amountClass,
+                      )}
+                    >
                       {config.prefix}
                       {money(tx.amount)}
                     </span>

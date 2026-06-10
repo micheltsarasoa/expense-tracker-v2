@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { Money } from '@/components/ui/money';
 import { useFormat } from '@/lib/settings-context';
 
 const CATEGORY_COLORS = [
@@ -119,7 +120,7 @@ export function SpendingByCategoryChart({ data, total, loading }: SpendingByCate
                     </div>
                     <div className="flex items-center gap-2 shrink-0 tabular-nums">
                       <span className="text-xs text-muted-foreground">{pct}%</span>
-                      <span className="font-medium">{money(entry.value)}</span>
+                      <Money value={entry.value} className="font-medium" />
                     </div>
                   </li>
                 );

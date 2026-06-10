@@ -15,6 +15,7 @@ export default async function CategoriesPage() {
       name: r.name,
       type: r.type,
       color: r.color ?? '#6b7280',
+      icon: r.icon ?? null,
       isSystem: r.isDefault,
       children: [],
       ...(r.parentId ? { parentId: r.parentId } : {}),

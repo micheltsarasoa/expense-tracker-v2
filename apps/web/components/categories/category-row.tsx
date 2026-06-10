@@ -11,38 +11,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { CategoryIcon } from './category-icon';
 import type { Category } from './category-modal';
 
 interface CategoryRowProps {
   category: Category;
-  isChild?: boolean;
   onEdit: (category: Category) => void;
   onDelete: (category: Category) => void;
 }
 
-export function CategoryRow({ category, isChild = false, onEdit, onDelete }: CategoryRowProps) {
+export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2">
       <div
         className={cn(
-          'group flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-muted/50',
+          'group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5 shadow-sm transition-colors hover:bg-muted/40',
           category.isSystem && 'bg-muted/30',
-          isChild && 'ml-6',
         )}
       >
-        {/* Connector line for children */}
-        {isChild && (
-          <div className="absolute left-[2.15rem] h-full w-px bg-border" aria-hidden="true" />
-        )}
+        <CategoryIcon icon={category.icon ?? null} color={category.color} />
 
-        {/* Color dot */}
-        <span
-          className="size-3 rounded-full shrink-0"
-          style={{ backgroundColor: category.color }}
-          aria-hidden="true"
-        />
-
-        {/* Name + badges */}
         <div className="flex flex-1 items-center gap-2 min-w-0">
           <span className="text-sm font-medium truncate">{category.name}</span>
           {category.isSystem && (
@@ -55,8 +43,13 @@ export function CategoryRow({ category, isChild = false, onEdit, onDelete }: Cat
           )}
         </div>
 
-        {/* Actions — only for non-system */}
-        {!category.isSystem ? (
+        <span
+          className="h-2.5 w-7 rounded-full shrink-0"
+          style={{ backgroundColor: category.color }}
+          aria-hidden="true"
+        />
+
+        {!category.isSystem && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -83,24 +76,13 @@ export function CategoryRow({ category, isChild = false, onEdit, onDelete }: Cat
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <div className="size-7 shrink-0" />
         )}
       </div>
 
-      {/* Subcategories */}
       {category.children && category.children.length > 0 && (
-        <div className="relative flex flex-col">
-          {/* Vertical connector */}
-          <div className="absolute left-9 top-0 bottom-0 w-px bg-border" aria-hidden="true" />
+        <div className="ml-5 flex flex-col gap-2 border-l border-border pl-3">
           {category.children.map((child) => (
-            <CategoryRow
-              key={child.id}
-              category={child}
-              isChild
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
+            <CategoryRow key={child.id} category={child} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </div>
       )}
