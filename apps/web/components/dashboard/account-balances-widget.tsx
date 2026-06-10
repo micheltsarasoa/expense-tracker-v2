@@ -4,8 +4,8 @@ import { Banknote, Building2, CreditCard, Wallet, CircleDollarSign } from 'lucid
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
+import { Money } from '@/components/ui/money';
 import { cn } from '@/lib/utils';
-import { useFormat } from '@/lib/settings-context';
 import type { AccountType } from '@/components/accounts/balance-card';
 
 const typeConfig: Record<AccountType, { label: string; icon: React.ElementType }> = {
@@ -37,7 +37,6 @@ function balanceClass(n: number) {
 }
 
 export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidgetProps) {
-  const { money } = useFormat();
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
   if (loading) {
@@ -68,9 +67,10 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
     <Card className="shadow-sm">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-base font-medium">Account Balances</CardTitle>
-        <span className={cn('text-base font-bold tabular-nums', balanceClass(totalBalance))}>
-          {money(totalBalance)}
-        </span>
+        <Money
+          value={totalBalance}
+          className={cn('text-base font-bold', balanceClass(totalBalance))}
+        />
       </CardHeader>
       <CardContent>
         <ul className="space-y-0 divide-y divide-border">
@@ -93,14 +93,10 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
                   <span className="text-sm font-medium truncate">{account.name}</span>
                   <span className="text-xs text-muted-foreground">{config.label}</span>
                 </div>
-                <span
-                  className={cn(
-                    'text-sm font-semibold tabular-nums shrink-0',
-                    balanceClass(account.balance),
-                  )}
-                >
-                  {money(account.balance)}
-                </span>
+                <Money
+                  value={account.balance}
+                  className={cn('text-sm font-semibold shrink-0', balanceClass(account.balance))}
+                />
               </li>
             );
           })}
@@ -111,9 +107,10 @@ export function AccountBalancesWidget({ accounts, loading }: AccountBalancesWidg
             <Separator className="my-3" />
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">Total</span>
-              <span className={cn('text-sm font-bold tabular-nums', balanceClass(totalBalance))}>
-                {money(totalBalance)}
-              </span>
+              <Money
+                value={totalBalance}
+                className={cn('text-sm font-bold', balanceClass(totalBalance))}
+              />
             </div>
           </>
         )}

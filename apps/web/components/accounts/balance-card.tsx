@@ -20,8 +20,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Money } from '@/components/ui/money';
 import { cn } from '@/lib/utils';
-import { useFormat } from '@/lib/settings-context';
 
 export type AccountType =
   | 'cash'
@@ -58,7 +58,6 @@ const typeConfig: Record<AccountType, { label: string; icon: React.ElementType }
 };
 
 export function BalanceCard({ account, onEdit, onDeactivateOrDelete }: BalanceCardProps) {
-  const { money } = useFormat();
   const config = typeConfig[account.type];
   const Icon = config.icon;
 
@@ -107,9 +106,7 @@ export function BalanceCard({ account, onEdit, onDeactivateOrDelete }: BalanceCa
 
       {/* Balance */}
       <div className="flex flex-col items-end gap-1 shrink-0">
-        <span className={cn('text-lg font-bold tabular-nums', balanceClass)}>
-          {money(account.balance)}
-        </span>
+        <Money value={account.balance} className={cn('text-lg font-bold', balanceClass)} />
       </div>
 
       {/* Actions */}

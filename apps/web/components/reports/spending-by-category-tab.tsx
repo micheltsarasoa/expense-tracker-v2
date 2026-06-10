@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty';
+import { Money } from '@/components/ui/money';
 import { useFormat } from '@/lib/settings-context';
 
 const FALLBACK_COLORS = [
@@ -128,8 +129,8 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
                           <span className="font-medium">{row.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums font-medium">
-                        {money(row.value)}
+                      <td className="px-4 py-2.5 text-right">
+                        <Money value={row.value} className="font-medium" />
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                         {pct}%
@@ -141,8 +142,8 @@ export function SpendingByCategoryTab({ data, loading }: Props) {
               <tfoot>
                 <tr className="border-t border-border bg-muted/30">
                   <td className="px-4 py-2.5 text-xs font-semibold text-muted-foreground">Total</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums font-semibold">
-                    {money(total)}
+                  <td className="px-4 py-2.5 text-right">
+                    <Money value={total} className="font-semibold" />
                   </td>
                   <td className="px-4 py-2.5 text-right text-muted-foreground">100%</td>
                 </tr>

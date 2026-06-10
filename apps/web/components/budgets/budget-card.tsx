@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
+import { Money } from '@/components/ui/money';
 import { cn } from '@/lib/utils';
 import { useFormat } from '@/lib/settings-context';
 
@@ -29,7 +30,7 @@ function getProgressColor(pct: number) {
 }
 
 export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCardProps) {
-  const { money, date } = useFormat();
+  const { date } = useFormat();
   const pct = budget.pct; // server-computed, clamped 0..999
   const barPct = Math.min(pct, 100);
   const isOver = pct >= 100;
@@ -129,18 +130,20 @@ export function BudgetCard({ budget, onEdit, onDuplicate, onDelete }: BudgetCard
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{pct}%</span>
-          <span className="tabular-nums font-medium text-foreground">{money(budget.amount)}</span>
+          <Money value={budget.amount} className="font-medium text-foreground" />
         </div>
         <Progress value={barPct} className="h-2" indicatorClassName={progressColor} />
         <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground tabular-nums">{money(budget.spent)} spent</span>
+          <span className="text-muted-foreground">
+            <Money value={budget.spent} /> spent
+          </span>
           {isOver ? (
-            <span className="text-rose-600 dark:text-rose-400 tabular-nums font-medium">
-              Over by {money(Math.abs(remaining))}
+            <span className="text-rose-600 dark:text-rose-400 font-medium">
+              Over by <Money value={Math.abs(remaining)} />
             </span>
           ) : (
-            <span className="text-muted-foreground tabular-nums">
-              {money(budget.remaining)} left
+            <span className="text-muted-foreground">
+              <Money value={budget.remaining} /> left
             </span>
           )}
         </div>

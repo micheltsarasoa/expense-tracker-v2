@@ -162,7 +162,7 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
           <Card key={item.label} className="shadow-sm">
             <CardContent className="py-4 px-5">
               <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-              <p className={cn('text-xl font-bold tabular-nums', item.colorClass)}>
+              <p className={cn('font-mono text-xl font-bold tabular-nums', item.colorClass)}>
                 {totalNet < 0 && item.label === 'Net' ? '-' : ''}
                 {money(Math.abs(item.value))}
               </p>
@@ -195,15 +195,15 @@ export function IncomeVsExpensesTab({ data, loading }: Props) {
               {withNet.map((row) => (
                 <tr key={row.month} className="hover:bg-muted/40 transition-colors">
                   <td className="px-4 py-2.5 font-medium">{row.month}</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-emerald-600 dark:text-emerald-400">
+                  <td className="px-4 py-2.5 text-right font-mono tabular-nums text-emerald-600 dark:text-emerald-400">
                     +{money(row.income)}
                   </td>
-                  <td className="px-4 py-2.5 text-right tabular-nums text-rose-600 dark:text-rose-400">
+                  <td className="px-4 py-2.5 text-right font-mono tabular-nums text-rose-600 dark:text-rose-400">
                     -{money(row.expense)}
                   </td>
                   <td
                     className={cn(
-                      'px-4 py-2.5 text-right tabular-nums font-medium',
+                      'px-4 py-2.5 text-right font-mono tabular-nums font-medium',
                       row.net >= 0
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-rose-600 dark:text-rose-400',
