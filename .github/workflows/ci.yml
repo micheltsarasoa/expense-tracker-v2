@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-
 jobs:
   # ── 1. Static: Lint + Type-check + Secret Scanning ──────────────────────────
   static:
