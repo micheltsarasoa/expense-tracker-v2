@@ -34,6 +34,9 @@ pnpm-debug.log*
 
 # Vercel
 .vercel
+!apps/web/.vercel/
+apps/web/.vercel/*
+!apps/web/.vercel/project.json
 
 graphify-out/
 .kilo/*
