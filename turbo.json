@@ -3,6 +3,12 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "DATABASE_URL",
+        "NEXT_PUBLIC_STACK_PROJECT_ID",
+        "NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY",
+        "STACK_SECRET_SERVER_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "dev": {
