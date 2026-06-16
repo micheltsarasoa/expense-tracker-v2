@@ -149,7 +149,9 @@ export class ImportService extends BaseService {
       amount: normalizeAmount(row['amount'] ?? ''),
       transactionDate: row['date'] ?? '',
       paymentMethodId: accountId,
-      ...(type === 'transfer' ? { toPaymentMethodId: toAccountId } : { categoryId }),
+      ...(type === 'transfer'
+        ? { toPaymentMethodId: toAccountId, ...(categoryId ? { categoryId } : {}) }
+        : { categoryId }),
       ...(row['description'] ? { description: row['description'] } : {}),
       ...(labelId ? { labelId } : {}),
     };
