@@ -1,9 +1,6 @@
 'use client';
 
 import {
-  TrendingUp,
-  TrendingDown,
-  ArrowLeftRight,
   ArrowRight,
   CheckCircle,
   Circle,
@@ -21,7 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import {
+  TransactionTypeBadge,
+  transactionTypeConfig,
+} from '@/components/transactions/transaction-type-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,32 +39,6 @@ interface TransactionsTableProps {
   onDelete: (transaction: TransactionListItemDTO) => void;
   onToggleValidated: (id: string) => void;
 }
-
-const typeConfig = {
-  income: {
-    label: 'Income',
-    icon: TrendingUp,
-    badgeClass:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400',
-    amountClass: 'text-emerald-600 dark:text-emerald-400',
-    prefix: '+',
-  },
-  expense: {
-    label: 'Expense',
-    icon: TrendingDown,
-    badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950 dark:text-rose-400',
-    amountClass: 'text-rose-600 dark:text-rose-400',
-    prefix: '-',
-  },
-  transfer: {
-    label: 'Transfer',
-    icon: ArrowLeftRight,
-    badgeClass:
-      'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-400',
-    amountClass: 'text-violet-600 dark:text-violet-400',
-    prefix: '',
-  },
-};
 
 export function TransactionsTable({
   transactions,
@@ -93,24 +67,14 @@ export function TransactionsTable({
         </TableHeader>
         <TableBody>
           {transactions.map((tx) => {
-            const config = typeConfig[tx.type];
-            const TypeIcon = config.icon;
+            const config = transactionTypeConfig[tx.type];
             return (
               <TableRow key={tx.id} className="group">
                 <TableCell className="text-sm text-muted-foreground tabular-nums whitespace-nowrap">
                   {date(tx.transactionDate)}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      'flex w-fit items-center gap-1 text-xs font-medium',
-                      config.badgeClass,
-                    )}
-                  >
-                    <TypeIcon className="size-3" />
-                    {config.label}
-                  </Badge>
+                  <TransactionTypeBadge type={tx.type} className="w-fit" />
                 </TableCell>
                 <TableCell className="text-sm max-w-48">
                   {tx.description ? (

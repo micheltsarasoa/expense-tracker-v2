@@ -117,7 +117,7 @@ export class TransactionService extends BaseService {
           amount: data.amount,
           transactionDate: data.transactionDate,
           paymentMethodId: data.paymentMethodId,
-          ...(data.type !== 'transfer' ? { categoryId: data.categoryId } : {}),
+          ...(data.categoryId ? { categoryId: data.categoryId } : {}),
           ...(data.type === 'transfer' ? { toPaymentMethodId: data.toPaymentMethodId } : {}),
           ...(data.description !== undefined ? { description: data.description } : {}),
           ...(data.labelId !== undefined ? { labelId: data.labelId } : {}),

@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { TrendingUp, TrendingDown, ArrowLeftRight, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { TransactionListItemDTO } from '@expense-tracker/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import {
+  TransactionTypeBadge,
+  transactionTypeConfig,
+} from '@/components/transactions/transaction-type-badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Empty,
@@ -16,33 +19,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useFormat } from '@/lib/settings-context';
-
-const typeConfig = {
-  income: {
-    label: 'Income',
-    icon: TrendingUp,
-    badgeClass:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800',
-    amountClass: 'text-emerald-600 dark:text-emerald-400',
-    prefix: '+',
-  },
-  expense: {
-    label: 'Expense',
-    icon: TrendingDown,
-    badgeClass:
-      'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950 dark:text-rose-400 dark:border-rose-800',
-    amountClass: 'text-rose-600 dark:text-rose-400',
-    prefix: '-',
-  },
-  transfer: {
-    label: 'Transfer',
-    icon: ArrowLeftRight,
-    badgeClass:
-      'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-400 dark:border-violet-800',
-    amountClass: 'text-violet-600 dark:text-violet-400',
-    prefix: '',
-  },
-};
 
 interface RecentTransactionsWidgetProps {
   transactions: TransactionListItemDTO[];
@@ -97,20 +73,10 @@ export function RecentTransactionsWidget({ transactions, loading }: RecentTransa
         ) : (
           <ul className="divide-y divide-border">
             {transactions.map((tx) => {
-              const config = typeConfig[tx.type];
-              const Icon = config.icon;
+              const config = transactionTypeConfig[tx.type];
               return (
                 <li key={tx.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      'flex shrink-0 items-center gap-1 text-xs font-medium',
-                      config.badgeClass,
-                    )}
-                  >
-                    <Icon className="size-3" />
-                    {config.label}
-                  </Badge>
+                  <TransactionTypeBadge type={tx.type} className="shrink-0" />
                   <div className="flex min-w-0 flex-1 flex-col">
                     <span className="text-sm truncate">
                       {tx.description || (

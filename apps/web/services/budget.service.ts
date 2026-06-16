@@ -27,7 +27,7 @@ export class BudgetService extends BaseService {
         isActive: budgets.isActive,
         spent: sql<string>`COALESCE(SUM(CASE
           WHEN ${transactions.isDeleted} = FALSE
-            AND ${transactions.type} = 'expense'
+            AND ${transactions.type} IN ('expense', 'transfer')
             AND ${transactions.transactionDate} >= ${budgets.startDate}
             AND (${budgets.endDate} IS NULL OR ${transactions.transactionDate} <= ${budgets.endDate})
             AND (${budgets.categoryId} IS NULL OR ${transactions.categoryId} = ${budgets.categoryId})

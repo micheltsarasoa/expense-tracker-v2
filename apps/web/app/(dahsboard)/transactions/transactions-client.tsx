@@ -107,10 +107,11 @@ export function TransactionsClient({
       ...(values.labelId ? { labelId: values.labelId } : {}),
       ...(values.description ? { description: values.description } : {}),
     };
-    const input =
-      values.type === 'transfer'
-        ? { ...base, toPaymentMethodId: values.toPaymentMethodId }
-        : { ...base, categoryId: values.categoryId };
+    const input = {
+      ...base,
+      ...(values.type === 'transfer' ? { toPaymentMethodId: values.toPaymentMethodId } : {}),
+      ...(values.categoryId ? { categoryId: values.categoryId } : {}),
+    };
     const res = await createTransaction(input);
     if (res.ok) toast.success('Transaction saved');
     else toast.error(res.error ?? 'Failed to save transaction. Please try again.');

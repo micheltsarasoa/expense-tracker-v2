@@ -29,6 +29,13 @@ import {
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { TransactionTypeTabs, type TransactionType } from './transaction-type-tab';
+import { cn } from '@/lib/utils';
+
+const borderByType: Record<TransactionType, string> = {
+  income: 'border-emerald-500',
+  expense: 'border-rose-500',
+  transfer: 'border-violet-500',
+};
 
 /** Normalized values the modal emits; cleared fields are null. */
 export interface TransactionFormValues {
@@ -107,12 +114,11 @@ export function TransactionModal({
   function handleTypeChange(next: TransactionType) {
     setType(next);
     setErrors({});
-    // Switching type clears the fields that no longer apply.
-    if (next === 'transfer') setCategoryId('');
-    else setToPaymentMethodId('');
+    if (next !== 'transfer') setToPaymentMethodId('');
   }
 
-  const categoryOptions = categories.filter((c) => c.type === type);
+  const categoryOptions =
+    type === 'transfer' ? categories : categories.filter((c) => c.type === type);
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -140,7 +146,7 @@ export function TransactionModal({
       transactionDate: date,
       paymentMethodId,
       toPaymentMethodId: type === 'transfer' ? toPaymentMethodId : null,
-      categoryId: type === 'transfer' ? null : categoryId,
+      categoryId: categoryId || null,
       labelId: labelId || null,
       description: description.trim() || null,
     });
@@ -150,7 +156,7 @@ export function TransactionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className={cn('sm:max-w-lg border-2 border-dashed', borderByType[type])}>
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Transaction' : 'New Transaction'}</DialogTitle>
           <DialogDescription className="sr-only">
@@ -190,72 +196,77 @@ export function TransactionModal({
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <Label>{type === 'transfer' ? 'From account' : 'Account'}</Label>
-            <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
-              <SelectTrigger className={errors.paymentMethodId ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Select account" />
-              </SelectTrigger>
-              <SelectContent>
-                {paymentMethods.map((pm) => (
-                  <SelectItem key={pm.id} value={pm.id}>
-                    {pm.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.paymentMethodId && (
-              <p className="text-xs text-destructive">{errors.paymentMethodId}</p>
-            )}
-          </div>
-
-          {type === 'transfer' && (
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label>To account</Label>
-              <Select value={toPaymentMethodId} onValueChange={setToPaymentMethodId}>
-                <SelectTrigger className={errors.toPaymentMethodId ? 'border-destructive' : ''}>
-                  <SelectValue placeholder="Select destination account" />
+              <Label>{type === 'transfer' ? 'From account' : 'Account'}</Label>
+              <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
+                <SelectTrigger className={errors.paymentMethodId ? 'border-destructive' : ''}>
+                  <SelectValue placeholder="Select account" />
                 </SelectTrigger>
                 <SelectContent>
-                  {paymentMethods
-                    .filter((pm) => pm.id !== paymentMethodId)
-                    .map((pm) => (
-                      <SelectItem key={pm.id} value={pm.id}>
-                        {pm.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              {errors.toPaymentMethodId && (
-                <p className="text-xs text-destructive">{errors.toPaymentMethodId}</p>
-              )}
-            </div>
-          )}
-
-          {type !== 'transfer' && (
-            <div className="flex flex-col gap-1.5">
-              <Label>Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger className={errors.categoryId ? 'border-destructive' : ''}>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="size-2 rounded-full shrink-0"
-                          style={{ backgroundColor: c.color ?? '#6b7280' }}
-                        />
-                        {c.name}
-                      </div>
+                  {paymentMethods.map((pm) => (
+                    <SelectItem key={pm.id} value={pm.id}>
+                      {pm.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
+              {errors.paymentMethodId && (
+                <p className="text-xs text-destructive">{errors.paymentMethodId}</p>
+              )}
             </div>
-          )}
+
+            {type === 'transfer' && (
+              <div className="flex flex-col gap-1.5">
+                <Label>To account</Label>
+                <Select value={toPaymentMethodId} onValueChange={setToPaymentMethodId}>
+                  <SelectTrigger className={errors.toPaymentMethodId ? 'border-destructive' : ''}>
+                    <SelectValue placeholder="Select destination account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {paymentMethods
+                      .filter((pm) => pm.id !== paymentMethodId)
+                      .map((pm) => (
+                        <SelectItem key={pm.id} value={pm.id}>
+                          {pm.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                {errors.toPaymentMethodId && (
+                  <p className="text-xs text-destructive">{errors.toPaymentMethodId}</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>
+              Category
+              {type === 'transfer' && (
+                <span className="font-normal text-muted-foreground"> (optional)</span>
+              )}
+            </Label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger className={errors.categoryId ? 'border-destructive' : ''}>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoryOptions.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: c.color ?? '#6b7280' }}
+                      />
+                      {c.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
+          </div>
 
           <div className="flex flex-col gap-1.5">
             <Label>

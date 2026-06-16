@@ -20,6 +20,7 @@ const incomeExpenseSchema = transactionBase.extend({
 const transferBase = transactionBase.extend({
   type: z.literal('transfer'),
   toPaymentMethodId: z.string().uuid(),
+  categoryId: z.string().uuid().optional(),
 });
 
 export const createTransactionSchema = z
