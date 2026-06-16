@@ -11,6 +11,9 @@ jobs:
   static:
     name: Static
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4.2.2
 
