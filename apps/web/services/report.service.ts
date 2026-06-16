@@ -135,7 +135,7 @@ export class ReportService extends BaseService {
         amount: budgets.amount,
         spent: sql<string>`COALESCE(SUM(CASE
           WHEN ${transactions.isDeleted} = FALSE
-            AND ${transactions.type} = 'expense'
+            AND ${transactions.type} IN ('expense', 'transfer')
             AND ${transactions.transactionDate} >= ${budgets.startDate}
             AND (${budgets.endDate} IS NULL OR ${transactions.transactionDate} <= ${budgets.endDate})
             AND ${transactions.transactionDate} >= ${from}
