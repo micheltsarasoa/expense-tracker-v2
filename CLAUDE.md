@@ -91,3 +91,17 @@ When any request is vague — UI, feature, schema, or otherwise — NEVER execut
    2. [Question]? [suggested default]"
 3. **Confirm before executing**: echo the enriched spec in a block labeled "📋 Enriched Prompt", then proceed.
    When the request is already detailed, skip to executing. No explanations unless asked.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`micheltsarasoa/expense-tracker-v2`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` at root + ADRs in `docs/decisions/`. See `docs/agents/domain.md`.
