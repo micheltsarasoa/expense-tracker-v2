@@ -354,7 +354,7 @@ Zod schemas for every body live in `packages/types` and are reused by forms and 
 1. **Two transfer models** (one row for own accounts, two rows for family). Migrate everything to two rows later?
 2. **Optimistic concurrency** on corrections (reject if `updatedAt` changed) or last-write-wins?
 3. Can a parent belong to a family **and** later want a second one (blended families)? Currently blocked by `UNIQUE(userId)`.
-4. Exact Stack server API for creating a user and setting a password → ADR-005 after the Context7 check. The legacy Neon Auth (Stack) is no longer offered to new users; migrating to the Better Auth based Neon Auth, where user creation is admin-only, is a separate decision.
+4. ~~Exact Stack server API~~ → settled in ADR-005. Migrating from the legacy Neon Auth (Stack) to the Better Auth based Neon Auth, where user creation is admin-only, remains a separate decision.
 5. A child without a personal email: is a parent-chosen placeholder address acceptable to the auth provider?
 
 ## v2 — Automatic allowance
