@@ -70,33 +70,33 @@
 
 ## 3.1 Core Initialization
 
-- [ ] **Scaffold**: `pnpm create next-app@latest`
+- [x] **Scaffold**: `pnpm create next-app@latest`
   - _Config_: App Router, TS (Strict), Tailwind v4, Turbopack enabled. No `--src-dir` (Next.js 16).
 - [ ] **shadcn/ui**: `pnpm dlx shadcn@latest init`
-  - _Note_: Use the `--preset` flag to match Figma tokens from Phase 2.
-- [ ] **Agent Guard**: Verify `CLAUDE.md` and `.claude/` are at root.
+  - _Note_: Deferred — requires Figma tokens from Phase 2 first.
+- [x] **Agent Guard**: Verify `CLAUDE.md` and `.claude/` are at root.
 
 ## 3.2 Quality Gates (The "Janitor" Layer)
 
-- [ ] **Strict Linting**:
+- [x] **Strict Linting**:
   - Add `typescript-eslint` strict & stylistic presets.
   - Add `eslint-plugin-react-compiler` (for React 19 optimization).
-- [ ] **Git Hooks (Husky)**:
+- [x] **Git Hooks (Husky)**:
   - `pre-commit`: Run `lint-staged` (ESLint + Prettier + `tsc --noEmit`).
   - `commit-msg`: Enforce Conventional Commits (`feat:`, `fix:`, `chore:`).
 
 ## 3.3 Database & Local Dev
 
-- [ ] **Drizzle Setup**: Initialize `drizzle-kit` in `packages/db`.
-- [ ] **Seed Engine**: Create `db:seed` script with `@faker-js/faker` for realistic test data.
+- [x] **Drizzle Setup**: Initialize `drizzle-kit` in `packages/db`.
+- [x] **Seed Engine**: Create `db:seed` script with `@faker-js/faker` for realistic test data.
 
 ## 3.4 CI/CD Pipeline (GitHub Actions)
 
-- [ ] **The "Triple Check" Workflow**:
-  1. **Static**: Lint, Type-check, Secret Scanning.
-  2. **Logic**: Vitest (Unit) + Playwright (E2E).
-  3. **Deploy**: Vercel Preview + **Neon Database Branching**.
-- [ ] **Neon Integration**: Automate `neon-create-branch` on every Pull Request.
+- [x] **The "Triple Check" Workflow**:
+  1. **Static**: Lint, Type-check, Secret Scanning. ✓
+  2. **Logic**: Vitest (Unit) + Playwright (E2E). — Vitest/Playwright deferred to Phase 5.5.
+  3. **Deploy**: Manual `workflow_dispatch` to Vercel (preview or production). ✓
+- [ ] **Neon Integration**: Automate `neon-create-branch` on every Pull Request. — Deferred; dev/prod branches used directly.
 
 ---
 
@@ -106,27 +106,27 @@
 
 ## 4.1 Schema Porting (`packages/db/src/schema/`)
 
-- [ ] **Multi-File Schema**: Split the 7-table schema into domain files (e.g., `transactions.ts`, `budgets.ts`).
-- [ ] **Functional Enums**: Use `pgEnum` for Category types and Transaction status.
-- [ ] **Audit Trail**: Implement `updatedAt` using Drizzle's `.$onUpdate()` hook for all tables.
-- [ ] **Multi-Label Logic**: ~~junction table~~ — deferred to scope 2. Single label per transaction for v2 launch.
+- [x] **Multi-File Schema**: Split the 7-table schema into domain files (e.g., `transactions.ts`, `budgets.ts`).
+- [x] **Functional Enums**: Use `pgEnum` for Category types and Transaction status.
+- [ ] **Audit Trail**: Implement `updatedAt` using Drizzle's `.$onUpdate()` hook for all tables. — Deferred; DB uses `CURRENT_TIMESTAMP` default; trigger-based update deferred to Phase 5.
+- [x] **Multi-Label Logic**: ~~junction table~~ — deferred to scope 2. Single label per transaction for v2 launch.
 
 ## 4.2 Neon Infrastructure
 
-- [ ] **Client Initialization**: Setup `drizzle-orm/neon-http` for Edge compatibility.
-- [ ] **Migration Hub**: Configure `drizzle.config.ts` to support both local and Neon branching.
-- [ ] **Type Inference**: Export `InsertTransaction` and `SelectTransaction` types for use in `packages/types`.
+- [x] **Client Initialization**: Setup `drizzle-orm/neon-http` for Edge compatibility.
+- [x] **Migration Hub**: Configure `drizzle.config.ts` to support both local and Neon branching.
+- [x] **Type Inference**: Export `InsertX`/`SelectX` types for all 7 tables from `packages/db`.
 
 ## 4.3 Service Layer & Logic
 
-- [ ] **Balance Strategy**: No SQL triggers. `TransactionService` handles balance updates as a **DB transaction**.
-- [ ] **Query Repository**: Port all queries to Drizzle Relational Queries (RQB).
-- [ ] **Multi-Tenant Scoping**: `withUserScope` helper for Drizzle queries to auto-inject `userId`.
+- [ ] **Balance Strategy**: No SQL triggers. `TransactionService` handles balance updates as a **DB transaction**. — Phase 5.
+- [ ] **Query Repository**: Port all queries to Drizzle Relational Queries (RQB). — Phase 5.
+- [x] **Multi-Tenant Scoping**: `withUserScope` helper for Drizzle queries to auto-inject `userId`.
 
 ## 4.4 Seeding & Validation
 
-- [ ] **Data Factory**: Standalone `seed.ts` script using `@faker-js/faker`.
-- [ ] **Migration Drill**: Run `generate` → `migrate` → `seed` cycle to verify schema integrity.
+- [x] **Data Factory**: Standalone `seed.ts` script using `@faker-js/faker`.
+- [x] **Migration Drill**: Run `generate` → `migrate` → `seed` cycle to verify schema integrity.
 
 ---
 
@@ -136,31 +136,32 @@
 
 ## 5.1 Service Layer (`services/`)
 
-- [x] **Domain Services**: `BaseService`, `SettingsService`, `CategoryService`, `LabelService`, `PaymentMethodService`, `TransactionService`, `BudgetService`, `ReportService`, `ImportService`.
-- [x] **Error Mapping**: `AppError` with `ErrorCode` const object in `packages/types`.
-- [x] **Transaction Wrappers**: `create`/`update`/`delete` on `TransactionService` use `db.transaction()` for atomic balance updates.
+- [ ] **Domain Services**: `TransactionService`, `BudgetService`, `CategoryService`, etc.
+  - _Rule_: Services must be framework-agnostic (no `next/headers`).
+- [ ] **Error Mapping**: Implement `AppError` (code, message, status) for predictable failures.
+- [ ] **Transaction Wrappers**: Multi-step logic uses `db.transaction()`.
 
 ## 5.2 Auth & Route Protection
 
-- [x] **Neon Auth**: `@stackframe/stack` configured — `lib/stack.ts`, `lib/auth.ts`.
-- [x] **proxy.ts**: Route protection at `apps/web/proxy.ts` using Next.js 16 `proxy()` + `proxyConfig` convention.
-- [x] **Password Security**: Delegated to Stack Auth.
+- [ ] **Neon Auth**: Configure SDK in `apps/web` — token issuance, refresh, session.
+- [ ] **proxy.ts**: Enforce route protection and `userId` extraction at `apps/web/proxy.ts`.
+- [ ] **Password Security**: Delegated to Neon Auth (no manual bcrypt/argon2 needed).
 
 ## 5.3 Request Validation & API (`app/api/v1/`)
 
-- [x] **Zod Integration**: All schemas in `packages/types`; `parseBody`/`parseQuery` helpers in `lib/validate.ts`.
-- [x] **Route Handlers**: 20+ handlers across settings, categories, labels, payment-methods, transactions (inc. import), budgets, reports.
-- [ ] **Server Actions**: Deferred to Phase 6 (frontend implementation).
+- [ ] **Zod Integration**: Shared schemas from `packages/types` for all inputs.
+- [ ] **Route Handlers**: Build `GET/POST/PATCH/DELETE` for mobile app consumption.
+- [ ] **Server Actions**: Build the mutation layer for the web app (using `useActionState`).
 
 ## 5.4 API Docs & Observability
 
-- [ ] **OpenAPI**: Deferred to Phase 7.
-- [x] **Logger**: `pino` in `lib/logger.ts`; used by `handleError`.
+- [ ] **OpenAPI**: Auto-generate `openapi.json` from Zod schemas via `zod-to-openapi`.
+- [ ] **Logger**: Structured logger (`pino`) for production debugging.
 
 ## 5.5 Testing Suite
 
-- [x] **Vitest**: `balanceDelta` pure-function tests (4 passing). Config in `vitest.config.ts`.
-- [ ] **MSW**: Deferred to Phase 7.
+- [ ] **Vitest**: Unit tests for services.
+- [ ] **MSW**: Mock Service Worker for integration testing.
 
 ---
 
