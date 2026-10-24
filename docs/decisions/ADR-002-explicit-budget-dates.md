@@ -1,7 +1,7 @@
 # ADR-002 — Explicit Budget Dates (No Recurring Period Types)
 
 **Date:** 2026-04-10  
-**Status:** Accepted
+**Status:** Superseded by ADR-007
 
 ## Context
 
@@ -18,11 +18,13 @@ All budgets in v2 have an **explicit `startDate` and `endDate`**. No period type
 ## Consequences
 
 **Positive**
+
 - No ambiguity in date range calculation
 - Budget suggestion algorithm can output concrete `startDate`/`endDate`
 - Simpler data model — one fewer enum field
 
 **Negative**
+
 - Users who want monthly budgets must create or duplicate one per month (mitigated by the duplicate action and future budget suggestions)
 - Intentional UX regression from v1 — acknowledged
 

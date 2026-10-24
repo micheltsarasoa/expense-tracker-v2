@@ -2,7 +2,9 @@
 
 ## Overview
 
-Budgets let users cap spending for a given period, optionally scoped to a category or label. Real-time progress is shown against actual transactions.
+Budgets let users cap spending, optionally scoped to a category or label. A budget is either **monthly** (covers every calendar month from a start month) or **one-off** (explicit dates). Real-time progress is shown against actual transactions. Budgets never block a transaction.
+
+Decision record: ADR-007 (supersedes ADR-002).
 
 ## Data Model
 
@@ -10,10 +12,11 @@ Budgets let users cap spending for a given period, optionally scoped to a catego
 budgets
   id          uuid PK
   userId      uuid FK → users
-  name        text
-  amount      numeric > 0
-  startDate   date
-  endDate     date
+  name        text (1–60)
+  kind        enum(monthly, one_off)
+  amount      numeric(15,2) > 0          — per month for monthly, total for one-off
+  startDate   date                       — monthly: first day of the start month
+  endDate     date (nullable)            — monthly: null = open-ended; one-off: required
   categoryId  uuid FK → categories  (optional — null = all categories)
   labelId     uuid FK → labels      (optional — null = all labels)
   isActive    boolean default true
@@ -23,62 +26,71 @@ budgets
 
 ## Business Rules
 
-- All budgets are **one-time** with an explicit `startDate` and `endDate` — no recurring period types (regression from v1)
-- `spent` is computed at query time: `SUM(transactions.amount)` where `transactionDate` falls within `startDate` / `endDate` and filters match
-- `remaining = amount - spent` (can go negative = over budget)
-- Budgets can be filtered by `categoryId`, `labelId`, both, or neither (catches all)
-- Budgets can be **duplicated**: creates a copy with a new date range (user sets new start/end), same name, amount, and filters
+- **Monthly** budgets cover whole calendar months. For a given month M, `spent(M) = SUM(expense amounts)` with `transactionDate` in M and filters matching. Nothing "resets": each month is computed at query time, so no background job is needed.
+  - `startDate` is always the 1st of a month; a budget created on the 28th still covers that whole month.
+  - At most one active monthly budget per (categoryId, labelId) pair for a user. Creating a second one → inline error with a link to edit the existing one.
+- **One-off** budgets keep the explicit range: `startDate` and `endDate` required, `endDate ≥ startDate`. `spent` = SUM over the range.
+- `remaining = amount - spent` (can go negative = over budget).
+- Only the owner's expense rows count. Family transfers out count (they are the parent's spending); a child's wallet expenses never count.
+- Budgets can be filtered by `categoryId`, `labelId`, both, or neither (catches all).
+- **Duplicate** copies name, kind, amount and filters. One-off: the user sets new dates. Monthly: the user picks a different category or label (same pair would break uniqueness).
 
 ## Operations
 
-| Operation | Endpoint |
-|---|---|
-| List | `GET /api/v1/budgets` |
-| Create | `POST /api/v1/budgets` |
-| Get one | `GET /api/v1/budgets/:id` |
-| Update | `PUT /api/v1/budgets/:id` |
-| Delete | `DELETE /api/v1/budgets/:id` |
-| Duplicate | `POST /api/v1/budgets/:id/duplicate` | Body: `{ startDate, endDate }` |
+| Operation | Endpoint                             |
+| --------- | ------------------------------------ | ------------------------------------------------------------------------- |
+| List      | `GET /api/v1/budgets?month=YYYY-MM`  |
+| Create    | `POST /api/v1/budgets`               |
+| Get one   | `GET /api/v1/budgets/:id`            |
+| Update    | `PUT /api/v1/budgets/:id`            |
+| Delete    | `DELETE /api/v1/budgets/:id`         |
+| Duplicate | `POST /api/v1/budgets/:id/duplicate` | Body: one-off `{ startDate, endDate }`, monthly `{ categoryId, labelId }` |
 
 ## UI
 
-- Budget list grouped by category (collapsible sections)
-- Progress bar per budget (spent / amount)
-- Color cues: green < 75%, orange 75–99%, red ≥ 100%
+- Monthly and one-off budgets shown in separate groups; the month switcher drives monthly figures.
+- Progress per budget (spent / amount).
+- Status: **On track** < 80 %, **Watch** 80–99 %, **Over** ≥ 100 % (warning colour, never destructive red).
 
 ## Modals
 
 ### Create / Edit Budget
+
 Fields:
-- **Name** — text, required
-- **Amount** — number, required, > 0
-- **Start date** — date picker, required
-- **End date** — date picker, required, must be > start date
-- **Category** — optional select (single); if set, only transactions of that category count
+
+- **Name** — text, required (1–60); defaults to the category name
+- **Kind** — radio: Monthly / One-off; locked when editing
+- **Amount** — number, required, > 0 (label says "per month" for monthly)
+- **Start month** (monthly) or **Start date** / **End date** (one-off)
+- **End month** (monthly, optional — empty = no end)
+- **Category** — optional select (single)
 - **Label** — optional select (single); stacks with category filter
 
 Behavior:
+
 - Edit pre-fills all fields from the existing budget
 - Submitting closes the modal and refreshes the budget list
 
 Error states:
-- End date ≤ start date → inline error on end date field
+
+- One-off: end date < start date → inline error on end date field
+- Monthly: duplicate (category, label) pair → inline error + "Edit it" link
 - Amount ≤ 0 → inline error on amount field
 - API failure → toast: "Failed to save budget. Please try again."
 
 Actions: Save / Cancel
 
 ### Duplicate Budget
-Pre-fills name, amount, category, label from the source budget.  
-User must set new **Start date** and **End date** (the only required edits).
+
+Pre-fills name, kind, amount, category, label from the source budget.
+One-off: user must set new **Start date** and **End date**. Monthly: user must change **Category** or **Label**.
 
 Actions: Duplicate / Cancel
 
 ### Delete Budget
-Simple confirmation: "Delete [name]? This cannot be undone."  
-No cascade effect — past transactions are unaffected.
 
-Actions: Delete (destructive) / Cancel
+Your own data, so no confirmation dialog: deleting is immediate with a toast "Deleted [name] · Undo" (Ledger rule).
+No cascade effect — past transactions are unaffected.
 
 ## v2 — Budget Suggestions (scope 1: rule-based)
 
@@ -119,18 +131,19 @@ Output: list of SuggestedBudget objects
 ```
 
 **Suggested budget object:**
+
 ```ts
 {
-  id: string             // deterministic hash of (userId, categoryId, normalizedDescription)
-  name: string           // normalizedDescription, title-cased (e.g. "Netflix")
-  suggestedAmount: number        // avgAmount in cents
-  suggestedStartDate: string     // YYYY-MM-DD, first day of next month
-  suggestedEndDate: string       // YYYY-MM-DD, last day of next month
-  categoryId: string
-  categoryName: string
-  confidence: 'low' | 'medium' | 'high'
-  basedOnMonths: number          // distinctMonths count
-  basedOnTransactions: number    // totalOccurrences count
+  id: string; // deterministic hash of (userId, categoryId, normalizedDescription)
+  name: string; // normalizedDescription, title-cased (e.g. "Netflix")
+  suggestedAmount: number; // avgAmount in cents
+  suggestedStartDate: string; // YYYY-MM-DD, first day of next month
+  suggestedEndDate: string; // YYYY-MM-DD, last day of next month
+  categoryId: string;
+  categoryName: string;
+  confidence: 'low' | 'medium' | 'high';
+  basedOnMonths: number; // distinctMonths count
+  basedOnTransactions: number; // totalOccurrences count
 }
 ```
 
@@ -159,6 +172,7 @@ Projected remaining      +€1,370
 ```
 
 **Data sources:**
+
 - Active budgets overlapping the current month → expected fixed expenses
 - Income transactions from the last 3 months → avg expected income
 - Current month transactions already logged → actual spend so far
