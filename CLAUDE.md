@@ -50,6 +50,7 @@ Turborepo · Next.js 16 App Router (React 19) · Expo Router · Neon PostgreSQL 
 - **Exports**: Named exports only (except Next.js pages/Expo screens).
 - **Forms**: Reuse Zod schemas from `packages/types` in both RHF and Server Actions.
 - **Errors**: Typed errors, user-facing messages, error boundaries. Never swallow errors silently.
+- **UI**: shadcn/ui + Tailwind v4. Follow Figma exactly → https://www.figma.com/design/MQKYaxbxPsejA5IOJAVqgA/expense-tracker
 - **Context7**: Before using any framework API, resolve latest docs via Context7 (Next.js, Expo, Drizzle, Neon Auth, shadcn/ui, Tailwind v4, Zod, TanStack). Never rely on training assumptions for version-specific behaviour.
 
 ## Code Rules (UI)
