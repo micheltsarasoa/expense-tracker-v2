@@ -26,3 +26,13 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Any change that writes more than one row for a single fact (both sides of a transfer, converting a row to a transfer) runs in one database transaction.
 **Why.** If the second write fails, the first rolls back. Money can never leave one account without arriving in the other.
+
+## Write the exception into the design system
+
+**Rule.** When a deliberate effect breaks a general design rule (glow and glass in a "quiet" system), record it in the system as a named, tokenized exception: where it applies, and its limits (static, never animated).
+**Pitfall.** An unwritten exception reads as drift. The next cleanup pass (human or AI) removes it.
+
+## Store icon keys, not glyphs
+
+**Rule.** Store an icon *name* (`shopping-cart`) per category and render it from a fixed icon set.
+**Why.** Emoji render differently on each OS, can't follow `currentColor` or theme tokens, and screen readers announce them unpredictably.

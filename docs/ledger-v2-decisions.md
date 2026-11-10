@@ -25,7 +25,7 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 | 9 | Child exit | Graduate flow (child becomes an independent user, history kept, oversight ended) — v2.1, data model ready in v2.0 |
 | 10 | Child login | Parent-chosen username — verify Neon Auth / Stack support first; fallback e-mail |
 | 11 | Canvas vs locked decisions | `docs/WAVE2-STATUS.md` wins: transaction type editable after save; budget category required |
-| 12 | Design system | Strict Ledger (no emoji, no load animations); custom SVG charts kept under a new ADR extending ADR-004 |
+| 12 | Design system | Ledger without emoji or load animations. Custom SVG charts kept under a new ADR extending ADR-004. Glow is a signature: glow gradients, glow filters, hero text glow, glass panels and wallet shadows stay, static only and tokenized (`--glow-mint`, `--glow-family`, `--glow-expense`). Name "Ledger" kept for now. |
 | 13 | Import | Duplicate detection on account + date + amount + normalized description, with a review step before commit |
 | 14 | Child income | Child can record received cash; visible to parent, no approval |
 | 15 | Adult invite | Invite token survives sign-up; user joins the family afterwards |
@@ -37,12 +37,13 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 - Transfer unification.
 - Spouse visibility (amends ADR-006).
 - i18n + family currency.
-- Custom SVG charts (extends ADR-004).
+- Custom SVG charts and glow identity (extends ADR-004).
 
 **Canvas updates:**
 - Remove deferred boards from v2.0 navigation.
 - Fix the two locked-decision conflicts.
-- Remove emoji and load animations.
+- Remove emoji and load animations (done); keep glow and glass.
+- Category icons: Lucide icon key per category.
 - Add child cash-in and the private-account toggle.
 - Make the quick add amount-first.
 
