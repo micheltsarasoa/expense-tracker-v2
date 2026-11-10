@@ -46,3 +46,8 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Import should accept the formats real files use (French banks: `;` separator, decimal comma, DD/MM/YYYY), detect them, and show what was detected.
 **Pitfall.** A strict template pushes the conversion work onto the user, and many will give up.
+
+## Reshape data, don't replay its effects
+
+**Rule.** A backfill that changes how data is stored (one transfer row becoming two) must not re-run side effects such as balance updates.
+**Why.** Stored balances already include the effects of the old rows. Applying them again would count every transfer twice. Prove it with an invariant: each transfer group's legs sum to zero.
