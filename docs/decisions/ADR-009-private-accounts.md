@@ -1,7 +1,7 @@
 # ADR-009: Private Accounts for Co-parents (Amends ADR-006)
 
 **Date:** 2026-11-10  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 

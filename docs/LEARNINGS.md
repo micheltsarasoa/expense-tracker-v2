@@ -51,3 +51,8 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** A backfill that changes how data is stored (one transfer row becoming two) must not re-run side effects such as balance updates.
 **Why.** Stored balances already include the effects of the old rows. Applying them again would count every transfer twice. Prove it with an invariant: each transfer group's legs sum to zero.
+
+## Hide the inputs, and hide the totals too
+
+**Rule.** When rows are hidden from a viewer, every total shown to that viewer must be computed from the rows they can see.
+**Pitfall.** Hiding the rows but showing the full total leaks the hidden amount: total minus visible rows equals the private spending.
