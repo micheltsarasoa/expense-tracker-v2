@@ -23,7 +23,7 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 | 7 | Transfers | Unify on two rows + `transferGroupId` before Family; single "spent / kept" definition; balance invariant test |
 | 8 | Notifications | In-app only, written in the same DB transaction as the event; undo hold via `visibleAt` |
 | 9 | Child exit | Graduate flow (child becomes an independent user, history kept, oversight ended) — v2.1, data model ready in v2.0 |
-| 10 | Child login | Parent-chosen username — verify Neon Auth / Stack support first; fallback e-mail |
+| 10 | Child login | Parent-chosen username, unique across the app. Stack has no username sign-in, so it is stored as a placeholder email on a domain we own (ADR-005); a real e-mail is still accepted |
 | 11 | Canvas vs locked decisions | `docs/WAVE2-STATUS.md` wins: transaction type editable after save; budget category required |
 | 12 | Design system | Ledger without emoji or load animations. Custom SVG charts kept under a new ADR extending ADR-004. Glow is a signature: glow gradients, glow filters, hero text glow, glass panels and wallet shadows stay, static only and tokenized (`--glow-mint`, `--glow-family`, `--glow-expense`). Name "Ledger" kept for now. |
 | 13 | Import | Duplicate detection on account + date + amount + normalized description, with a review step before commit |
@@ -50,6 +50,7 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 - Make the quick add amount-first.
 
 **Open checks:**
-- Stack Auth username support.
+- Stack Auth username support: done. Not supported natively; usernames go over placeholder emails (ADR-005).
 - `GLOSSARY.md` and `apps/mobile` are referenced in `CLAUDE.md` but missing.
-- ADR-005, 006 and 007 are still "Proposed".
+- ADR-005, 006 and 007: done, Accepted.
+- `CHILD_LOGIN_DOMAIN`: pick a domain we own and check it before release (ADR-005).

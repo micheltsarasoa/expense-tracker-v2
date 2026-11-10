@@ -1,7 +1,7 @@
 # ADR-005 — Parents Create Child Accounts Through a Privileged Server Route
 
 **Date:** 2026-10-23  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
