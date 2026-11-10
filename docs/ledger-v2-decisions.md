@@ -51,6 +51,9 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 
 **Open checks:**
 - Stack Auth username support: done. Not supported natively; usernames go over placeholder emails (ADR-005).
-- `GLOSSARY.md` and `apps/mobile` are referenced in `CLAUDE.md` but missing.
+- `GLOSSARY.md` and `apps/mobile`: done. Glossary drafted at the root; `apps/mobile` marked as planned in `CLAUDE.md`.
+
+**Tech debt:**
+- The domain word is **Account**, but the code says `payment_methods` / `paymentMethodId`. Rename in a later schema change (needs approval).
 - ADR-005, 006 and 007: done, Accepted.
 - `CHILD_LOGIN_DOMAIN`: pick a domain we own and check it before release (ADR-005).

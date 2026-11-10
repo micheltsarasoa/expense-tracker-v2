@@ -70,6 +70,10 @@ _Avoid_: Kid, dependant, minor
 The single cash account of a child.
 _Avoid_: Child account, pocket
 
+**Digital wallet**:
+A kind of account held in a phone or online service, such as Apple Pay or PayPal. Not related to a child's wallet.
+_Avoid_: Wallet (alone), e-wallet
+
 **Allowance**:
 A transfer from a parent's account to a child's wallet.
 _Avoid_: Family transfer, pocket money
