@@ -34,7 +34,7 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 ## Store icon keys, not glyphs
 
-**Rule.** Store an icon *name* (`shopping-cart`) per category and render it from a fixed icon set.
+**Rule.** Store an icon _name_ (`shopping-cart`) per category and render it from a fixed icon set.
 **Why.** Emoji render differently on each OS, can't follow `currentColor` or theme tokens, and screen readers announce them unpredictably.
 
 ## Put locale in the shared component, not in each screen
@@ -76,3 +76,9 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** When an auth system only knows email, a username can be stored as `<username>@<a domain you control>`.
 **Why.** The auth provider may send verification or security mail to that address. On a made-up or lapsed domain, a stranger receives it.
+
+## Add rules after the data fits them
+
+**Rule.** In an expand migration, add nullable columns and indexes only. Add CHECK constraints after the backfill.
+**Why.** Postgres checks every existing row when a CHECK is added, so it refuses a rule that the old data doesn't meet yet. A nullable column with no default doesn't rewrite the table.
+**Pitfall.** In a unique index, `NULL` never equals `NULL`. Rows without a value don't clash, so a partial index (`WHERE col IS NOT NULL`) gives the same guarantee and stays small.

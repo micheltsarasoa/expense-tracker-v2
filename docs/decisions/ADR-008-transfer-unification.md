@@ -31,7 +31,7 @@ The spec leaves the two models side by side as "known debt". The Ledger v2 revie
 - CHECKs:
   - `type <> 'transfer' OR (transfer_group_id IS NOT NULL AND transfer_leg IS NOT NULL)`.
   - `type = 'transfer' OR (transfer_group_id IS NULL AND transfer_leg IS NULL)`.
-- There is a unique index on `(transfer_group_id, transfer_leg)`, so a group never has two out rows.
+- There is a partial unique index on `(transfer_group_id, transfer_leg) WHERE transfer_group_id IS NOT NULL`, so a group never has two out rows. Non-transfer rows stay out of the index.
 
 **3. One DB transaction per change.**
 

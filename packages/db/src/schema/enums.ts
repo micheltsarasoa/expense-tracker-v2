@@ -12,3 +12,5 @@ export const paymentMethodType = pgEnum('payment_method_type', [
 ]);
 
 export const transactionType = pgEnum('transaction_type', ['income', 'expense', 'transfer']);
+
+export const transferLeg = pgEnum('transfer_leg', ['out', 'in']);
