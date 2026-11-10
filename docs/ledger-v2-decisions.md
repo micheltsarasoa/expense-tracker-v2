@@ -39,7 +39,7 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 - Transfer unification: done, ADR-008 (Accepted).
 - Spouse visibility: done, ADR-009 (Accepted, amends ADR-006).
 - i18n + family currency: done, ADR-010 (Accepted).
-- Custom SVG charts and glow identity (extends ADR-004).
+- Custom SVG charts and glow identity: done, ADR-011 (Accepted, extends ADR-004).
 
 **Canvas updates:**
 - Remove deferred boards from v2.0 navigation.

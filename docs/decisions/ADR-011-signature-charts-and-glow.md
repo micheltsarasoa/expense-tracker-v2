@@ -1,7 +1,7 @@
 # ADR-011: Custom SVG Signature Charts and Glow Identity (Extends ADR-004)
 
 **Date:** 2026-11-10  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 

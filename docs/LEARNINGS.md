@@ -61,3 +61,8 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Locale (language, separators, date order) belongs to the reader. Currency belongs to the data. Store them in different places.
 **Why.** Two parents can read the same shared amount in French and in English. If each parent had their own currency, the same 84,20 would mean euros to one and dollars to the other.
+
+## An effect that always means one thing is a signal
+
+**Rule.** Tie a visual effect (glow, colour) to a meaning and use it only for that meaning: mint = healthy, orange = overspent, lilac = family.
+**Why.** A consistent effect is read at a glance. The same effect used as decoration everywhere stops carrying information and adds GPU cost.
