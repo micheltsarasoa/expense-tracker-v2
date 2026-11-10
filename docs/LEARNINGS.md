@@ -66,3 +66,13 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Tie a visual effect (glow, colour) to a meaning and use it only for that meaning: mint = healthy, orange = overspent, lilac = family.
 **Why.** A consistent effect is read at a glance. The same effect used as decoration everywhere stops carrying information and adds GPU cost.
+
+## Check the installed SDK's types before designing on a feature
+
+**Rule.** To find out whether a library supports something, read the `.d.ts` files of the exact pinned version (`npm pack <pkg>@<version>` if it isn't installed).
+**Pitfall.** A word search can mislead: every `username` in Stack 2.8.81 is SMTP config. The method signatures (`signInWithCredential({ email, password })`) are the real answer.
+
+## A placeholder email must use a domain you own
+
+**Rule.** When an auth system only knows email, a username can be stored as `<username>@<a domain you control>`.
+**Why.** The auth provider may send verification or security mail to that address. On a made-up or lapsed domain, a stranger receives it.
