@@ -56,3 +56,8 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** When rows are hidden from a viewer, every total shown to that viewer must be computed from the rows they can see.
 **Pitfall.** Hiding the rows but showing the full total leaks the hidden amount: total minus visible rows equals the private spending.
+
+## Separate how a value reads from what it means
+
+**Rule.** Locale (language, separators, date order) belongs to the reader. Currency belongs to the data. Store them in different places.
+**Why.** Two parents can read the same shared amount in French and in English. If each parent had their own currency, the same 84,20 would mean euros to one and dollars to the other.

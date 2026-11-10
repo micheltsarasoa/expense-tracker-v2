@@ -1,7 +1,7 @@
 # ADR-010: Message Catalog, Locale and One Currency per Family
 
 **Date:** 2026-11-10  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
