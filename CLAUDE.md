@@ -20,12 +20,12 @@ I'm here to learn, not just to ship.
 
 ## Stack
 
-Turborepo · Next.js 16 App Router (React 19) · Expo Router · Neon PostgreSQL (Drizzle) · Zod · shadcn/ui · Tailwind v4 (@theme)
+Turborepo · Next.js 16 App Router (React 19) · Expo Router (planned) · Neon PostgreSQL (Drizzle) · Zod · shadcn/ui · Tailwind v4 (@theme)
 
 ## Workspace Layout & Boundaries
 
 - `apps/web`: Next.js 16 App Router.
-- `apps/mobile`: Expo Router.
+- `apps/mobile`: Expo Router (planned, not created yet; v2.0 ships responsive web/PWA).
 - `packages/db`: Drizzle only. Single source of truth. `numeric(15,2)` for all monetary amounts.
 - `packages/types`: Zod schemas + shared types. Zero runtime deps.
 - `docs/specs/`: Feature specs. **READ BEFORE CODING.**
