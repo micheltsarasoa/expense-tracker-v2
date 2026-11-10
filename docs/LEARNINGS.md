@@ -21,3 +21,8 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Check a design against specs, ADRs and locked decisions before building it. Where they conflict, the recorded decision wins unless it is explicitly reopened.
 **Pitfall.** Generated designs quietly add scope (screens with no spec) and reverse settled choices (e.g. making a field optional).
+
+## Multi-row writes belong in one DB transaction
+
+**Rule.** Any change that writes more than one row for a single fact (both sides of a transfer, converting a row to a transfer) runs in one database transaction.
+**Why.** If the second write fails, the first rolls back. Money can never leave one account without arriving in the other.

@@ -29,6 +29,7 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 | 13 | Import | Duplicate detection on account + date + amount + normalized description, with a review step before commit |
 | 14 | Child income | Child can record received cash; visible to parent, no approval |
 | 15 | Adult invite | Invite token survives sign-up; user joins the family afterwards |
+| 16 | Type edits | Expense ↔ income edit freely. Transfer ↔ expense/income only through an explicit "Convert" action that creates or deletes the paired row in one DB transaction |
 
 ## Follow-ups
 
