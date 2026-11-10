@@ -36,3 +36,13 @@ One short entry per reusable lesson (pattern, pitfall, rule).
 
 **Rule.** Store an icon *name* (`shopping-cart`) per category and render it from a fixed icon set.
 **Why.** Emoji render differently on each OS, can't follow `currentColor` or theme tokens, and screen readers announce them unpredictably.
+
+## Put locale in the shared component, not in each screen
+
+**Rule.** Money, dates and status labels render through shared components that read locale, currency and labels from one catalog.
+**Why.** One default change (euro after the number, decimal comma) fixed every screen at once. Per-screen formatting leaves stragglers ("$84,20", "ON TRACK" on a French page).
+
+## Parse what users actually have
+
+**Rule.** Import should accept the formats real files use (French banks: `;` separator, decimal comma, DD/MM/YYYY), detect them, and show what was detected.
+**Pitfall.** A strict template pushes the conversion work onto the user, and many will give up.

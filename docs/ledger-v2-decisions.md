@@ -30,6 +30,8 @@ Outcome of a review of the "Ledger v2" design canvas (19 artboards) against `doc
 | 14 | Child income | Child can record received cash; visible to parent, no approval |
 | 15 | Adult invite | Invite token survives sign-up; user joins the family afterwards |
 | 16 | Type edits | Expense ↔ income edit freely. Transfer ↔ expense/income only through an explicit "Convert" action that creates or deletes the paired row in one DB transaction |
+| 17 | Import formats | Auto-detect separator (`;` or `,`), decimal mark (`,` or `.`) and date format (DD/MM/YYYY or ISO); the preview step shows what was detected and lets the user correct it |
+| 18 | Shared components localize | Status badges and amounts take labels, locale and currency from the message catalog (FR: euro after the number, decimal comma) |
 
 ## Follow-ups
 
