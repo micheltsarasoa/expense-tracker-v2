@@ -1,7 +1,7 @@
 # ADR-008: Transfer Unification (Two Rows per Transfer)
 
 **Date:** 2026-11-10  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
