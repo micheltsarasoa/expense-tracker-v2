@@ -8,12 +8,6 @@ import * as schema from '@expense-tracker/db/schema';
 
 import { TEMPLATE_DATABASE } from './constants';
 
-declare module 'vitest' {
-  export interface ProvidedContext {
-    testDatabaseUrl: string;
-  }
-}
-
 // drizzle-kit/api is a CommonJS bundle that Vite cannot transform; load it with Node's require.
 const { generateDrizzleJson, generateMigration } = createRequire(import.meta.url)(
   'drizzle-kit/api',

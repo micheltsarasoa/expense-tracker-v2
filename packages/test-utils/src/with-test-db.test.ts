@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { eq, users } from '@expense-tracker/db';
 
-import { asUser, createPaymentMethod, createUser, withTestDb } from './index';
+import { asUser, createCategory, createPaymentMethod, createUser, withTestDb } from './index';
 
 describe('withTestDb', () => {
   it('gives each call its own migrated database, even in parallel', async () => {
@@ -39,6 +39,16 @@ describe('factories', () => {
       const account = await createPaymentMethod(db, { userId: user.id, initialBalance: '100.00' });
       expect(account.userId).toBe(user.id);
       expect(account.currentBalance).toBe('100.00');
+    });
+  });
+
+  it('create several accounts and categories for the same user without name clashes', async () => {
+    await withTestDb(async (db) => {
+      const user = await createUser(db);
+      await createPaymentMethod(db, { userId: user.id });
+      await createPaymentMethod(db, { userId: user.id });
+      await createCategory(db, { userId: user.id });
+      await createCategory(db, { userId: user.id });
     });
   });
 });

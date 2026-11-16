@@ -33,7 +33,7 @@ export async function createPaymentMethod(
   const [account] = await db
     .insert(paymentMethods)
     .values({
-      name: 'Test account',
+      name: `Account ${randomUUID().slice(0, 8)}`,
       type: 'bank_account',
       initialBalance,
       currentBalance: initialBalance,
@@ -50,7 +50,7 @@ export async function createCategory(
 ): Promise<SelectCategory> {
   const [category] = await db
     .insert(categories)
-    .values({ name: 'Test category', type: 'expense', ...values })
+    .values({ name: `Category ${randomUUID().slice(0, 8)}`, type: 'expense', ...values })
     .returning();
   return category!;
 }
