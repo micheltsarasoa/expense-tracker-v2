@@ -1,0 +1,21 @@
+Expense Tracker
+Copyright (C) 2026 Expense Tracker contributors
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU Affero General Public License as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version. See LICENSE.
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Third-party material distributed in this repository
+---------------------------------------------------
+
+The agent skills under .claude/skills/ listed below are not covered by the AGPL. They keep their
+own licence, whose text ships next to them.
+
+- Matt Pocock skills (MIT, .claude/skills/MATT-POCOCK-LICENSE.txt):
+  ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-me,
+  grill-with-docs, grilling, handoff, implement, implement-spec, improve-codebase-architecture,
+  pr, prototype, research, retro, setup-matt-pocock-skills, tdd, teach, to-questionnaire, to-spec,
+  to-tickets, triage, wait-what, wayfinder, wizard, writing-for-agents
+- frontend-design (Apache-2.0, Anthropic, .claude/skills/frontend-design/LICENSE.txt)

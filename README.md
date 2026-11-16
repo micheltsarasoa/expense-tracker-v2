@@ -2,7 +2,7 @@
 
 Self-hostable, open source personal and family finance app: adults, shared households and children, on the web and as an installable child app.
 
-Status: pre-1.0. The path to 1.0 is in [docs/roadmap/](docs/roadmap/README.md).
+Licence: [AGPL-3.0-or-later](LICENSE). Status: pre-1.0. The path to 1.0 is in [docs/roadmap/](docs/roadmap/README.md).
 
 ## Architecture
 

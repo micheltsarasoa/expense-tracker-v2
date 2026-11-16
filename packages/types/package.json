@@ -2,6 +2,7 @@
   "name": "@expense-tracker/types",
   "version": "0.0.1",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "exports": {
     ".": {
       "types": "./src/index.ts",
