@@ -16,7 +16,7 @@ packages/
   types/    Zod schemas and shared types
 ```
 
-Target layout (kid PWA, worker, design system, domain core): see [CLAUDE.md](CLAUDE.md#layout-and-boundaries).
+Target layout (kid PWA, worker, design system, domain core): see [AGENTS.md](AGENTS.md#layout-and-boundaries).
 
 ## Quick start
 
