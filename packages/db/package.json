@@ -14,7 +14,7 @@
     "migrate": "drizzle-kit migrate",
     "seed": "tsx src/seed.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/",
+    "lint": "eslint . --max-warnings 0",
     "check:migrations": "sh scripts/check-migrations.sh"
   },
   "dependencies": {
