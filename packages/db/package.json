@@ -14,7 +14,8 @@
     "migrate": "drizzle-kit migrate",
     "seed": "tsx src/seed.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "check:migrations": "sh scripts/check-migrations.sh"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
