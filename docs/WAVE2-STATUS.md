@@ -17,7 +17,7 @@
 | 1   | Wave 1 UX fixes + strict-mode cleanup (tsc 43→0)                                                                            | (web-stabilization branch) | ✅                                   |
 | 2   | Foundation: DTOs in `packages/types/src/dto/`, `getUserId`, `runAction`, service-singleton hoist to `services/instances.ts` | `c8f27ec`                  | ✅                                   |
 | 3   | Budgets slice (RSC + actions + modals)                                                                                      | `fd8971c`                  | ✅ **verified live**                 |
-| 4   | Auth fix: `StackProvider`/`StackTheme` at root; dashboard chrome moved to `(dahsboard)/layout.tsx`                          | `9f7492d`                  | ✅ verified                          |
+| 4   | Auth fix: `StackProvider`/`StackTheme` at root; dashboard chrome moved to `(dashboard)/layout.tsx`                          | `9f7492d`                  | ✅ verified                          |
 | 5   | K3: `TransactionService.list` enriched w/ joins → `TransactionListItemDTO` (+ `alias` re-export in db)                      | `60d9998`                  | ✅                                   |
 | 6   | Budget **category required** (schema + modal)                                                                               | `a12bd03`                  | ✅ verified                          |
 | 7   | Categories page wired (RSC + actions, tree)                                                                                 | `b50e505`                  | ✅ **verified live**                 |
