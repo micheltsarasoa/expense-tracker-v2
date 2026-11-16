@@ -19,7 +19,8 @@
     "clean": "turbo clean && rm -rf node_modules",
     "prepare": "husky",
     "docs:links": "node tools/check-links.mjs",
-    "test:hooks": "node --test .claude/hooks/test/*.test.mjs"
+    "test:hooks": "node --test .claude/hooks/test/*.test.mjs",
+    "test:coverage": "turbo run test:coverage && node tools/coverage-summary.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

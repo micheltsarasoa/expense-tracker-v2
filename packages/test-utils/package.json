@@ -17,7 +17,8 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@expense-tracker/db": "workspace:^",
@@ -30,6 +31,7 @@
     "@expense-tracker/config": "workspace:^",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
+    "@vitest/coverage-v8": "4.1.4",
     "eslint": "^9",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8",
