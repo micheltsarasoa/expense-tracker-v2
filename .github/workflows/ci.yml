@@ -96,3 +96,30 @@ jobs:
 
       - name: Unit tests (Vitest)
         run: pnpm test -- --reporter=verbose --reporter=github-actions
+
+  # ── Build: every app must compile (required on PRs) ─────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: static
+    env:
+      # Placeholders: the build needs well-formed values, never real secrets.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      NEXT_PUBLIC_STACK_PROJECT_ID: 3f2504e0-4f89-41d3-9a0c-0305e82c3301
+      NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: pck_ci_placeholder
+      STACK_SECRET_SERVER_KEY: ssk_ci_placeholder
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: pnpm/action-setup@v4.1.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
