@@ -34,9 +34,9 @@ pnpm-debug.log*
 
 # Vercel
 .vercel
-!apps/web/.vercel/
-apps/web/.vercel/*
-!apps/web/.vercel/project.json
+
+# Claude Code local settings
+.claude/settings.local.json
 
 graphify-out/
 .kilo/*

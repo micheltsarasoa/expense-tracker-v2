@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: No local-only files tracked
+        run: test -z "$(git ls-files .claude/settings.local.json '**/.vercel/**' '.env' '**/.env.local')"
+
       - name: Lint
         run: pnpm lint
 
