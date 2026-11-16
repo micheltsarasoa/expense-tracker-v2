@@ -107,13 +107,13 @@ Sortie de phase : voir [`README.md`](./README.md).
 
 ### Epic 1.3 — Authentification
 
-| ID    | Résultat                                         | Critères d'acceptation                                                                   | Test d'abord                                     | Dép.         | Déc.       |
-| ----- | ------------------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |
-| P1-20 | ADR auth (Better Auth) + `spec-auth.md` réécrite | ADR accepté ; spec sans bcrypt/JWT maison ; pas de migration des comptes Stack Auth      | —                                                | —            | D-02       |
-| P1-21 | Couture `getActor()`                             | Tout le code lit l'acteur par une seule fonction ; faux acteur pour les tests            | Test : service appelé sans acteur → erreur typée | P1-20        | D-02       |
-| P1-22 | Inscription, connexion, session sur Better Auth  | Parcours E2E vert ; aucune dépendance à un service hébergé                               | E2E inscription → connexion → déconnexion        | P1-21, P1-11 | D-02, D-36 |
-| P1-23 | Mot de passe oublié + vérification d'e-mail      | E-mails visibles dans Mailpit ; jetons à usage unique et expirants                       | Test : jeton réutilisé → refus                   | P1-22        | —          |
-| P1-24 | 2FA TOTP optionnelle                             | Adultes seulement, jamais pour les enfants ; activation, codes de secours, désactivation | Test : connexion sans second facteur → refus     | P1-22        | D-36       |
+| ID    | Résultat                                         | Critères d'acceptation                                                                                                           | Test d'abord                                     | Dép.         | Déc.       |
+| ----- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------ | ---------- |
+| P1-20 | ADR auth (Better Auth) + `spec-auth.md` réécrite | ADR accepté ; spec sans bcrypt/JWT maison ; pas de migration des comptes Stack Auth                                              | —                                                | —            | D-02       |
+| P1-21 | Couture `getActor()`                             | Tout le code lit l'acteur par une seule fonction ; faux acteur pour les tests                                                    | Test : service appelé sans acteur → erreur typée | P1-20        | D-02       |
+| P1-22 | Inscription, connexion, session sur Better Auth  | Parcours E2E vert ; aucune dépendance à un service hébergé ; la fumée P0-34 couvre connexion → tableau de bord (bureau + 390 px) | E2E inscription → connexion → déconnexion        | P1-21, P1-11 | D-02, D-36 |
+| P1-23 | Mot de passe oublié + vérification d'e-mail      | E-mails visibles dans Mailpit ; jetons à usage unique et expirants                                                               | Test : jeton réutilisé → refus                   | P1-22        | —          |
+| P1-24 | 2FA TOTP optionnelle                             | Adultes seulement, jamais pour les enfants ; activation, codes de secours, désactivation                                         | Test : connexion sans second facteur → refus     | P1-22        | D-36       |
 
 ### Epic 1.4 — Autorisation
 
