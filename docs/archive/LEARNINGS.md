@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Learnings
 
 One short entry per reusable lesson (pattern, pitfall, rule).

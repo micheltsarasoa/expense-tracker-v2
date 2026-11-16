@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Visual Redesign Plan — Expense Tracker v2 (`apps/web`)
 
 > **Scope:** the visual / aesthetic layer — typography, color, distinctiveness ("anti-AI-slop"), dark-theme refinement. Companion to [ux-audit.md](ux-audit.md), which covers functional/spec conformity and is a separate concern.

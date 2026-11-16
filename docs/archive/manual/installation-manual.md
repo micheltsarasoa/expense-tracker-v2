@@ -1,12 +1,14 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../../agents/README.md).
+
 # Installation & Configuration Manual
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Node.js | 20+ | [nodejs.org](https://nodejs.org) or `nvm install 20` |
-| pnpm | 9+ | `npm install -g pnpm@latest` |
-| Git | any | system package manager |
+| Tool    | Version | Install                                              |
+| ------- | ------- | ---------------------------------------------------- |
+| Node.js | 20+     | [nodejs.org](https://nodejs.org) or `nvm install 20` |
+| pnpm    | 9+      | `npm install -g pnpm@latest`                         |
+| Git     | any     | system package manager                               |
 
 ---
 
@@ -163,7 +165,7 @@ pnpm --filter db migrate    # applies migrations to the live Neon DB
 Add a `drizzle.config.ts` in `packages/db/`:
 
 ```ts
-import { defineConfig } from 'drizzle-kit'
+import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
   schema: './src/schema.ts',
@@ -172,7 +174,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
-})
+});
 ```
 
 ---
@@ -195,6 +197,7 @@ pnpm --filter web dev
 ## 6. Auth — Neon Auth
 
 Authentication is handled by **Neon Auth** (not NextAuth). Neon Auth provides:
+
 - Email + password login/register
 - JWT issuance and refresh
 - Web: token stored in HTTP-only cookie
@@ -214,9 +217,9 @@ Route protection is done via Next.js proxy (`apps/web/proxy.ts`) validating the 
 
 ## Environment Variables Reference
 
-| Variable | Location | Purpose |
-|----------|----------|---------|
-| `DATABASE_URL` | root `.env` | Neon PostgreSQL connection string |
-| `NEON_AUTH_SECRET` | `apps/web/.env.local` | Neon Auth JWT validation secret |
+| Variable              | Location              | Purpose                              |
+| --------------------- | --------------------- | ------------------------------------ |
+| `DATABASE_URL`        | root `.env`           | Neon PostgreSQL connection string    |
+| `NEON_AUTH_SECRET`    | `apps/web/.env.local` | Neon Auth JWT validation secret      |
 | `NEXT_PUBLIC_API_URL` | `apps/web/.env.local` | Public base URL (consumed by mobile) |
-| `EXPO_PUBLIC_API_URL` | `apps/mobile/.env` | API base URL for Expo app |
+| `EXPO_PUBLIC_API_URL` | `apps/mobile/.env`    | API base URL for Expo app            |

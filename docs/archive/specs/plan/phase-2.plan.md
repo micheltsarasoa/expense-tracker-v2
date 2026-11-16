@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../../../agents/README.md).
+
 # Design Specification — Expense Tracker v2
 
 ## Context

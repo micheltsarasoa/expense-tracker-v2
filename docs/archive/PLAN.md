@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Phase 1: Foundation & Specs
 
 **Goal**: Establish a "Source of Truth" to prevent drift during implementation.

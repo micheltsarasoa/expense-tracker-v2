@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../../agents/README.md).
+
 # Spec — v2 Monorepo Architecture
 
 ## Overview
@@ -24,6 +26,7 @@ expense-tracker/
 ## Packages
 
 ### `@expense-tracker/db`
+
 - Drizzle ORM schema (single source of truth)
 - Migration files
 - Neon serverless client setup
@@ -31,6 +34,7 @@ expense-tracker/
 - **Not imported by mobile** — mobile calls the web API, never the DB directly
 
 ### `@expense-tracker/types`
+
 - TypeScript interfaces for all domain entities (Transaction, Budget, Category…)
 - Zod validation schemas reused in both web (API validation) and mobile (form validation)
 - API response types: `ApiResponse<T>`, error shapes
@@ -38,6 +42,7 @@ expense-tracker/
 ## Apps
 
 ### `apps/web`
+
 - Next.js 16, App Router, TypeScript
 - Owns all `/api/v1/*` REST routes
 - Uses `@expense-tracker/db` directly for data access
@@ -45,6 +50,7 @@ expense-tracker/
 - Auth: Neon Auth (server-side token validation in proxy)
 
 ### `apps/mobile`
+
 - Expo SDK, Expo Router (file-based routing — mirrors web route structure where possible)
 - Calls `apps/web` API (`/api/v1/*`) — no direct DB access
 - Uses `@expense-tracker/types` for API response typing and form validation
@@ -98,8 +104,8 @@ sequenceDiagram
 {
   "pipeline": {
     "build": { "dependsOn": ["^build"], "outputs": [".next/**", "dist/**"] },
-    "dev":   { "cache": false, "persistent": true },
-    "lint":  {},
+    "dev": { "cache": false, "persistent": true },
+    "lint": {},
     "typecheck": { "dependsOn": ["^build"] }
   }
 }
@@ -111,11 +117,11 @@ sequenceDiagram
 
 ## Environment Variables
 
-| Variable | Used by | Purpose |
-|---|---|---|
-| `DATABASE_URL` | `packages/db` | Neon PostgreSQL connection string |
-| `NEON_AUTH_SECRET` | `apps/web` | Token validation secret |
-| `NEXT_PUBLIC_API_URL` | `apps/mobile` | Base URL of the web API |
+| Variable              | Used by       | Purpose                           |
+| --------------------- | ------------- | --------------------------------- |
+| `DATABASE_URL`        | `packages/db` | Neon PostgreSQL connection string |
+| `NEON_AUTH_SECRET`    | `apps/web`    | Token validation secret           |
+| `NEXT_PUBLIC_API_URL` | `apps/mobile` | Base URL of the web API           |
 
 - `.env` at root for shared vars; each app can have its own `.env.local`
 - `vercel env pull` syncs Vercel environment to local `.env.local` for `apps/web`

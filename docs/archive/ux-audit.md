@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # UX & Conformity Audit — Transactions · Budgets · Dashboard/Reports
 
 > **Scope:** the 3 key pages plus their modals, tables, filter bars, widgets, and the surrounding layout/navigation.

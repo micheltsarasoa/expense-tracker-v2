@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Step C — Remediation & Reconnection Plan
 
 > **Builds on:** the architecture map (API↔front rupture) and [docs/ux-audit.md](ux-audit.md).

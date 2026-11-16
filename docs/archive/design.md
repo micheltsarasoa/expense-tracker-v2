@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Design Specification — Expense Tracker v2
 
 > **Purpose**: Figma brief for UI/UX design. Every screen, component, state, and interaction the designer needs to produce hi-fi mocks — derived directly from the feature specs, DB schema, and Zod schemas.

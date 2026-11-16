@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../agents/README.md).
+
 # Wave 2 — Status & Next Steps (working scratch file)
 
 > Branch: **`claude/wave2-foundation`** (stacked on `claude/web-stabilization`, both unmerged).

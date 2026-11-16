@@ -1,3 +1,5 @@
+> **Outdated.** Archived in phase 0; it may contradict the code. Sources of truth: [docs/agents/README.md](../../../agents/README.md).
+
 # Phase 5: API & Backend Logic
 
 ## Context
