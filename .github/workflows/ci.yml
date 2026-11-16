@@ -44,6 +44,10 @@ jobs:
       - name: Migrations match the schema
         run: pnpm --filter db check:migrations
 
+      - name: Dependency audit (report only until upgrades land)
+        continue-on-error: true
+        run: pnpm audit --audit-level=high
+
       - name: Secret scan (gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
