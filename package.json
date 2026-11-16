@@ -18,7 +18,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore",
     "clean": "turbo clean && rm -rf node_modules",
     "prepare": "husky",
-    "docs:links": "node tools/check-links.mjs"
+    "docs:links": "node tools/check-links.mjs",
+    "test:hooks": "node --test .claude/hooks/test/*.test.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
