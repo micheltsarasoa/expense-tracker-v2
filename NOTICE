@@ -20,3 +20,8 @@ own licence, whose text ships next to them.
   wayfinder, wizard, writing-for-agents
 - i-have-adhd (MIT, as declared in its SKILL.md; no author stated)
 - frontend-design (Apache-2.0, Anthropic, .claude/skills/frontend-design/LICENSE.txt)
+- BMAD-METHOD skills (MIT, Copyright (c) 2025 BMad Code, LLC, .claude/skills/BMAD-LICENSE.txt):
+  bmad-advanced-elicitation, bmad-checkpoint-preview, bmad-create-architecture, bmad-create-prd,
+  bmad-edit-prd, bmad-review-edge-case-hunter, bmad-technical-research, bmad-validate-prd.
+  BMad, BMad Method and BMad Core are trademarks of BMad Code, LLC; their use here grants no
+  trademark rights. Source: https://github.com/bmad-code-org/BMAD-METHOD
