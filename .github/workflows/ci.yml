@@ -40,6 +40,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # ── Git hooks run on a clean checkout (portability) ─────────────────────────
+  hooks:
+    name: Hooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - uses: pnpm/action-setup@v4.1.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pre-commit hook
+        run: sh .husky/pre-commit
+
+      - name: commit-msg hook accepts a conventional message
+        run: |
+          echo "chore: ci hook check" > "$RUNNER_TEMP/msg"
+          sh .husky/commit-msg "$RUNNER_TEMP/msg"
+
+      - name: commit-msg hook rejects a non-conventional message
+        run: |
+          echo "not conventional" > "$RUNNER_TEMP/bad"
+          ! sh .husky/commit-msg "$RUNNER_TEMP/bad"
+
   # ── 2. Logic: Unit tests ─────────────────────────────────────────────────────
   logic:
     name: Logic
