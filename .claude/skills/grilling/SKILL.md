@@ -5,23 +5,17 @@ description: Grill the user relentlessly about a plan, decision, or idea. Use wh
 
 Interview the user relentlessly until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.
 
-Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the whole frontier in one round: number each question and give your recommended answer. Then wait for the user's answers before the next round.
+Work the tree in **rounds**. The **frontier** is every decision whose prerequisites are already settled: the questions you can ask _now_ without guessing at answers you haven't heard yet. Ask the frontier with the `AskUserQuestion` tool, then wait for the answers before the next round.
 
-Format a round like so:
+Rules for each round:
 
-```
-❓ **Q1** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
+- At most 4 questions per `AskUserQuestion` call; a bigger frontier takes several calls, most blocking first.
+- 2 to 4 options per question. Put your recommendation first, its label ending with « (Recommandé) », and give a one-line reason in its description.
+- Each question stands alone: the owner may see only the pop-up, so name the files, items or decision ids it is about.
+- Word the options as concrete outcomes ("Keep the deploy workflow until Docker"), not yes/no.
+- No quiz or comprehension questions.
 
-➡️ <your recommended answer>
-
----
-
-❓ **Q2** - **<question title>**: <question body, might be multiple paragraphs, including multiple choices>
-
-➡️ <your recommended answer>
-```
-
-Word each question so "yes" accepts your recommended answer.
+If `AskUserQuestion` is unavailable (sub-agent, headless run), stop and return the numbered questions, each with options and your recommendation.
 
 Each round the user answers reshapes the tree: settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round. A question whose answer depends on another question still open in this round belongs to a _later_ round, not this one.
 

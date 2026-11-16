@@ -15,7 +15,8 @@ own licence, whose text ships next to them.
 
 - Matt Pocock skills (MIT, .claude/skills/MATT-POCOCK-LICENSE.txt):
   ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-me,
-  grill-with-docs, grilling, handoff, implement, implement-spec, improve-codebase-architecture,
-  pr, prototype, research, retro, setup-matt-pocock-skills, tdd, teach, to-questionnaire, to-spec,
-  to-tickets, triage, wait-what, wayfinder, wizard, writing-for-agents
+  grill-with-docs, grilling (adapted to AskUserQuestion), handoff, implement, implement-spec,
+  improve-codebase-architecture, pr, prototype, research, retro, tdd, to-spec, to-tickets, triage,
+  wayfinder, wizard, writing-for-agents
+- i-have-adhd (MIT, as declared in its SKILL.md; no author stated)
 - frontend-design (Apache-2.0, Anthropic, .claude/skills/frontend-design/LICENSE.txt)
