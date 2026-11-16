@@ -4,10 +4,10 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`GLOSSARY.md`** at the repo root.
+- **[`GLOSSARY.md`](../../GLOSSARY.md)** at the repo root.
 - **`docs/decisions/`**: read ADRs that touch the area you're about to work in.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+A missing term is a gap: add it to the glossary in the same PR (see the `domain-modeling` skill).
 
 ## File structure
 

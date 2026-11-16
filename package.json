@@ -16,7 +16,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore",
     "clean": "turbo clean && rm -rf node_modules",
-    "prepare": "husky"
+    "prepare": "husky",
+    "docs:links": "node tools/check-links.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
