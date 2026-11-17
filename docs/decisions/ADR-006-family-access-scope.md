@@ -1,7 +1,7 @@
 # ADR-006 — Family Access Scope: Who Can Read and Write Whose Rows
 
 **Date:** 2026-10-23  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 

@@ -15,6 +15,13 @@
       "when": 1776071096043,
       "tag": "0001_slow_riptide",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794341380551,
+      "tag": "0002_watery_shape",
+      "breakpoints": true
     }
   ]
 }

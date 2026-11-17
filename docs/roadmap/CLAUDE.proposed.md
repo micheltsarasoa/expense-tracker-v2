@@ -36,17 +36,17 @@ Check framework docs for the installed version before using an API.
 
 ## Layout and boundaries
 
-| Path | Role |
-|---|---|
-| `apps/web` | Adult web app (Next.js) |
-| `apps/kid` | Child app, installable PWA |
-| `apps/worker` | Background jobs (pg-boss) |
-| `packages/tokens` | Design tokens |
-| `packages/ui` | Atomic web UI (React DOM, Tailwind v4, shadcn), shared by web and kid |
-| `packages/core` | Pure domain logic: `Money`, `authorize()`, rules |
-| `packages/types` | Zod schemas and shared types; zero runtime deps |
-| `packages/db` | Drizzle schema and access; the ONLY entry point to the database |
-| `packages/api-client` | Typed client generated from the OpenAPI spec |
+| Path                  | Role                                                                  |
+| --------------------- | --------------------------------------------------------------------- |
+| `apps/web`            | Adult web app (Next.js)                                               |
+| `apps/kid`            | Child app, installable PWA                                            |
+| `apps/worker`         | Background jobs (pg-boss)                                             |
+| `packages/tokens`     | Design tokens                                                         |
+| `packages/ui`         | Atomic web UI (React DOM, Tailwind v4, shadcn), shared by web and kid |
+| `packages/core`       | Pure domain logic: `Money`, `authorize()`, rules                      |
+| `packages/types`      | Zod schemas and shared types; zero runtime deps                       |
+| `packages/db`         | Drizzle schema and access; the ONLY entry point to the database       |
+| `packages/api-client` | Typed client generated from the OpenAPI spec                          |
 
 - Apps import packages; a package never imports an app.
 - Check `packages/types` before creating a type or schema.
@@ -89,11 +89,11 @@ pnpm --filter db migrate              # local database only
 
 ## Where to find things
 
-| Need | File |
-|---|---|
-| Domain vocabulary | `GLOSSARY.md` |
-| Decisions | `docs/roadmap/decisions-taken.md`, `docs/decisions/` |
-| Next task | `docs/roadmap/phases.md` |
-| Agent setup | `docs/roadmap/agent-setup.md` |
+| Need                     | File                                                           |
+| ------------------------ | -------------------------------------------------------------- |
+| Domain vocabulary        | `GLOSSARY.md`                                                  |
+| Decisions                | `docs/roadmap/decisions-taken.md`, `docs/decisions/`           |
+| Next task                | `docs/roadmap/phases.md`                                       |
+| Agent setup              | `docs/roadmap/agent-setup.md`                                  |
 | Issues and triage labels | `docs/agents/issue-tracker.md`, `docs/agents/triage-labels.md` |
-| Next.js in this repo | `apps/web/AGENTS.md` |
+| Next.js in this repo     | `apps/web/AGENTS.md`                                           |

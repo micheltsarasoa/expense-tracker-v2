@@ -16,21 +16,27 @@ Domain vocabulary for code, tests, issues and docs. Use the **Term** column in c
 
 ## Money
 
-| Term                  | FR                   | Definition                                                                                                            | Avoid                                       |
-| --------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Money                 | Montant              | An amount with its currency. Stored `numeric(15,2)`, carried as a string, handled by the `Money` type. Never a float. | price, value                                |
-| Account               | Compte               | Where money sits: bank account, card, cash. Has an initial balance and a current balance. Table: `payment_methods`.   | payment method (in UI), wallet (for adults) |
-| Wallet                | Porte-monnaie        | The single cash account of a child.                                                                                   | piggy bank                                  |
-| Balance               | Solde                | Initial balance plus the sum of the account's transactions. Cached and reconciled (D-29).                             | total                                       |
-| Transaction           | Opération            | One money movement on one account: income, expense, or one side of a transfer.                                        | entry, operation, movement                  |
-| Transfer              | Virement             | Two linked transactions moving money between two accounts, possibly owned by two users.                               | move                                        |
-| Category              | Catégorie            | Required classification of a transaction (Groceries, Rent…).                                                          | type, tag                                   |
-| Label                 | Étiquette            | Optional free tag on a transaction, many per transaction.                                                             | category                                    |
-| Budget                | Budget               | A spending cap, monthly or one-off, optionally scoped to a category or label.                                         | envelope, limit                             |
-| Recurring transaction | Opération récurrente | A rule that creates a transaction on a schedule.                                                                      | subscription, standing order                |
-| Goal                  | Objectif             | A target amount to save by a date.                                                                                    | savings plan                                |
-| Shared pot            | Pot commun           | A household account that several members pay into and spend from.                                                     | joint account, kitty                        |
-| Receipt               | Justificatif         | A file (photo, PDF) attached to a transaction.                                                                        | ticket, invoice                             |
+| Term                  | FR                     | Definition                                                                                                            | Avoid                                       |
+| --------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Money                 | Montant                | An amount with its currency. Stored `numeric(15,2)`, carried as a string, handled by the `Money` type. Never a float. | price, value                                |
+| Account               | Compte                 | Where money sits: bank account, card, cash. Has an initial balance and a current balance. Table: `payment_methods`.   | payment method (in UI), wallet (for adults) |
+| Wallet                | Porte-monnaie          | The single cash account of a child.                                                                                   | piggy bank                                  |
+| Balance               | Solde                  | Initial balance plus the sum of the account's transactions. Cached and reconciled (D-29).                             | total                                       |
+| Transaction           | Opération              | One money movement on one account: income, expense, or one side of a transfer.                                        | entry, operation, movement                  |
+| Transfer              | Virement               | Two linked transactions moving money between two accounts, possibly owned by two users.                               | move                                        |
+| Category              | Catégorie              | Required classification of a transaction (Groceries, Rent…).                                                          | type, tag                                   |
+| Label                 | Étiquette              | Optional free tag on a transaction, many per transaction.                                                             | category                                    |
+| Budget                | Budget                 | A spending cap, monthly or one-off, optionally scoped to a category or label.                                         | envelope, limit                             |
+| Recurring transaction | Opération récurrente   | A rule that creates a transaction on a schedule.                                                                      | subscription, standing order                |
+| Goal                  | Objectif               | A target amount to save by a date.                                                                                    | savings plan                                |
+| Shared pot            | Pot commun             | A household account that several members pay into and spend from.                                                     | joint account, kitty                        |
+| Receipt               | Justificatif           | A file (photo, PDF) attached to a transaction.                                                                        | ticket, invoice                             |
+| Digital wallet        | Portefeuille numérique | An account held in a phone or online service (Apple Pay, PayPal). Not a child's wallet.                               | wallet (alone), e-wallet                    |
+| Transfer group        | Groupe de virement     | The out leg and in leg of one transfer, created, edited and deleted as a whole (ADR-008).                             | transfer pair, linked transactions          |
+| Leg                   | Jambe                  | One transaction of a transfer: the out leg leaves the source account, the in leg arrives in the target account.       | side, half                                  |
+| Convert               | Convertir              | The explicit action that turns a transfer into an expense or income, or back, by removing or adding a leg.            | change type                                 |
+| Spent                 | Dépensé                | Expenses plus out legs to a child's wallet over a period. Transfers between one user's own accounts are never spent.  | outflow, total debits                       |
+| Kept                  | Gardé                  | Income minus spent over a period.                                                                                     | savings, net, balance                       |
 
 ## Child features
 
@@ -40,6 +46,7 @@ Domain vocabulary for code, tests, issues and docs. Use the **Term** column in c
 | Money request | Demande         | A child asks a parent for an amount. States: `pending`, `approved`, `declined`, `cancelled`. Approval records the transfer atomically. | ask, claim                     |
 | Spending rule | Règle           | A parent-defined condition on a child's spending (amount, category). It flags, it never blocks.                                        | limit, block                   |
 | Flag          | Signalement     | The notice raised when a spending rule matches.                                                                                        | alert, violation               |
+| Graduate      | Émanciper       | A child leaving the household to become an independent user, keeping their history.                                                    | leave                          |
 | Correction    | Correction      | A parent's visible edit of a child's transaction; the child sees the change and who made it.                                           | override                       |
 
 ## Platform
@@ -48,3 +55,13 @@ Domain vocabulary for code, tests, issues and docs. Use the **Term** column in c
 | ------------ | ------------ | ------------------------------------------------------------------------------------------ | ---------------------- |
 | Actor        | Acteur       | The authenticated user on whose behalf a request runs. Every query is scoped by the actor. | current user (in code) |
 | Notification | Notification | An in-app (and optionally email) message to a user (D-30).                                 | alert                  |
+
+## Visibility and formatting
+
+| Term               | FR                | Definition                                                                                   | Avoid                            |
+| ------------------ | ----------------- | -------------------------------------------------------------------------------------------- | -------------------------------- |
+| Shared account     | Compte partagé    | An account whose transactions co-parents can read. Accounts are shared by default (ADR-009). | public account                   |
+| Private account    | Compte privé      | An adult's account that co-parents cannot see at all, balance included (ADR-009).            | hidden account                   |
+| Username           | Nom d'utilisateur | The name a parent chooses for a child to sign in with, unique across the app (ADR-005).      | login, handle, pseudo            |
+| Locale             | Langue et format  | The language and number and date conventions one person reads the app in (ADR-010).          | language (alone)                 |
+| Household currency | Devise du foyer   | The one currency all amounts of a household are in. Amounts are never converted (D-05).      | currency symbol, family currency |

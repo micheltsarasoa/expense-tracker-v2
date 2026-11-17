@@ -8,10 +8,11 @@ import {
   numeric,
   pgTable,
   text,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { transactionType } from './enums';
+import { transactionType, transferLeg } from './enums';
 import { timestamps } from './_shared';
 import { categories } from './categories';
 import { labels } from './labels';
@@ -30,6 +31,8 @@ export const transactions = pgTable(
     labelId: uuid('label_id'),
     paymentMethodId: uuid('payment_method_id').notNull(),
     toPaymentMethodId: uuid('to_payment_method_id'),
+    transferGroupId: uuid('transfer_group_id'),
+    transferLeg: transferLeg('transfer_leg'),
     description: text(),
     isValidated: boolean('is_validated').default(false).notNull(),
     isDeleted: boolean('is_deleted').default(false).notNull(),
@@ -58,6 +61,9 @@ export const transactions = pgTable(
       'btree',
       table.paymentMethodId.asc().nullsLast(),
     ),
+    uniqueIndex('uq_transactions_transfer_leg')
+      .on(table.transferGroupId, table.transferLeg)
+      .where(sql`transfer_group_id IS NOT NULL`),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [users.id],

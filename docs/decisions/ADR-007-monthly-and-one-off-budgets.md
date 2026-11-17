@@ -1,7 +1,7 @@
 # ADR-007 — Monthly and One-off Budgets (Supersedes ADR-002)
 
 **Date:** 2026-10-24  
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
