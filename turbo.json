@@ -23,10 +23,17 @@
       "outputs": []
     },
     "test": {
-      "outputs": []
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "passThroughEnv": ["TEST_DATABASE_URL", "DOCKER_HOST", "TESTCONTAINERS_*"]
     },
     "clean": {
       "cache": false
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "passThroughEnv": ["TEST_DATABASE_URL", "DOCKER_HOST", "TESTCONTAINERS_*"]
     }
   }
 }

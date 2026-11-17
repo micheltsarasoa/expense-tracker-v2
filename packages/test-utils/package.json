@@ -1,0 +1,40 @@
+{
+  "name": "@expense-tracker/test-utils",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./global-setup": {
+      "types": "./src/global-setup.ts",
+      "default": "./src/global-setup.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@expense-tracker/db": "workspace:^",
+    "@testcontainers/postgresql": "^12.2.1",
+    "drizzle-kit": "0.30.6",
+    "drizzle-orm": "^0.41.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@expense-tracker/config": "workspace:^",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@vitest/coverage-v8": "4.1.4",
+    "eslint": "^9",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8",
+    "vitest": "^4.1.4"
+  }
+}

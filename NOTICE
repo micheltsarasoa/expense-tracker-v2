@@ -1,0 +1,27 @@
+Expense Tracker
+Copyright (C) 2026 Expense Tracker contributors
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU Affero General Public License as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version. See LICENSE.
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Third-party material distributed in this repository
+---------------------------------------------------
+
+The agent skills under .claude/skills/ listed below are not covered by the AGPL. They keep their
+own licence, whose text ships next to them.
+
+- Matt Pocock skills (MIT, .claude/skills/MATT-POCOCK-LICENSE.txt):
+  ask-matt, code-review, codebase-design, diagnosing-bugs, domain-modeling, grill-me,
+  grill-with-docs, grilling (adapted to AskUserQuestion), handoff, implement, implement-spec,
+  improve-codebase-architecture, pr, prototype, research, retro, tdd, to-spec, to-tickets, triage,
+  wayfinder, wizard, writing-for-agents
+- i-have-adhd (MIT, as declared in its SKILL.md; no author stated)
+- frontend-design (Apache-2.0, Anthropic, .claude/skills/frontend-design/LICENSE.txt)
+- BMAD-METHOD skills (MIT, Copyright (c) 2025 BMad Code, LLC, .claude/skills/BMAD-LICENSE.txt):
+  bmad-advanced-elicitation, bmad-checkpoint-preview, bmad-create-architecture, bmad-create-prd,
+  bmad-edit-prd, bmad-review-edge-case-hunter, bmad-technical-research, bmad-validate-prd.
+  BMad, BMad Method and BMad Core are trademarks of BMad Code, LLC; their use here grants no
+  trademark rights. Source: https://github.com/bmad-code-org/BMAD-METHOD

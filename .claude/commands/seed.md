@@ -1,18 +1,8 @@
-Seed the database with development data.
+Seed the LOCAL development database with demo data. Profile: $ARGUMENTS (solo, parent, child; default: all).
 
-Steps:
-1. Check if `packages/db/src/seed.ts` exists
-   - If it does: proceed to step 3
-   - If not: ask the user which entities to seed (default: users, categories,
-     payment_methods, transactions), then create the seed file before continuing
-2. Seed file rules (when creating):
-   - Fixed dev user: `dev@example.com` — idempotent (upsert, not insert)
-   - Amounts as integers (cents) — e.g. 4999 for $49.99
-   - Insert in dependency order: users → categories → payment_methods → transactions → budgets
-   - No hardcoded UUIDs — use `crypto.randomUUID()` or let the DB generate them,
-     except for the dev user which needs a stable ID for reproducibility
-3. Run: `pnpm --filter db seed`
-   (if no `seed` script exists in `packages/db/package.json`, run `npx tsx packages/db/src/seed.ts`)
-4. Report rows inserted per table
+1. Check the database host is local, as in `/migrate` step 1–2. Never seed a non-local database.
+2. Use `pnpm --filter db seed` (or `seed:demo <profile>` once it exists, D-22). Do not write ad hoc insert scripts.
+3. Seeds are idempotent (upsert by stable ids), amounts are decimal strings, insert order follows foreign keys.
+4. Report rows per table.
 
-Never seed against a production database — confirm `DATABASE_URL` points to a dev/staging instance first.
+If the seed for the profile does not exist yet, stop and point to the matching task in `docs/roadmap/phases.md`.

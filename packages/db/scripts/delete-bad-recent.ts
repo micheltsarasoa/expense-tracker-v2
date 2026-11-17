@@ -35,7 +35,7 @@ async function main() {
 
   console.log(`Will delete ${toDelete.length} transactions (date >= ${CUTOFF})`);
 
-  const result = await db
+  await db
     .delete(schema.transactions)
     .where(
       and(

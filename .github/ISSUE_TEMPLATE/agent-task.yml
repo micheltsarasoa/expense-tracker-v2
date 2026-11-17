@@ -1,0 +1,40 @@
+name: Agent task
+description: A task small enough for one PR, ready for an agent or a contributor.
+labels: [needs-triage]
+body:
+  - type: input
+    id: task
+    attributes:
+      label: Roadmap task
+      placeholder: P3-12
+  - type: textarea
+    id: result
+    attributes:
+      label: Result
+      description: What is true once this is merged.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checkable, automated where possible. One test per criterion.
+      placeholder: "- [ ] ...\n- [ ] Another user gets 404 (negative access test)"
+    validations:
+      required: true
+  - type: textarea
+    id: first-test
+    attributes:
+      label: First failing test
+      description: The red test to write first.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Spec in docs/specs/, decisions (D-xx, ADR), dependencies on other tasks.
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope

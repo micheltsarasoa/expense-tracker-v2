@@ -2,10 +2,15 @@
   "name": "@expense-tracker/db",
   "version": "0.0.1",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "exports": {
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./schema": {
+      "types": "./src/schema/index.ts",
+      "default": "./src/schema/index.ts"
     }
   },
   "scripts": {
@@ -13,7 +18,8 @@
     "migrate": "drizzle-kit migrate",
     "seed": "tsx src/seed.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint . --max-warnings 0",
+    "check:migrations": "sh scripts/check-migrations.sh"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
@@ -22,6 +28,7 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
+    "@expense-tracker/config": "workspace:*",
     "@faker-js/faker": "^10.4.0",
     "@types/node": "^20",
     "@types/ws": "^8.18.1",

@@ -1,1 +1,1 @@
-/c/Users/jms/AppData/Roaming/npm/pnpm.cmd exec commitlint --edit "$1"
+pnpm exec commitlint --edit "$1"

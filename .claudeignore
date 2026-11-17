@@ -1,2 +1,17 @@
+# Generated, vendored or bulky: never useful context for agents.
+node_modules/
+.turbo/
 .next/
-docs/specs/plan
+dist/
+build/
+out/
+coverage/
+playwright-report/
+test-results/
+storybook-static/
+.vercel/
+*.tsbuildinfo
+pnpm-lock.yaml
+
+# Outdated documents (see docs/agents/README.md)
+docs/archive/

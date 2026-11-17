@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose a capability or a change of behaviour.
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is stuck, doing what? Use GLOSSARY.md terms.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: profile
+    attributes:
+      label: Who benefits
+      multiple: true
+      options: [Solo user, Parent, Co-parent, Child, Roommate, Self-hoster, Contributor]
+  - type: textarea
+    id: roadmap
+    attributes:
+      label: Roadmap link
+      description: Related task in docs/roadmap/phases.md or decision D-xx, if any.
