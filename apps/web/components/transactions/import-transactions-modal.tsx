@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import { validateImport, commitImport } from '@/app/(dahsboard)/transactions/actions';
+import { validateImport, commitImport } from '@/app/(dashboard)/transactions/actions';
 
 interface ImportTransactionsModalProps {
   open: boolean;

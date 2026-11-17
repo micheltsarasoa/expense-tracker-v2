@@ -1,119 +1,67 @@
-# Expense Tracker
+# Glossary
 
-A personal and family finance app: each person records what they spend and earn across their own accounts, and parents follow their children's spending without blocking it.
+Domain vocabulary for code, tests, issues and docs. Use the **Term** column in code and English docs, the **FR** column in the French UI. If a concept is missing, add it here in the same PR.
+
+## People and groups
+
+| Term      | FR               | Definition                                                                                                                   | Avoid                        |
+| --------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| User      | Utilisateur      | A person with a login. Owns rows through `userId`.                                                                           | customer, client             |
+| Solo user | Utilisateur seul | A user who belongs to no household.                                                                                          | single                       |
+| Household | Foyer            | A group of users who share some money and see each other's data as allowed by their role. One currency per household (D-05). | family (in code), team       |
+| Parent    | Parent           | Adult household member. Full control of own data; read-only on co-parents' data; manages children.                           | admin, owner                 |
+| Co-parent | Co-parent        | Another parent of the same household.                                                                                        | partner, spouse              |
+| Child     | Enfant           | Minor household member with one wallet and a login created by a parent. Sees only their own data.                            | kid (in code), minor (in UI) |
+| Roommate  | Colocataire      | Adult household member who shares only the shared pot, not their personal data.                                              | flatmate                     |
 
 ## Money
 
-**Account**:
-A place where a user's money sits and whose balance the app tracks, such as a bank account, a card or cash. Every transaction belongs to exactly one account.
-_Avoid_: Payment method, compte (UI only)
+| Term                  | FR                     | Definition                                                                                                            | Avoid                                       |
+| --------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Money                 | Montant                | An amount with its currency. Stored `numeric(15,2)`, carried as a string, handled by the `Money` type. Never a float. | price, value                                |
+| Account               | Compte                 | Where money sits: bank account, card, cash. Has an initial balance and a current balance. Table: `payment_methods`.   | payment method (in UI), wallet (for adults) |
+| Wallet                | Porte-monnaie          | The single cash account of a child.                                                                                   | piggy bank                                  |
+| Balance               | Solde                  | Initial balance plus the sum of the account's transactions. Cached and reconciled (D-29).                             | total                                       |
+| Transaction           | Opération              | One money movement on one account: income, expense, or one side of a transfer.                                        | entry, operation, movement                  |
+| Transfer              | Virement               | Two linked transactions moving money between two accounts, possibly owned by two users.                               | move                                        |
+| Category              | Catégorie              | Required classification of a transaction (Groceries, Rent…).                                                          | type, tag                                   |
+| Label                 | Étiquette              | Optional free tag on a transaction, many per transaction.                                                             | category                                    |
+| Budget                | Budget                 | A spending cap, monthly or one-off, optionally scoped to a category or label.                                         | envelope, limit                             |
+| Recurring transaction | Opération récurrente   | A rule that creates a transaction on a schedule.                                                                      | subscription, standing order                |
+| Goal                  | Objectif               | A target amount to save by a date.                                                                                    | savings plan                                |
+| Shared pot            | Pot commun             | A household account that several members pay into and spend from.                                                     | joint account, kitty                        |
+| Receipt               | Justificatif           | A file (photo, PDF) attached to a transaction.                                                                        | ticket, invoice                             |
+| Digital wallet        | Portefeuille numérique | An account held in a phone or online service (Apple Pay, PayPal). Not a child's wallet.                               | wallet (alone), e-wallet                    |
+| Transfer group        | Groupe de virement     | The out leg and in leg of one transfer, created, edited and deleted as a whole (ADR-008).                             | transfer pair, linked transactions          |
+| Leg                   | Jambe                  | One transaction of a transfer: the out leg leaves the source account, the in leg arrives in the target account.       | side, half                                  |
+| Convert               | Convertir              | The explicit action that turns a transfer into an expense or income, or back, by removing or adding a leg.            | change type                                 |
+| Spent                 | Dépensé                | Expenses plus out legs to a child's wallet over a period. Transfers between one user's own accounts are never spent.  | outflow, total debits                       |
+| Kept                  | Gardé                  | Income minus spent over a period.                                                                                     | savings, net, balance                       |
 
-**Transaction**:
-One recorded movement of money in one account, owned by one user. It is an expense, an income or one leg of a transfer.
-_Avoid_: Entry, operation, movement
+## Child features
 
-**Expense**:
-A transaction where money leaves the household for goods or services.
-_Avoid_: Spending (for a single row), debit
+| Term          | FR              | Definition                                                                                                                             | Avoid                          |
+| ------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| Allowance     | Argent de poche | A transfer from a parent to a child's wallet, one-off or on a schedule.                                                                | pocket money (in code), salary |
+| Money request | Demande         | A child asks a parent for an amount. States: `pending`, `approved`, `declined`, `cancelled`. Approval records the transfer atomically. | ask, claim                     |
+| Spending rule | Règle           | A parent-defined condition on a child's spending (amount, category). It flags, it never blocks.                                        | limit, block                   |
+| Flag          | Signalement     | The notice raised when a spending rule matches.                                                                                        | alert, violation               |
+| Graduate      | Émanciper       | A child leaving the household to become an independent user, keeping their history.                                                    | leave                          |
+| Correction    | Correction      | A parent's visible edit of a child's transaction; the child sees the change and who made it.                                           | override                       |
 
-**Income**:
-A transaction where money enters an account from outside the household.
-_Avoid_: Revenue, credit
+## Platform
 
-**Transfer**:
-Money moved between two accounts, recorded as one transfer group with an out leg and an in leg.
-_Avoid_: Move, internal transaction
+| Term         | FR           | Definition                                                                                 | Avoid                  |
+| ------------ | ------------ | ------------------------------------------------------------------------------------------ | ---------------------- |
+| Actor        | Acteur       | The authenticated user on whose behalf a request runs. Every query is scoped by the actor. | current user (in code) |
+| Notification | Notification | An in-app (and optionally email) message to a user (D-30).                                 | alert                  |
 
-**Transfer group**:
-The pair of legs that make up one transfer. It is created, edited and deleted as a whole.
-_Avoid_: Transfer pair, linked transactions
+## Visibility and formatting
 
-**Leg**:
-One of the two transactions of a transfer: the **out leg** leaves the source account, the **in leg** arrives in the target account.
-_Avoid_: Side, half, out row / in row
-
-**Convert**:
-The explicit action that turns a transfer into an expense or income, or the reverse, by removing or adding the other leg.
-_Avoid_: Change type
-
-**Spent**:
-What a user's money went to over a period: their expenses plus their out legs to a child's wallet. Transfers between a user's own accounts are never spent.
-_Avoid_: Outflow, total debits
-
-**Kept**:
-Income minus spent over a period.
-_Avoid_: Savings, net, balance
-
-**Budget**:
-A spending limit on one category, either **monthly** (repeats every calendar month) or **one-off** (fixed start and end dates).
-_Avoid_: Envelope, cap
-
-## Family
-
-**Family**:
-A household of parents and children who share visibility over each other's finances.
-_Avoid_: Household, group, team
-
-**Parent**:
-An adult member of a family. Manages children and reads co-parents' shared data.
-_Avoid_: Admin, guardian, owner
-
-**Co-parent**:
-Another parent of the same family, seen from one parent's point of view.
-_Avoid_: Spouse, partner
-
-**Child**:
-A member of a family who has one wallet and sees only their own data.
-_Avoid_: Kid, dependant, minor
-
-**Wallet**:
-The single cash account of a child.
-_Avoid_: Child account, pocket
-
-**Digital wallet**:
-A kind of account held in a phone or online service, such as Apple Pay or PayPal. Not related to a child's wallet.
-_Avoid_: Wallet (alone), e-wallet
-
-**Allowance**:
-A transfer from a parent's account to a child's wallet.
-_Avoid_: Family transfer, pocket money
-
-**Money request**:
-A child's request for an amount, which a parent approves (recording an allowance) or declines.
-_Avoid_: Ask, demand
-
-**Spending rule**:
-A threshold a parent sets on a child's spending. Breaking it raises a flag; it never blocks.
-_Avoid_: Limit, restriction, control
-
-**Flag**:
-A mark on a child's expense saying it broke a spending rule or took the wallet below zero, shown to parents until seen.
-_Avoid_: Alert, warning
-
-**Graduate**:
-A child leaving the family to become an independent user, keeping their history.
-_Avoid_: Leave, emancipate
-
-## Visibility
-
-**Shared account**:
-An account whose transactions co-parents can read. Accounts are shared by default.
-_Avoid_: Public account
-
-**Private account**:
-An account of an adult that co-parents cannot see at all, including its balance and its transactions.
-_Avoid_: Hidden account, secret account
-
-**Username**:
-The name a parent chooses for a child to sign in with, unique across the app.
-_Avoid_: Login, handle, pseudo
-
-## Formatting
-
-**Locale**:
-The language and number and date conventions one person reads the app in.
-_Avoid_: Language (alone), format settings
-
-**Family currency**:
-The one currency all amounts of a family are in. Amounts are never converted.
-_Avoid_: Currency symbol, user currency
+| Term               | FR                | Definition                                                                                   | Avoid                            |
+| ------------------ | ----------------- | -------------------------------------------------------------------------------------------- | -------------------------------- |
+| Shared account     | Compte partagé    | An account whose transactions co-parents can read. Accounts are shared by default (ADR-009). | public account                   |
+| Private account    | Compte privé      | An adult's account that co-parents cannot see at all, balance included (ADR-009).            | hidden account                   |
+| Username           | Nom d'utilisateur | The name a parent chooses for a child to sign in with, unique across the app (ADR-005).      | login, handle, pseudo            |
+| Locale             | Langue et format  | The language and number and date conventions one person reads the app in (ADR-010).          | language (alone)                 |
+| Household currency | Devise du foyer   | The one currency all amounts of a household are in. Amounts are never converted (D-05).      | currency symbol, family currency |

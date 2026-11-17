@@ -2,6 +2,7 @@
   "name": "@expense-tracker/web",
   "version": "0.1.0",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@expense-tracker/db": "workspace:*",
@@ -42,6 +44,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@expense-tracker/config": "workspace:*",
+    "@expense-tracker/test-utils": "workspace:^",
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",

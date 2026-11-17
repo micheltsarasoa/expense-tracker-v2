@@ -34,9 +34,9 @@ pnpm-debug.log*
 
 # Vercel
 .vercel
-!apps/web/.vercel/
-apps/web/.vercel/*
-!apps/web/.vercel/project.json
+
+# Claude Code local settings
+.claude/settings.local.json
 
 graphify-out/
 .kilo/*
@@ -46,3 +46,8 @@ _bmad-output/
 graphify-out/
 .fallow/
 .fallowrc.json
+
+# Test outputs
+coverage/
+playwright-report/
+test-results/
